@@ -18,7 +18,9 @@
 <body>
     <div class="container">
         <h1 class="titulo">Iniciar Sesión</h1>
-        <form>
+        <!-- Formulario de login -->
+        <form method="POST">
+            {% csrf_token %}  <!-- Protege el formulario de CSRF -->
             <input type="text" name="username" placeholder="Usuario" required>
             <input type="password" name="password" placeholder="Contraseña" required>
             <input type="submit" value="Iniciar Sesión">
