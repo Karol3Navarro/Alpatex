@@ -1,0 +1,19 @@
+{% extends "index/base.html" %}
+{% block body %}
+    <form id="registroForm" action="{% url 'producto_add' %}" method="POST">
+        {% csrf_token %}
+    
+        <pre>Producto:           <input type="text" name="producto" id="producto" ></pre>
+    
+        <input class="btn btn-primary me-md-2" type="submit" name="opcion" value="Agregar">
+    </form>
+    <br>
+    <button class="btn btn-primary me-md-2" type="button">
+        <a style="color: white; text-decoration: none;" href="{% url 'home' %}">Volver</a>
+    </button>
+    <div id="idMensaje">
+        {% if mensaje %}
+            {{mensaje}}
+        {% endif%}
+    </div>
+{% endblock %}

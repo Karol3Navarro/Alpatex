@@ -1,0 +1,11 @@
+{% extends "index/base.html" %}
+{% block body %}
+    <div class="container">
+        <h2>{{ producto.nombre }}</h2>
+        <p><strong>Vendedor:</strong> {{ producto.usuario.username }}</p>
+        <p><strong>Detalles del Producto:</strong> (Aquí puedes agregar más detalles)</p>
+        <!-- Agrega más detalles según lo necesites -->
+        <a href="{% url 'home' %}" class="btn btn-secondary">Volver</a>
+    </div>
+    <a href="{% url 'detailms' username=producto.usuario.username %}" class="btn btn-primary">Me Interesa</a>
+{% endblock %}

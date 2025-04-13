@@ -70,7 +70,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Alpatex.wsgi.application'
 
-LOGIN_REDIRECT_URL="home"
+LOGIN_REDIRECT_URL= "home"
 LOGOUT_REDIRECT_URL = "index"
 
 # Database
