@@ -1,6 +1,20 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 # Create your views here.
+
+
+def logout(request):
+    context={}
+    return render(request, 'index/index.html', context)
+
+@login_required
+def menu(request):
+    request.session["usuario"]="cgarcia"
+    usuario=request.session["usuario"]
+    context={'usuario':usuario}
+    return render(request, 'index/inicio.html', context)
+
 
 def index(request):
     if request.method == "POST":
