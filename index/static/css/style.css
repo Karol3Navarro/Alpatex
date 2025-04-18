@@ -105,6 +105,27 @@ input[type="submit"]:hover{
     background-color: #DD1155;
     transform: scale(1.05);
 }
+.error {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+
+.help-text {
+    font-size: 12px;
+    color: #6c757d;
+    display: none;
+}
+
+
+input:focus + .help-text {
+    display: block;
+}
+
+input:focus + .help-text {
+    display: block;
+}
 
 /*
 Alpatex

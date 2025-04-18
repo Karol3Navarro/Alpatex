@@ -4,7 +4,8 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .models import Producto
-# Create your views here.
+from .Forms import CustomUserCreationForm
+from django.contrib import messages
 
 
 def logout(request):
@@ -74,3 +75,18 @@ def producto_add(request):
 def ver_producto(request, id_producto):
     producto = get_object_or_404(Producto, id_producto=id_producto)
     return render(request, 'index/ver_producto.html', {'producto': producto})
+
+def registro(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        
+        if form.is_valid():
+            form.save()
+            messages.success(request, '¡Cuenta creada exitosamente!')
+            return redirect('index')  # Redirige a la página principal
+        else:
+            messages.error(request, 'Por favor corrige los errores en el formulario.')
+    else:
+        form = CustomUserCreationForm()
+
+    return render(request, 'index/registro.html', {'form': form})
