@@ -8,3 +8,17 @@ class Producto(models.Model):
 
     def __str__(self):
         return str(self.nombre)
+class Perfil(models.Model):
+    GENERO_CHOICES = [
+        ('M', 'Masculino'),
+        ('F', 'Femenino'),
+        ('O', 'Otro'),
+    ]
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    foto_perfil = models.ImageField(upload_to='perfil_images/', null=True, blank=True)
+    genero = models.CharField(max_length=1, choices=GENERO_CHOICES, default='O')
+    direccion = models.CharField(max_length=255, null=True, blank=True)
+    rut = models.CharField(max_length=12, null=True, blank=True)
+
+    def __str__(self):
+        return self.user.username

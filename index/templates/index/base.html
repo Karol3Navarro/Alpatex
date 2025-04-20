@@ -37,7 +37,7 @@
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-center gap-3 me-3">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'perfil' %}">Perfil</a>
+                            <a class="nav-link" href="{% url 'perfil_usuario' %}">Perfil</a>
                         </li>
                         <li class="nav-item">
                             <form method="POST" action="{% url 'logout' %}">

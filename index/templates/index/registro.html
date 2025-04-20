@@ -1,85 +1,26 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type='text/css' href='{% static "css/style.css"%}' rel='stylesheet'>
+
+    <!--
+        -google font
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;500&display=swap" rel="stylesheet">
     <title>Registro</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <div class="container">
-        <h2>Crear Cuenta</h2>
-
-        <form method="POST">
-            {% csrf_token %}
-
-            <div class="form-group">
-                <label for="id_username">Nombre de usuario</label>
-                {% if form.username.errors %}
-                    <div class="error">{{ form.username.errors.0 }}</div>
-                {% endif %}
-                {{ form.username }}
-                <small class="help-text">Requerido. Máximo 150 caracteres. Solo letras, dígitos y @/./+/-/_</small>
-            </div>
-
-            <div class="form-group">
-                <label for="id_nombre_completo">Nombre completo</label>
-                {% if form.nombre_completo.errors %}
-                    <div class="error">{{ form.nombre_completo.errors.0 }}</div>
-                {% endif %}
-                {{ form.nombre_completo }}
-            </div>
-
-            <div class="form-group">
-                <label for="id_rut">RUT</label>
-                {% if form.rut.errors %}
-                    <div class="error">{{ form.rut.errors.0 }}</div>
-                {% endif %}
-                {{ form.rut }}
-            </div>
-
-            <div class="form-group">
-                <label for="id_direccion">Dirección</label>
-                {% if form.direccion.errors %}
-                    <div class="error">{{ form.direccion.errors.0 }}</div>
-                {% endif %}
-                {{ form.direccion }}
-            </div>
-
-            <div class="form-group">
-                <label for="id_email">Correo electrónico</label>
-                {% if form.email.errors %}
-                    <div class="error">{{ form.email.errors.0 }}</div>
-                {% endif %}
-                {{ form.email }}
-            </div>
-
-            <div class="form-group">
-                <label for="id_password1">Contraseña</label>
-                {% if form.password1.errors %}
-                    <div class="error">{{ form.password1.errors.0 }}</div>
-                {% endif %}
-                {{ form.password1 }}
-                <small class="help-text">
-                    La contraseña debe tener al menos 8 caracteres, no puede ser completamente numérica, ni común.
-                </small>
-            </div>
-
-            <div class="form-group">
-                <label for="id_password2">Confirmar contraseña</label>
-                {% if form.password2.errors %}
-                    <div class="error">{{ form.password2.errors.0 }}</div>
-                {% endif %}
-                {{ form.password2 }}
-            </div>
-
-            <button type="submit" class="crear-cuenta">Registrarse</button>
-        </form>
-
-        <p class="login-link">
-            ¿Ya tienes cuenta? <a href="{% url 'index' %}">Inicia sesión aquí</a>
-        </p>
-    </div>
+    <h2>Registrar Usuario</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}  <!-- Mostrar el formulario como párrafos -->
+        <button type="submit">Registrar</button>
+    </form>
+    
 </body>
 </html>

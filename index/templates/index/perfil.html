@@ -1,0 +1,85 @@
+{% extends "index/base.html" %}
+{% load static %}
+
+{% block body %}
+    <h2>Mi Perfil</h2>
+
+    <div style="display: flex; gap: 40px;">
+        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+            <div style="text-align: center;">
+                {% if perfil.foto_perfil %}
+                <img src="{{ perfil.foto_perfil.url }}" alt="Foto de perfil" width="150">
+                {% else %}
+                <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada" width="150">
+                {% endif %}
+            </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div>
+                    <label for="foto_perfil_input" id="label_foto_perfil" style="display: none;"></label>
+                    <input type="file" id="foto_perfil_input" name="foto_perfil" style="display: none;">
+                </div>
+                <div>
+                    <label for="username_input">Nombre de usuario:</label>
+                    <input type="text" id="username_input" name="username" value="{{ request.user.username }}" disabled>
+                </div>
+                <div>
+                    <label for="email_input">Correo:</label>
+                    <input type="email" id="email_input" name="email" value="{{ request.user.email }}" disabled>
+                </div>
+                <div>
+                    <label for="genero_input">Género:</label>
+                    <input type="text" id="genero_input" name="genero" value="{{ perfil.genero|default:'' }}" disabled>
+                </div>
+
+                <div>
+                    <label for="rut_input">RUT:</label>
+                    <input type="text" id="rut_input" name="rut" value="{{ perfil.rut|default:'RUT no disponible' }}" disabled>
+                </div>
+                <div>
+                    <label for="direccion_input">Dirección:</label>
+                    <input type="text" id="direccion_input" name="direccion" value="{{ perfil.direccion|default:'Dirección no disponible' }}" disabled>
+                </div>
+
+              
+
+                <button type="submit" id="guardar_editar" style="display: none;">Guardar cambios</button>
+            </form>
+
+            <button id="btn_editar" onclick="activarEdicion()">Editar perfil</button>
+        </div>
+    </div>
+
+    <script>
+        function activarEdicion() {
+            document.getElementById("username_input").disabled = false;
+            document.getElementById("email_input").disabled = false;
+            document.getElementById("genero_input").disabled = false;
+            document.getElementById("foto_perfil_input").disabled = false;
+            document.getElementById("direccion_input").disabled = false;
+
+            document.getElementById("label_foto_perfil").style.display = "block"; 
+            document.getElementById("foto_perfil_input").style.display = "inline-block";  
+            document.getElementById("guardar_editar").style.display = "inline-block";
+
+            document.getElementById("btn_editar").textContent = "Cancelar edición";
+            document.getElementById("btn_editar").setAttribute("onclick", "cancelarEdicion()");
+        }
+
+        function cancelarEdicion() {
+            document.getElementById("username_input").disabled = true;
+            document.getElementById("email_input").disabled = true;
+            document.getElementById("genero_input").disabled = true;
+            document.getElementById("foto_perfil_input").disabled = true;
+            document.getElementById("direccion_input").disabled = true;
+
+            document.getElementById("label_foto_perfil").style.display = "none"; 
+            document.getElementById("foto_perfil_input").style.display = "none";  
+
+            document.getElementById("guardar_editar").style.display = "none";
+
+            document.getElementById("btn_editar").textContent = "Editar perfil";
+            document.getElementById("btn_editar").setAttribute("onclick", "activarEdicion()");
+        }
+    </script>
+{% endblock %}
