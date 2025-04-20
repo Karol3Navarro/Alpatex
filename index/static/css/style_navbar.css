@@ -1,0 +1,31 @@
+
+.navbar-estilo {
+    background-color: #AD5CA1; 
+}
+
+
+/* Estilo para los botones y enlaces */
+.btn, .nav-link {
+    color: white !important; 
+    font-weight: normal; 
+    text-decoration: none; 
+}
+
+.btn:hover, .nav-link:hover {
+    font-weight: bold; /* Letras en negrita al pasar el cursor */
+}
+
+/* Estilo para el botón de búsqueda */
+.formulario-busqueda .btn:hover {
+    transform: scale(1.2); /* Aumenta el tamaño del icono */
+}
+
+/* Para que el icono no se distorsione */
+.formulario-busqueda .btn i {
+    font-size: 1.2rem; 
+    transition: transform 0.2s; 
+}
+
+.formulario-busqueda .btn:hover i {
+    transform: scale(1.3); /* Aumenta el tamaño del icono al hacer hover */
+}
