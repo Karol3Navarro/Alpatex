@@ -29,8 +29,13 @@
                 </div>
                 <div>
                     <label for="genero_input">Género:</label>
-                    <input type="text" id="genero_input" name="genero" value="{{ perfil.genero|default:'' }}" disabled>
+                    <select id="genero_input" name="genero" disabled>
+                        <option value="Masculino" {% if perfil.genero == 'Masculino' %}selected{% endif %}>Masculino</option>
+                        <option value="Femenino" {% if perfil.genero == 'Femenino' %}selected{% endif %}>Femenino</option>
+                        <option value="Otro" {% if perfil.genero == 'Otro' %}selected{% endif %}>Otro</option>
+                    </select>
                 </div>
+                
 
                 <div>
                     <label for="rut_input">RUT:</label>
