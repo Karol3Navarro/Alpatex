@@ -15,12 +15,14 @@
     <title>Registro</title>
 </head>
 <body>
-    <h2>Registrar Usuario</h2>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}  <!-- Mostrar el formulario como párrafos -->
-        <button type="submit">Registrar</button>
-    </form>
+    <div class="container">
+        <h1 class="titulo">Registrar Usuario</h1>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Registrar</button>
+        </form>
+    </div>
     
 </body>
 </html>
