@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block body %}
+    <a href="{% url 'home' %}" class="regresar"><span class="material-symbols-outlined">chevron_left</span> Regresar</a>
     <h2>Mi Perfil</h2>
 
     <div style="display: flex; gap: 40px;">
@@ -51,40 +52,9 @@
                 <button type="submit" id="guardar_editar" style="display: none;">Guardar cambios</button>
             </form>
 
-            <button id="btn_editar" onclick="activarEdicion()">Editar perfil</button>
+            <button id="btn_editar" onclick="toggleEdit(true)">Editar perfil</button>
         </div>
     </div>
 
-    <script>
-        function activarEdicion() {
-            document.getElementById("username_input").disabled = false;
-            document.getElementById("email_input").disabled = false;
-            document.getElementById("genero_input").disabled = false;
-            document.getElementById("foto_perfil_input").disabled = false;
-            document.getElementById("direccion_input").disabled = false;
 
-            document.getElementById("label_foto_perfil").style.display = "block"; 
-            document.getElementById("foto_perfil_input").style.display = "inline-block";  
-            document.getElementById("guardar_editar").style.display = "inline-block";
-
-            document.getElementById("btn_editar").textContent = "Cancelar edición";
-            document.getElementById("btn_editar").setAttribute("onclick", "cancelarEdicion()");
-        }
-
-        function cancelarEdicion() {
-            document.getElementById("username_input").disabled = true;
-            document.getElementById("email_input").disabled = true;
-            document.getElementById("genero_input").disabled = true;
-            document.getElementById("foto_perfil_input").disabled = true;
-            document.getElementById("direccion_input").disabled = true;
-
-            document.getElementById("label_foto_perfil").style.display = "none"; 
-            document.getElementById("foto_perfil_input").style.display = "none";  
-
-            document.getElementById("guardar_editar").style.display = "none";
-
-            document.getElementById("btn_editar").textContent = "Editar perfil";
-            document.getElementById("btn_editar").setAttribute("onclick", "activarEdicion()");
-        }
-    </script>
 {% endblock %}

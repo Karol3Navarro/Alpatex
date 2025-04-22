@@ -43,6 +43,35 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+const editables = [
+    "username_input",
+    "email_input",
+    "genero_input",
+    "foto_perfil_input",
+    "direccion_input"
+];
+
+function toggleEdit(modo){
+    console.log("Modo edición:", modo);
+    editables.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = !modo;
+    });
+
+    document.getElementById("label_foto_perfil").style.display = modo ? "block" : "none"; 
+    document.getElementById("foto_perfil_input").style.display = modo ? "inline-block" : "none";  
+    document.getElementById("guardar_editar").style.display = modo ? "inline-block" : "none";
+
+    const btn = document.getElementById("btn_editar");
+    if (modo) {
+        btn.textContent = "Cancelar edición";
+        btn.setAttribute("onclick", "toggleEdit(false)");
+    } else {
+        btn.textContent = "Editar perfil";
+        btn.setAttribute("onclick", "toggleEdit(true)");
+    }
+}
+
 function abrirModal(){
     document.getElementById("modRecContra").style.display = "block";
 }
