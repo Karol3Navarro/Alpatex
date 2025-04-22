@@ -12,6 +12,18 @@ body {
     height: 100vh;
     background-color: #F7F0F0;
 }
+.regresar{
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: black;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.regresar:hover {
+    color: #DD1155;
+    transform: scale(1.05);
+}
 
 .container {
     padding: 20px;
@@ -46,7 +58,7 @@ body {
     margin-bottom: 20px;
 }
 
-input[type="text"], input[type="password"] {
+input[type="text"], input[type="password"], input[type="email"], .form-control {
     border: 2px solid #AD5CA1;
     border-radius: 5px;
     padding: 10px;
@@ -81,6 +93,7 @@ input[type="submit"] {
     display: block;
     text-align: center;
     margin: 15px;
+    cursor: pointer;
 }
 
 input[type="submit"]:hover{
@@ -151,4 +164,34 @@ input:focus + .help-text {
     color: #DD1155;
     margin-top: 2px;
     display: block;
+}
+
+.mod-password{
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    background-color: #F7F0F0;
+    border: #AD5CA1 2px solid;
+    border-radius: 15px;
+    box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.5);
+}
+
+.mod-cont{
+    padding: 30px;
+    max-width: 500px;
+    margin: 5% auto;
+}
+
+.cerrar{
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.cerrar:hover{
+    color: #DD1155;
 }

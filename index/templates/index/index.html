@@ -25,7 +25,7 @@
             <input type="password" name="password" placeholder="Contraseña" required>
             <input type="submit" value="Iniciar Sesión">
         </form>
-        <a href="#" class="recuperar">¿Olvidaste tu contraseña?</a>
+        <p class="recuperar" onclick="abrirModal()">¿Olvidaste tu contraseña?</p>
     </div>
     <div class="introduccion">
         <h1 class="welcome">Bienvenido a Alpatex</h1>
@@ -35,5 +35,22 @@
             <button type="submit" class="btn">Crear Cuenta</button>
         </form>
     </div>
+
+    <div id="modRecContra" class="mod-password">
+        <div class="mod-cont">
+            <span class="cerrar" onclick="cerrarModal()">&times;</span>
+            <h2>Recuperar Contraseña</h2>
+            <p>Te enviaremos un enlace para restablecer tu contraseña.</p>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="email" name="email" placeholder="Correo electrónico" required>
+                <button type="submit" class="btn">Enviar enlace</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script src="{% static 'js/scripts.js' %}"></script>
+
 </body>
 </html>

@@ -7,6 +7,10 @@
     <link type='text/css' href='{% static "css/style.css"%}' rel='stylesheet'>
 
     <!--
+        -ICONOS
+    -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=chevron_left" />
+    <!--
         -google font
     -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,6 +20,7 @@
 </head>
 <body>
     <div class="container">
+        <a href="{% url 'index' %}" class="regresar"><span class="material-symbols-outlined">chevron_left</span> Regresar</a>
         <h1 class="titulo">Registrar Usuario</h1>
         <form method="POST">
             {% csrf_token %}

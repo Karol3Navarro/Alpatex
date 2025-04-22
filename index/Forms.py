@@ -27,6 +27,11 @@ class CustomUserCreationForm(UserCreationForm):
         self.fields['password1'].label = "Clave"
         self.fields['password2'].label = "Confirmar clave"
 
+        for field in self.fields.values():
+            field.widget.attrs.update({
+                'class': 'form-control'
+            })
+
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():

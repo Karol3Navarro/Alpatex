@@ -42,3 +42,11 @@ document.addEventListener("DOMContentLoaded", () => {
         xhr.send(formData); // Envia los datos al servidor
     });
 });
+
+function abrirModal(){
+    document.getElementById("modRecContra").style.display = "block";
+}
+
+function cerrarModal(){
+    document.getElementById("modRecContra").style.display = "none";
+}
