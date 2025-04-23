@@ -1,8 +1,15 @@
+.navbar{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    width: 100%;
+}
 
 .navbar-estilo {
     background-color: #AD5CA1; 
 }
-
 
 /* Estilo para los botones y enlaces */
 .btn, .nav-link {

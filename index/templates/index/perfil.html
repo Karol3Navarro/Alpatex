@@ -2,57 +2,72 @@
 {% load static %}
 
 {% block body %}
-    <a href="{% url 'home' %}" class="regresar"><span class="material-symbols-outlined">chevron_left</span> Regresar</a>
-    <h2>Mi Perfil</h2>
+    <div class="reg-btn">
+        <a href="{% url 'home' %}" class="regresar">
+            <span class="material-symbols-outlined">chevron_left</span> Regresar
+        </a>
+    </div>
 
-    <div style="display: flex; gap: 40px;">
-        <div style="display: flex; flex-direction: column; align-items: flex-start;">
-            <div style="text-align: center;">
+    <div class="profile-container">
+        <h2>Mi Perfil</h2>
+
+        <div class="perfil-cont">
+            <div class="perfil-foto">
                 {% if perfil.foto_perfil %}
                 <img src="{{ perfil.foto_perfil.url }}" alt="Foto de perfil" width="150">
                 {% else %}
                 <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada" width="150">
                 {% endif %}
             </div>
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div>
-                    <label for="foto_perfil_input" id="label_foto_perfil" style="display: none;"></label>
-                    <input type="file" id="foto_perfil_input" name="foto_perfil" style="display: none;">
-                </div>
-                <div>
-                    <label for="username_input">Nombre de usuario:</label>
-                    <input type="text" id="username_input" name="username" value="{{ request.user.username }}" disabled>
-                </div>
-                <div>
-                    <label for="email_input">Correo:</label>
-                    <input type="email" id="email_input" name="email" value="{{ request.user.email }}" disabled>
-                </div>
-                <div>
-                    <label for="genero_input">Género:</label>
-                    <select id="genero_input" name="genero" disabled>
-                        <option value="Masculino" {% if perfil.genero == 'Masculino' %}selected{% endif %}>Masculino</option>
-                        <option value="Femenino" {% if perfil.genero == 'Femenino' %}selected{% endif %}>Femenino</option>
-                        <option value="Otro" {% if perfil.genero == 'Otro' %}selected{% endif %}>Otro</option>
-                    </select>
-                </div>
-                
 
-                <div>
-                    <label for="rut_input">RUT:</label>
-                    <input type="text" id="rut_input" name="rut" value="{{ perfil.rut|default:'RUT no disponible' }}" disabled>
-                </div>
-                <div>
-                    <label for="direccion_input">Dirección:</label>
-                    <input type="text" id="direccion_input" name="direccion" value="{{ perfil.direccion|default:'Dirección no disponible' }}" disabled>
-                </div>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
 
-              
+                    <div>
+                        <label for="foto_perfil_input" id="label_foto_perfil" style="display: none;"></label>
+                        <input type="file" id="foto_perfil_input" name="foto_perfil" style="display: none;">
+                    </div>
 
-                <button type="submit" id="guardar_editar" style="display: none;">Guardar cambios</button>
-            </form>
+                    <div>
+                        <label for="username_input">Nombre de usuario:</label>
+                        <input type="text" id="username_input" name="username" value="{{ request.user.username }}" disabled>
+                    </div>
 
-            <button id="btn_editar" onclick="toggleEdit(true)">Editar perfil</button>
+                    <div>
+                        <label for="email_input">Correo:</label>
+                        <input type="email" id="email_input" name="email" value="{{ request.user.email }}" disabled>
+                    </div>
+
+                    <div>
+                        <label for="genero_input">Género:</label>
+                        <select id="genero_input" name="genero" disabled>
+                            <option value="Masculino" {% if perfil.genero == 'Masculino' %}selected{% endif %}>Masculino</option>
+                            <option value="Femenino" {% if perfil.genero == 'Femenino' %}selected{% endif %}>Femenino</option>
+                            <option value="Otro" {% if perfil.genero == 'Otro' %}selected{% endif %}>Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="rut_input">RUT:</label>
+                        <input type="text" id="rut_input" name="rut" value="{{ perfil.rut|default:'RUT no disponible' }}" disabled>
+                    </div>
+
+                    <div>
+                        <label for="direccion_input">Dirección:</label>
+                        <input type="text" id="direccion_input" name="direccion" value="{{ perfil.direccion|default:'Dirección no disponible' }}" disabled>
+                    </div>
+                    
+                    <button type="submit" id="guardar_editar" class="btn">Guardar cambios</button>
+                </form>
+
+                <button id="btn_editar" onclick="toggleEdit(true)" class="btn"> Editar perfil</button>
+            </div>
+        </div>
+
+        <div class="btns-perfil">
+            <button class="btn">Mis Productos</button>
+            <button class="btn">Mis Mensajes</button>
+            <button class="btn">Mis Compras</button>
         </div>
     </div>
 

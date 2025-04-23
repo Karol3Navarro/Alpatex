@@ -7,11 +7,23 @@
 
 body {
     display: flex;
-    justify-content: center;
-    align-items: center;
     height: 100vh;
     background-color: #F7F0F0;
 }
+
+.cent-body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.reg-btn{
+    position: fixed;
+    top: 80px;
+    left: 10px;
+    z-index: 1000;
+}
+
 .regresar{
     display: inline-flex;
     align-items: center;
@@ -58,13 +70,18 @@ body {
     margin-bottom: 20px;
 }
 
-input[type="text"], input[type="password"], input[type="email"], .form-control {
+input[type="text"], 
+input[type="password"], 
+input[type="email"], 
+.form-control,
+select {
     border: 2px solid #AD5CA1;
     border-radius: 5px;
     padding: 10px;
     margin-top: 10px;
     font-size: 16px;
     width: 100%;
+    background-color: white;
 }
 
 input[type="text"], input[type="password"], input[type="submit"]:focus{
@@ -144,12 +161,10 @@ input[type="submit"]:hover{
     margin-top: 5px;
 }
 
-
 .help-text {
     font-size: 12px;
     display: none;
 }
-
 
 input:focus + .help-text {
     display: block;
@@ -194,4 +209,34 @@ input:focus + .help-text {
 
 .cerrar:hover{
     color: #DD1155;
+}
+
+.profile-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 800px;
+    margin: 20px;
+    margin-left: 100px;
+}
+
+.perfil-cont{
+    display: flex;
+    flex-direction: column;
+    max-width: 500px;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+
+.perfil-foto img {
+    width: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.btns-perfil{
+    display: flex;
+    justify-content: space-between;
 }
