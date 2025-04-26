@@ -117,7 +117,7 @@ def mensajes_privados(request, username, *args, **kwargs):
     
     Usuarios_Canal = canal.canalusuario_set.all().values("usuario__username")
     print(Usuarios_Canal)
-    mensaje_canal = canal.canalmensaje_set.all()
+    mensaje_canal = canal.canalmensaje_set.all().order_by('tiempo')
     print(mensaje_canal.values("texto"))
 
         

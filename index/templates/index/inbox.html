@@ -1,9 +1,8 @@
 {% extends "index/base.html" %}
+{% block title %}Mis Mensajes{% endblock title %}
 {% block body %}
 
-	<h1>
-		Bienvenido {{user}}. Inbox
-	</h1>
+	<h1>Mensajes: {{user}}</h1>
 
 	{% for inbox in inbox %}
 		<div class="div_inbox">
@@ -19,7 +18,7 @@
 
 			{% if inbox.canalmensaje_set.count != 0 %}
 				<div class="div_ms_inbox">
-					{% with ultimo_mensaje=inbox.canalmensaje_set.last %}
+					{% with ultimo_mensaje=inbox.canalmensaje_set.all|dictsortreversed:"tiempo"|first %}
 						<p>Mensaje: {{ultimo_mensaje.texto}}</p>
 						<p>Usuario: {{ultimo_mensaje.usuario}}</p>
 						<small>{{object.id}}</small>
@@ -31,20 +30,5 @@
 		</div>
 		{% empty %}
 		<h2>Inbox Vacio</h2>
-	{% endfor %}
-
-
-<style>
-	
-	.div_inbox{
-		width: 90%;
-		margin:10px auto;
-		background: #fff;
-		border-radius: 5px;
-		border:1px solid #e6e6e6;
-		padding: 5px;
-	}
-
-</style>
-		
+	{% endfor %}	
 {% endblock %}

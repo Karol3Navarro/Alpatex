@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } else if (xhr.status === 400) {
                 console.log(xhr.response);
             } else {
-                alert("Un error ocurrió, por favor intenta nuevamente");
+                alert("Error, por favor intenta nuevamente");
             }
         };
 
