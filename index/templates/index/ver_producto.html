@@ -4,6 +4,7 @@
     <div class="container">
         <h2>{{ producto.nombre }}</h2>
         <p><strong>Vendedor:</strong> {{ producto.usuario.username }}</p>
+        <p><strong>Dirección:</strong> {{ producto.direccion }}</p>
         <p><strong>Detalles del Producto:</strong> (Aquí puedes agregar más detalles)</p>
         <!-- Agrega más detalles según lo necesites -->
         <a href="{% url 'home' %}" class="btn btn-secondary">Volver</a>

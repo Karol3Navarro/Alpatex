@@ -5,6 +5,7 @@
         {% csrf_token %}
     
         <pre>Producto:           <input type="text" name="producto" id="producto" ></pre>
+        <pre>Dirección: <input type="text" name="direccion" id="direccion" value="{{ direccion_usuario }}"></pre>
     
         <input class="btn btn-primary me-md-2" type="submit" name="opcion" value="Agregar">
     </form>

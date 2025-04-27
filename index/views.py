@@ -6,7 +6,28 @@ from django.contrib.auth.decorators import login_required
 from .models import Producto,Perfil
 from .Forms import CustomUserCreationForm, PerfilForm
 from django.contrib import messages
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 
+def map(request):
+    productos = Producto.objects.select_related('usuario').all()
+    productos_data = []
+    
+    for producto in productos:
+        if producto.direccion:  # Solo productos que tengan dirección
+            productos_data.append({
+                'id': producto.id_producto,
+                'nombre': producto.nombre,
+                'direccion': producto.direccion,
+                'vendedor': producto.usuario.username  # Opcional, si quieres mostrar quién lo vende
+            })
+
+    productos_json = json.dumps(productos_data, cls=DjangoJSONEncoder)
+
+    context = {
+        'perfiles_json': productos_json  # Puedes cambiarle el nombre si quieres, pero no es necesario
+    }
+    return render(request, 'index/map.html', context)
 
 def logout(request):
     context={}
@@ -47,28 +68,35 @@ def home(request):
 
 def producto_add(request):
     if request.method != "POST":
-        # Si no es un POST, mostramos el formulario vacío
         productos = Producto.objects.all()
-        context = {"productos": productos}
+        direccion_usuario = ""
+        if request.user.is_authenticated:
+            try:
+                direccion_usuario = request.user.perfil.direccion or ""
+            except Perfil.DoesNotExist:
+                direccion_usuario = ""
+        
+        context = {
+            "productos": productos,
+            "direccion_usuario": direccion_usuario  # Manda la dirección al template
+        }
         return render(request, 'index/producto_add.html', context)
     else:
-        # Si es un POST, verificamos que el nombre no esté vacío
-        nombre = request.POST.get("producto")  # Usamos .get() para obtener el valor
-        
-        if not nombre:  # Verificamos que el campo 'producto' no esté vacío
+        nombre = request.POST.get("producto")
+        direccion = request.POST.get("direccion")  # Captura lo que el usuario escribió
+
+        if not nombre:
             context = {'mensaje': "El nombre del producto es obligatorio."}
             return render(request, 'index/producto_add.html', context)
         
-        # Crear el producto y asignar el usuario autenticado
         producto = Producto.objects.create(
             nombre=nombre,
-            usuario=request.user  # Asignamos el usuario autenticado
+            direccion=direccion,
+            usuario=request.user
         )
 
-        # Guardamos el producto
         producto.save()
 
-        # Enviamos un mensaje de éxito
         context = {'mensaje': "Producto creado con éxito!"}
         return render(request, 'index/producto_add.html', context)
 

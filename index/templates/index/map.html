@@ -1,0 +1,25 @@
+{% extends "index/base.html" %}
+{% load static %}
+{% block title %}Mapa de Productos{% endblock title %}
+{% block body %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+    </style>
+
+    <h1>Mapa de Productos</h1>
+
+    <div id="map"></div>
+
+    <!-- Esto genera Productos como JSON directamente -->
+    <script>
+        window.perfiles = JSON.parse('{{ perfiles_json|escapejs }}');
+    </script>
+
+    <!-- Cargar mapa -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="{% static 'js/mapa.js' %}"></script>
+{% endblock %}
