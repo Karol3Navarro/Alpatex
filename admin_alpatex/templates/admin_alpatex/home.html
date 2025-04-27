@@ -1,0 +1,27 @@
+{% extends "admin_alpatex/base.html" %}
+
+{% block body %}
+    <div class="container-items">
+        <div class="row" id="product-container">
+            {% for x in productos %}
+                <div class="col-md-3 mb-2">
+                    <div class="card Ccard" style="width: 13rem;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ x.nombre }}</h5>
+                            <p class="price card-text">Precio: {{ x.usuario }}</p>
+                            <a href="{% url 'ver_producto' id_producto=x.id_producto %}" class="btn btn-primary">Ver Producto Admin</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Botón para redirigir a la gestión de productos -->
+    {% if user.is_staff %}
+        <div class="text-center mt-4">
+            <a href="{% url 'gestionar_productos' %}" class="btn btn-warning">Gestionar Productos</a>
+        </div>
+    {% endif %}
+    
+{% endblock %}

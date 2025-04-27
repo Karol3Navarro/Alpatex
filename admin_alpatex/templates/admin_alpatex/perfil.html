@@ -1,0 +1,24 @@
+{% extends "admin_alpatex/base.html" %}
+{% load static %}
+
+{% block body %}
+    <div class="profile-container">
+        <h2>Perfil de {{ perfil.user.username }}</h2>
+
+        <div class="perfil-info">
+            <div class="perfil-foto">
+                {% if perfil.foto_perfil %}
+                    <img src="{{ perfil.foto_perfil.url }}" alt="Foto de perfil" width="150">
+                {% else %}
+                    <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada" width="150">
+                {% endif %}
+            </div>
+
+            <p><strong>Correo:</strong> {{ perfil.user.email }}</p>
+            <p><strong>Género:</strong> {{ perfil.get_genero_display }}</p>
+            <p><strong>Dirección:</strong> {{ perfil.direccion }}</p>
+            <p><strong>RUT:</strong> {{ perfil.rut }}</p>
+            <p><strong>Fecha de creación:</strong> {{ perfil.user.date_joined|date:"d M Y" }}</p> 
+        </div>
+    </div>
+{% endblock %}

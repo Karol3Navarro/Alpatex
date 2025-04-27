@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type='text/css' href='{% static "css/style.css"%}' rel='stylesheet'>
+
+    <!--
+        -google font
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;500&display=swap" rel="stylesheet">
+    
+    <title>Iniciar Sesión</title>
+</head>
+<body class="cent-body">
+    <div class="container">
+        <h1 class="titulo">Iniciar Sesión</h1>
+        <!-- Formulario de login -->
+        <form method="POST">
+            {% csrf_token %}  <!-- Protege el formulario de CSRF -->
+            <input type="text" name="username" placeholder="Usuario" required>
+            <input type="password" name="password" placeholder="Contraseña" required>
+            <input type="submit" value="Iniciar Sesión">
+        </form>
+        <p class="recuperar" onclick="abrirModal()">¿Olvidaste tu contraseña?</p>
+    </div>
+    <div class="introduccion">
+        <h1 class="welcome">Bienvenido a Alpatex</h1>
+        <p>Si ya tienes una cuenta, inicia sesión para ver los nuevos productos agregados.</p>
+        <p>Si no tienes una cuenta, creala! Solo te tomará unos minutos.</p>
+        <form action="{% url 'registro' %}" method="get">
+            <button type="submit" class="btn">Crear Cuenta</button>
+        </form>
+    </div>
+
+    <div id="modRecContra" class="mod-password">
+        <div class="mod-cont">
+            <span class="cerrar" onclick="cerrarModal()">&times;</span>
+            <h2>Recuperar Contraseña</h2>
+            <p>Te enviaremos un enlace para restablecer tu contraseña.</p>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="email" name="email" placeholder="Correo electrónico" required>
+                <button type="submit" class="btn">Enviar enlace</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script src="{% static 'js/scripts.js' %}"></script>
+
+</body>
+</html>

@@ -24,7 +24,8 @@ urlpatterns = [
     path('index/', include('index.urls')),
 
     path('accounts/', include("django.contrib.auth.urls")), #Autentificacion
-    path('', include('Dm.urls'))
+    path('', include('Dm.urls')),
+    path('admin_dashboard/', include('admin_alpatex.urls')), 
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

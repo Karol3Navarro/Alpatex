@@ -1,0 +1,76 @@
+{% extends "admin_alpatex/base.html" %}
+{% load static %}
+
+{% block body %}
+<h1>Gestionar Productos Pendientes</h1>
+
+{% if productos_pendientes %}
+  <ul class="list-group">
+    {% for producto in productos_pendientes %}
+      <li class="list-group-item d-flex align-items-center">
+        <div class="me-3">
+          <img src="{{ producto.imagen.url }}" width="60" alt="{{ producto.nombre }}">
+        </div>
+        <div>
+          <strong>{{ producto.nombre }}</strong><br>
+          <small>Publicado por: {{ producto.usuario.username }}</small>
+        </div>
+        <div class="ms-auto">
+          <form method="POST" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="producto_id" value="{{ producto.id }}">
+            <button type="submit" name="accion" value="aceptar" class="btn btn-success btn-sm">
+              Aceptar
+            </button>
+          </form>
+
+          <!-- Botón abre el modal -->
+          <button type="button" class="btn btn-danger btn-sm ms-1"
+                  data-bs-toggle="modal" data-bs-target="#rechazoModal"
+                  data-product-id="{{ producto.id }}">
+            Rechazar
+          </button>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No hay productos pendientes.</p>
+{% endif %}
+
+<!-- Modal de Rechazo -->
+<div class="modal fade" id="rechazoModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form method="POST" class="modal-content">
+      {% csrf_token %}
+      <div class="modal-header">
+        <h5 class="modal-title">Motivo del Rechazo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="producto_id" id="modal-product-id">
+        <textarea name="motivo" class="form-control" rows="4"
+                  placeholder="Escribe aquí el motivo..." required></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button type="submit" name="accion" value="rechazar" class="btn btn-danger">
+          Confirmar Rechazo
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Script para inyectar el ID de producto en el modal -->
+<script>
+  var rechazoModal = document.getElementById('rechazoModal');
+  rechazoModal.addEventListener('show.bs.modal', function (event) {
+    var button = event.relatedTarget;
+    var productId = button.getAttribute('data-product-id');
+    rechazoModal.querySelector('#modal-product-id').value = productId;
+  });
+</script>
+{% endblock %}

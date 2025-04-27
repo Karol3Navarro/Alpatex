@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .models import Producto,Perfil
-from .Forms import CustomUserCreationForm, PerfilForm
+from .Forms import CustomUserCreationForm, PerfilForm, ProductoForm
 from django.contrib import messages
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -46,19 +46,19 @@ def index(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        # Intentamos autenticar al usuario con el username y password
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            # Si el usuario es válido, lo logueamos
             login(request, user)
-            return redirect('home')  # Redirige a la página inicio después del login
+            if user.is_staff:  
+                return redirect('admin_dashboard')  
+            else:
+                return redirect('home')  
         else:
-            # Si el login falla, podemos mostrar un mensaje de error
             error_message = "Credenciales incorrectas, por favor intenta nuevamente."
             return render(request, 'index/index.html', {'error_message': error_message})
 
-    return render(request, 'index/index.html')  # Muestra el formulario de login
+    return render(request, 'index/index.html')  
 
 def home(request):
     usuarios = User.objects.all()
@@ -173,3 +173,68 @@ def editar_perfil(request):
         form = PerfilForm(instance=request.user.perfil)
 
     return render(request, 'perfil/editar_perfil.html', {'form': form})
+
+@login_required
+def perfil_usuario(request):
+    perfil, _ = Perfil.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        form = PerfilForm(request.POST, request.FILES, instance=perfil, user=request.user)
+        if form.is_valid():
+            form.save(user=request.user)
+            messages.success(request, "Perfil actualizado con éxito.")
+            return redirect('perfil_usuario')
+        else:
+            messages.error(request, "Hubo un error al actualizar el perfil.")
+    else:
+        form = PerfilForm(instance=perfil, user=request.user)
+
+    return render(request, 'index/perfil.html', {'perfil': perfil, 'form': form})
+
+ 
+
+@login_required
+def editar_perfil(request):
+    if request.method == 'POST':
+        form = PerfilForm(request.POST, request.FILES, instance=request.user.perfil)
+        if form.is_valid():
+            form.save()
+            return redirect('perfil')
+    else:
+        form = PerfilForm(instance=request.user.perfil)
+
+    return render(request, 'perfil/editar_perfil.html', {'form': form})
+
+@login_required
+def productos_perfil(request):
+    productos = Producto.objects.filter(usuario=request.user)  # Filtramos por el usuario actual
+    if not productos:
+        mensaje = "No tienes productos agregados."
+    else:
+        mensaje = None
+    return render(request, 'index/productos_perf.html', {'productos': productos, 'mensaje': mensaje})
+
+
+
+@login_required
+def producto_add_perf(request):
+    if request.method == "POST":
+        form = ProductoForm(request.POST, request.FILES)
+        if form.is_valid():
+            producto = form.save(commit=False)
+            producto.usuario = request.user  # Asignamos el usuario actual
+            producto.estado_revision = "Pendiente"  # El producto está en estado pendiente
+            producto.save()
+            messages.success(request, "Producto creado con éxito!")
+            return redirect('productos_perf')  # Redirigimos a la misma página o a otra si lo prefieres
+        else:
+            messages.error(request, "Por favor corrige los errores en el formulario.")
+    else:
+        form = ProductoForm()
+
+    return render(request, 'index/producto_add.html', {'form': form})
+
+
+
+
+

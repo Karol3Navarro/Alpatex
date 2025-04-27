@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'index',
-    'Dm'
+    'Dm',
+    'admin_alpatex'
 ]
 
 MIDDLEWARE = [

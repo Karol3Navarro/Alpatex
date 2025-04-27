@@ -1,6 +1,6 @@
 {% extends "index/base.html" %}
 {% load static %}
-{% block title %}Mi Perfil{% endblock title %}
+
 {% block body %}
     <div class="reg-btn">
         <a href="{% url 'home' %}" class="regresar">
@@ -65,8 +65,8 @@
         </div>
 
         <div class="btns-perfil">
-            <button class="btn">Mis Productos</button>
-            <button class="btn"><a href="{% url 'inbox' %}">Mis Mensajes</a></button>
+            <a href="{% url 'productos_perf' %}" class="btn">Mis Productos</a>
+            <button class="btn">Mis Mensajes</button>
             <button class="btn">Mis Compras</button>
         </div>
     </div>

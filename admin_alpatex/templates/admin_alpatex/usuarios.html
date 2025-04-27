@@ -1,0 +1,27 @@
+<!-- admin_alpatex/templates/admin_alpatex/usuarios.html -->
+{% extends "admin_alpatex/base.html" %}
+{% load static %}
+
+{% block body %}
+  <h1>Usuarios Registrados</h1>
+  <div class="row">
+    {% for usuario in usuarios %}
+      <div class="col-md-3 mb-3">
+        <div class="card">
+          <div class="perfil-foto">
+            {% if usuario.perfil.foto_perfil %}  <!-- Cambié usuario.foto_perfil por usuario.perfil.foto_perfil -->
+                <img src="{{ usuario.perfil.foto_perfil.url }}" alt="Foto de perfil" width="150">
+            {% else %}
+                <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada" width="150">
+            {% endif %}
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">{{ usuario.username }}</h5>
+            <p class="card-text"><strong>Dirección:</strong> {{ usuario.perfil.direccion }}</p>
+            <a href="{% url 'perfil_usuario' username=usuario.username %}">Ver Perfil</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

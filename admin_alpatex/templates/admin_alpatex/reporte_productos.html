@@ -1,0 +1,59 @@
+{% extends "admin_alpatex/base.html" %}
+{% block body %}
+  <h1>Reporte de Productos</h1>
+
+  <!-- Filtros -->
+  <form method="get" action="{% url 'reporte_productos' %}">
+    <input type="text" name="nombre" placeholder="Nombre del producto" value="{{ request.GET.nombre }}">
+    <input type="text" name="usuario" placeholder="Nombre de usuario" value="{{ request.GET.usuario }}">
+    <input type="date" name="fecha_inicio" value="{{ request.GET.fecha_inicio }}">
+    <input type="date" name="fecha_fin" value="{{ request.GET.fecha_fin }}">
+    <button type="submit">Filtrar</button>
+</form>
+<a href="{% url 'exportar_excel' %}" class="btn btn-success">Exportar a Excel</a>
+
+
+  <!-- Tabla de Productos -->
+  <div class="container-items mt-4">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Usuario</th>
+          <th>Fecha de Creación</th>
+          <th>Dirección</th>
+          <th>Estado de Revisión</th>
+          <th>Motivo de Rechazo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Itera sobre los productos y muestra los detalles -->
+        {% for x in productos %}
+          <tr>
+            <td>{{ x.nombre }}</td>
+            <td>{{ x.usuario.username }}</td>
+            <td>{{ x.fecha_creacion|date:"d M Y" }}</td>
+            <td>{{ x.usuario.perfil.direccion }}</td>
+            <td>
+              <span 
+                {% if x.estado_revision == "Pendiente" %} style="color: orange;"
+                {% elif x.estado_revision == "Rechazado" %} style="color: red;"
+                {% elif x.estado_revision == "Aceptado" %} style="color: green;"
+                {% endif %}>
+                {{ x.estado_revision }}
+              </span>
+            </td>
+            <td>
+              {% if x.estado_revision == "Rechazado" %}
+                {{ x.motivo_rechazo }}
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% endblock %}

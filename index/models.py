@@ -1,14 +1,37 @@
 from django.db import models
 from django.contrib.auth.models import User
-# Create your models here.
+from django.utils import timezone
+
 class Producto(models.Model):
+    ESTADO_PRODUCTO = [
+        ('Nuevo', 'Nuevo'),
+        ('Usado', 'Usado'),
+    ]
+    TIPO_PUBLICACION = [
+        ('Venta', 'Venta'),
+        ('Intercambio', 'Intercambio'),
+    ]
+    ESTADO_REVISION = [
+        ('Pendiente', 'Pendiente'),
+        ('Aceptado', 'Aceptado'),
+        ('Rechazado', 'Rechazado'),
+    ]
+
     id_producto = models.AutoField(db_column='idProducto', primary_key=True)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=100)
     direccion = models.CharField(max_length=255, null=True, blank=True)
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)  # Relación con el usuario
+    estado = models.CharField(max_length=10, choices=ESTADO_PRODUCTO, default='Nuevo')  # default value added
+    tipo = models.CharField(max_length=20, choices=TIPO_PUBLICACION, default='')
+    imagen = models.ImageField(upload_to='productos/', default='productos/default_image.jpg')
+    estado_revision = models.CharField(max_length=10, choices=ESTADO_REVISION, default='Pendiente')
+    motivo_rechazo = models.TextField(blank=True)
+    fecha_creacion = models.DateTimeField(default=timezone.now)
+
 
     def __str__(self):
-        return str(self.nombre)
+        return self.nombre
+
 class Perfil(models.Model):
     GENERO_CHOICES = [
         ('Masculino', 'Masculino'),

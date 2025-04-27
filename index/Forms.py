@@ -2,7 +2,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from .models import Perfil
+from .models import Perfil, Producto
 
 class CustomUserCreationForm(UserCreationForm):
     nombre_completo = forms.CharField(max_length=100, label="Nombre completo")
@@ -85,3 +85,13 @@ class PerfilForm(forms.ModelForm):
             user.save() 
             perfil.save()  
         return perfil
+    
+class ProductoForm(forms.ModelForm):
+    class Meta:
+        model = Producto
+        fields = ['nombre', 'estado',  'tipo', 'imagen']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
