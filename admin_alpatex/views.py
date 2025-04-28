@@ -13,33 +13,40 @@ def dashboard(request):
     return render(request, 'admin_alpatex/home.html')
 
 
-@staff_member_required
-def gestionar_productos(request):
-    productos_pendientes = Producto.objects.filter(estado_revision='Pendiente')
 
+def gestionar_productos(request):
     if request.method == 'POST':
         producto_id = request.POST.get('producto_id')
         accion = request.POST.get('accion')
-        print(f"Producto ID recibido: {producto_id}, Acción: {accion}")  # Opcional para debug
+        print(f"Producto ID recibido: {producto_id}, Acción: {accion}")
+
+        # Validar si viene producto_id vacío
+        if not producto_id:
+            messages.error(request, "Error: No se recibió el ID del producto.")
+            return redirect('nombre_url_gestionar_productos')  # Cambia por el nombre real de tu URL
+
         producto = get_object_or_404(Producto, id_producto=producto_id)
 
         if accion == 'aceptar':
             producto.estado_revision = 'Aceptado'
-            producto.motivo_rechazo = ''
+            producto.save()
+            messages.success(request, "Producto aceptado correctamente.")
         elif accion == 'rechazar':
-            producto.estado_revision = 'Rechazado'
-            producto.motivo_rechazo = request.POST.get('motivo', '').strip()
-
-        producto.save()
-        messages.success(request, f"Producto {accion} correctamente.")
+            motivo = request.POST.get('motivo')
+            if motivo:
+                producto.estado_revision = 'Rechazado'
+                producto.motivo_rechazo = motivo
+                producto.save()
+                messages.success(request, "Producto rechazado correctamente.")
+            else:
+                messages.error(request, "Debes indicar el motivo de rechazo.")
+        else:
+            messages.error(request, "Acción no válida.")
 
         return redirect('gestionar_productos')
 
-    return render(request, 'admin_alpatex/gestion_productos.html', {
-        'productos_pendientes': productos_pendientes
-    })
-
-
+    productos_pendientes = Producto.objects.filter(estado_revision='Pendiente')
+    return render(request, 'admin_alpatex/gestion_productos.html', {'productos_pendientes': productos_pendientes})
 
 @login_required
 def reporte_productos(request):
