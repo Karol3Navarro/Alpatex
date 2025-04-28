@@ -21,7 +21,7 @@ class Producto(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=100)
     direccion = models.CharField(max_length=255, null=True, blank=True)
-    estado = models.CharField(max_length=10, choices=ESTADO_PRODUCTO, default='Nuevo')  # default value added
+    estado = models.CharField(max_length=10, choices=ESTADO_PRODUCTO, default='')  # default value added
     tipo = models.CharField(max_length=20, choices=TIPO_PUBLICACION, default='')
     imagen = models.ImageField(upload_to='productos/', default='productos/default_image.jpg')
     estado_revision = models.CharField(max_length=10, choices=ESTADO_REVISION, default='Pendiente')

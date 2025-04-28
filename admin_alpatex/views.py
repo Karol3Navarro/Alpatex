@@ -10,7 +10,21 @@ from datetime import datetime
 
 
 def dashboard(request):
-    return render(request, 'admin_alpatex/home.html')
+    return render(request, 'admin_alpatex/home_admin.html')
+
+def home_admin(request):
+    usuarios = User.objects.all()
+    productos = Producto.objects.all()  # Obtener todos los productos
+    context = {"usuarios": usuarios, "productos": productos}  # Pasar la variable 'productos'
+    return render(request, 'admin_alpatex/home_admin.html', context)
+
+@login_required
+def menu(request):
+    request.session["usuario"]="cgarcia"
+    usuario=request.session["usuario"]
+    context={'usuario':usuario}
+    return render(request, 'admin_alpatex/home_admin.html', context)
+
 
 
 

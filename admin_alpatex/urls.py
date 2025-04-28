@@ -9,6 +9,7 @@ urlpatterns = [
     path('usuarios/', views.usuarios, name='usuarios'),
     path('perfil/<str:username>/', views.perfil_usuario, name='perfil_usuario'),
     path('exportar_excel/', views.export_to_excel, name='exportar_excel'),
+    path('home_admin', views.home_admin, name='home_admin'),
 
 
 
