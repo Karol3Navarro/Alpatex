@@ -89,9 +89,10 @@ class PerfilForm(forms.ModelForm):
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        fields = ['nombre', 'estado',  'tipo', 'direccion' , 'imagen']
+        fields =  ['nombre', 'estado',  'tipo', 'direccion' , 'imagen']  
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control'})
+        
+        if 'direccion' in self.initial:
+            self.fields['direccion'].initial = self.initial['direccion']

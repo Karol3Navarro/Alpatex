@@ -183,12 +183,12 @@ def productos_perfil(request):
     return render(request, 'index/productos_perf.html', {'productos': productos, 'mensaje': mensaje})
 
 
-
 @login_required
 def producto_add_perf(request):
     productos = Producto.objects.all()
     direccion_usuario = ""
 
+    # Obtener la dirección del usuario autenticado
     if request.user.is_authenticated:
         try:
             direccion_usuario = request.user.perfil.direccion or ""
@@ -199,15 +199,16 @@ def producto_add_perf(request):
         form = ProductoForm(request.POST, request.FILES)
         if form.is_valid():
             producto = form.save(commit=False)
-            producto.usuario = request.user  
-            producto.estado_revision = "Pendiente"  
+            producto.usuario = request.user
+            producto.estado_revision = "Pendiente"
             producto.save()
             messages.success(request, "Producto creado con éxito!")
             return redirect('productos_perf')  # O puedes redirigir a producto_add_perf si prefieres
         else:
             messages.error(request, "Por favor corrige los errores en el formulario.")
     else:
-        form = ProductoForm()
+        # Pasar la dirección del usuario al formulario como valor predeterminado
+        form = ProductoForm(initial={'direccion': direccion_usuario})
 
     context = {
         'form': form,
@@ -216,6 +217,7 @@ def producto_add_perf(request):
     }
 
     return render(request, 'index/producto_add_perf.html', context)
+
 
 def producto_add(request):
     if request.method != "POST":
