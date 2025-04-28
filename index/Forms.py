@@ -89,7 +89,7 @@ class PerfilForm(forms.ModelForm):
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        fields = ['nombre', 'estado',  'tipo', 'imagen']
+        fields = ['nombre', 'estado',  'tipo', 'direccion' , 'imagen']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

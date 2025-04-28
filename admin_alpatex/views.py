@@ -15,13 +15,13 @@ def dashboard(request):
 
 @staff_member_required
 def gestionar_productos(request):
-    # Filtrar productos pendientes de aprobación
     productos_pendientes = Producto.objects.filter(estado_revision='Pendiente')
 
     if request.method == 'POST':
         producto_id = request.POST.get('producto_id')
         accion = request.POST.get('accion')
-        producto = get_object_or_404(Producto, id=producto_id)
+        print(f"Producto ID recibido: {producto_id}, Acción: {accion}")  # Opcional para debug
+        producto = get_object_or_404(Producto, id_producto=producto_id)
 
         if accion == 'aceptar':
             producto.estado_revision = 'Aceptado'
@@ -38,6 +38,7 @@ def gestionar_productos(request):
     return render(request, 'admin_alpatex/gestion_productos.html', {
         'productos_pendientes': productos_pendientes
     })
+
 
 
 @login_required

@@ -66,39 +66,7 @@ def home(request):
     context = {"usuarios": usuarios, "productos": productos}  # Pasar la variable 'productos'
     return render(request, 'index/home.html', context)
 
-def producto_add(request):
-    if request.method != "POST":
-        productos = Producto.objects.all()
-        direccion_usuario = ""
-        if request.user.is_authenticated:
-            try:
-                direccion_usuario = request.user.perfil.direccion or ""
-            except Perfil.DoesNotExist:
-                direccion_usuario = ""
-        
-        context = {
-            "productos": productos,
-            "direccion_usuario": direccion_usuario  # Manda la dirección al template
-        }
-        return render(request, 'index/producto_add.html', context)
-    else:
-        nombre = request.POST.get("producto")
-        direccion = request.POST.get("direccion")  # Captura lo que el usuario escribió
 
-        if not nombre:
-            context = {'mensaje': "El nombre del producto es obligatorio."}
-            return render(request, 'index/producto_add.html', context)
-        
-        producto = Producto.objects.create(
-            nombre=nombre,
-            direccion=direccion,
-            usuario=request.user
-        )
-
-        producto.save()
-
-        context = {'mensaje': "Producto creado con éxito!"}
-        return render(request, 'index/producto_add.html', context)
 
 def ver_producto(request, id_producto):
     producto = get_object_or_404(Producto, id_producto=id_producto)
@@ -218,21 +186,70 @@ def productos_perfil(request):
 
 @login_required
 def producto_add_perf(request):
+    productos = Producto.objects.all()
+    direccion_usuario = ""
+
+    if request.user.is_authenticated:
+        try:
+            direccion_usuario = request.user.perfil.direccion or ""
+        except Perfil.DoesNotExist:
+            direccion_usuario = ""
+
     if request.method == "POST":
         form = ProductoForm(request.POST, request.FILES)
         if form.is_valid():
             producto = form.save(commit=False)
-            producto.usuario = request.user  # Asignamos el usuario actual
-            producto.estado_revision = "Pendiente"  # El producto está en estado pendiente
+            producto.usuario = request.user  
+            producto.estado_revision = "Pendiente"  
             producto.save()
             messages.success(request, "Producto creado con éxito!")
-            return redirect('productos_perf')  # Redirigimos a la misma página o a otra si lo prefieres
+            return redirect('productos_perf')  # O puedes redirigir a producto_add_perf si prefieres
         else:
             messages.error(request, "Por favor corrige los errores en el formulario.")
     else:
         form = ProductoForm()
 
-    return render(request, 'index/producto_add.html', {'form': form})
+    context = {
+        'form': form,
+        'productos': productos,
+        'direccion_usuario': direccion_usuario,
+    }
+
+    return render(request, 'index/producto_add_perf.html', context)
+
+def producto_add(request):
+    if request.method != "POST":
+        productos = Producto.objects.all()
+        direccion_usuario = ""
+        if request.user.is_authenticated:
+            try:
+                direccion_usuario = request.user.perfil.direccion or ""
+            except Perfil.DoesNotExist:
+                direccion_usuario = ""
+        
+        context = {
+            "productos": productos,
+            "direccion_usuario": direccion_usuario  # Manda la dirección al template
+        }
+        return render(request, 'index/producto_add.html', context)
+    else:
+        nombre = request.POST.get("producto")
+        direccion = request.POST.get("direccion")  # Captura lo que el usuario escribió
+
+        if not nombre:
+            context = {'mensaje': "El nombre del producto es obligatorio."}
+            return render(request, 'index/producto_add.html', context)
+        
+        producto = Producto.objects.create(
+            nombre=nombre,
+            direccion=direccion,
+            usuario=request.user
+        )
+
+        producto.save()
+
+        context = {'mensaje': "Producto creado con éxito!"}
+        return render(request, 'index/producto_add.html', context)
 
 
 

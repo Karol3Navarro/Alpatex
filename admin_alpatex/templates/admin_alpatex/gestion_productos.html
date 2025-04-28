@@ -18,7 +18,7 @@
         <div class="ms-auto">
           <form method="POST" style="display:inline;">
             {% csrf_token %}
-            <input type="hidden" name="producto_id" value="{{ producto.id }}">
+            <input type="hidden" name="producto_id" value="{{ producto.id_producto }}">
             <button type="submit" name="accion" value="aceptar" class="btn btn-success btn-sm">
               Aceptar
             </button>
@@ -27,7 +27,8 @@
           <!-- Botón abre el modal -->
           <button type="button" class="btn btn-danger btn-sm ms-1"
                   data-bs-toggle="modal" data-bs-target="#rechazoModal"
-                  data-product-id="{{ producto.id }}">
+                  data-product-id="{{ producto.id_producto }}"
+>
             Rechazar
           </button>
         </div>

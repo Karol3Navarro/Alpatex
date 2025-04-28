@@ -1,0 +1,12 @@
+{% extends "index/base.html" %}
+
+{% block body %}
+  <h1>Agregar Producto</h1>
+  
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Agregar Producto</button>
+  </form>
+  
+{% endblock %}
