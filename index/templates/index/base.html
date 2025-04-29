@@ -27,7 +27,7 @@
     
 </head>
 <body>
-
+<!--
     <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
         <div class="container-fluid navbar-estilo">
             <a class="navbar-brand" href="{% url 'home' %}">
@@ -49,7 +49,7 @@
                     </li>
                 </ul>
     
-                <!-- Contenedor para los elementos de usuario (Perfil, Cerrar Sesión, Iniciar Sesión) y el formulario de búsqueda -->
+                Contenedor para los elementos de usuario (Perfil, Cerrar Sesión, Iniciar Sesión) y el formulario de búsqueda
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-center gap-3 me-3">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
@@ -67,7 +67,7 @@
                         </li>
                     {% endif %}
     
-                    <!-- Formulario de búsqueda -->
+                    Formulario de búsqueda
                     <li class="nav-item formulario-busqueda">
                         <form class="d-flex" role="search">
                             <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
@@ -80,9 +80,60 @@
             </div>
         </div>
     </nav>
+-->
 
-    
-    
+    <header>
+        <div class="banner">
+            <div class="sociales">
+                <ul>
+                    <li class="face"><a href="https://www.facebook.com"><i class></i></a></li>
+                    <li class="ig"><a href="https://www.instagram.com"><i class></i></a></li>
+                </ul>
+            </div>
+
+            <div class="logo">
+                <a href="/"><img src="{% static 'img/logo-fotor-bg-remover-20250420131433.png' %}" alt="ALPATEX"></a>
+            </div>
+
+            <div class="icons">
+                <ul>
+                    {% if user.is_authenticated %}
+                            <li>
+                                <a class="user" href="{% url 'perfil_usuario' %}">
+                                    <i></i>
+                                </a>
+                            </li>
+                            <li>
+                                <form method="POST" action="{% url 'logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-reg">Cerrar sesión</button>
+                                </form>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a class="user" href="/">Iniciar sesión</a>
+                            </li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="busqueda">
+                <form action= "/search" method="get" class="right" role="search">
+                    <input name="q" class="form-search" type="search" placeholder="Buscar" aria-label="Search">
+                    <button type="submit">
+                        <i class="lupa"></i>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+        <nav>
+            <ul class="menu">
+                <li><a class="navegacion" href="{% url 'home' %}">Inicio</a></li>
+                <li><a class="navegacion" href="{% url 'inbox' %}">InBox</a></li>
+                <li><a class="navegacion" href="{% url 'mapa' %}">Mapa</a></li>
+            </ul>
+        </nav>
+    </header>
 
     <main class="containers pt-5 mt-5">
         {% block body %}

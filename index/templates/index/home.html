@@ -1,11 +1,15 @@
 {% extends "index/base.html" %}
 {% block title %}Alpatex{% endblock title %}
 {% block body %}
+    <div class="title-prod">
+        <h2 class="prod-dest">Productos Destacados</h1>
+    </div>
+
     <div class="container-items">
-        <div class="row" id="product-container">
+        <div class="grid-prod" id="product-container">
             {% for x in productos %}
-                <div class="col-md-3 mb-2">
-                    <div class="card Ccard" style="width: 13rem;">
+                <div class="product">
+                    <div class="card-product">
                         <div class="card-body">
                             <h5 class="card-title">{{ x.nombre }}</h5>
                             <p class="price card-text">Precio: {{ x.usuario }}</p>
