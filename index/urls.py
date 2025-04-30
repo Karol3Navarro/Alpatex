@@ -16,4 +16,8 @@ urlpatterns = [
     
     path('producto/agregar/', views.producto_add_perf, name='producto_add_perf'),
     path('admin_dashboard/', include('admin_alpatex.urls')),  
+
+
+    path('membresia/', views.ver_membresia_usuario, name='ver_membresia_usuario'),
+
 ]

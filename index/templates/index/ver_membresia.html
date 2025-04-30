@@ -1,0 +1,21 @@
+<h2>Mi Membresía Actual</h2>
+
+{% if perfil.membresia %}
+  <p><strong>Nombre:</strong> {{ perfil.membresia.nombre }}</p>
+  <p><strong>Ventajas:</strong> {{ perfil.membresia.descripcion }}</p>
+{% else %}
+  <p>No tienes una membresía activa.</p>
+{% endif %}
+
+<h3>Cambiar de Membresía</h3>
+<form method="post">
+  {% csrf_token %}
+  <select name="membresia_id">
+    {% for m in membresias %}
+      <option value="{{ m.id }}" {% if perfil.membresia and perfil.membresia.id == m.id %}selected{% endif %}>
+        {{ m.nombre }} - ${{ m.precio }} CLP
+      </option>
+    {% endfor %}
+  </select>
+  <button type="submit">Actualizar</button>
+</form>

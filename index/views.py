@@ -9,6 +9,7 @@ from django.contrib import messages
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Avg
+from admin_alpatex.models import Membresia
 
 def map(request):
     productos = Producto.objects.select_related('usuario').all()
@@ -248,3 +249,21 @@ def producto_add_perf(request):
     }
 
     return render(request, 'index/producto_add_perf.html', context)
+
+@login_required
+def ver_membresia_usuario(request):
+    perfil = Perfil.objects.get(user=request.user)
+    membresias = Membresia.objects.all()
+
+    if request.method == 'POST':
+        nueva_id = request.POST.get('membresia_id')
+        if nueva_id:
+            nueva_membresia = Membresia.objects.get(id=nueva_id)
+            perfil.membresia = nueva_membresia
+            perfil.save()
+            return redirect('ver_membresia_usuario')
+
+    return render(request, 'index/ver_membresia.html', {
+        'perfil': perfil,
+        'membresias': membresias,
+    })
