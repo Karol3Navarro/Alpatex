@@ -1,6 +1,11 @@
 {% extends "index/base.html" %}
 {% block title %}Mis Mensajes{% endblock title %}
 {% block body %}
+	<div class="reg-btn">
+		<a href="{% url 'home' %}" class="regresar">
+			<span class="material-symbols-outlined">chevron_left</span> Regresar
+		</a>
+	</div>
 
 	<h1>Mensajes: {{user}}</h1>
 

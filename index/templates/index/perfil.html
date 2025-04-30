@@ -8,17 +8,19 @@
         </a>
     </div>
 
-    <div class="profile-container">
-        <h2>Mi Perfil</h2>
+    <div class="profile-main">
 
-        <div class="perfil-cont">
-            <div class="perfil-foto">
-                {% if perfil.foto_perfil %}
-                <img src="{{ perfil.foto_perfil.url }}" alt="Foto de perfil" width="150">
-                {% else %}
-                <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada" width="150">
-                {% endif %}
-            </div>
+        <div class="profile-container">
+            <h2>Mi Perfil</h2>
+
+            <div class="perfil-cont">
+                <div class="perfil-foto">
+                    {% if perfil.foto_perfil %}
+                    <img src="{{ perfil.foto_perfil.url }}" alt="Foto de perfil" width="150">
+                    {% else %}
+                    <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada" width="150">
+                    {% endif %}
+                </div>
 
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
@@ -66,10 +68,9 @@
 
         <div class="btns-perfil">
             <a href="{% url 'productos_perf' %}" class="btn">Mis Productos</a>
-            <button class="btn">Mis Mensajes</button>
-            <button class="btn">Mis Compras</button>
+            <a href="{% url 'inbox' %}" class="btn">Mis Mensajes</a>
+            <a href="#" class="btn">Mis Compras</a>
         </div>
     </div>
-
 
 {% endblock %}
