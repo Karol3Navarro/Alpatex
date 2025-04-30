@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 import openpyxl
 from django.http import HttpResponse
 from datetime import datetime
+from .models import Membresia
+from .forms import MembresiaForm
 
 
 def dashboard(request):
@@ -132,3 +134,39 @@ def perfil_usuario(request, username):
     perfil = get_object_or_404(Perfil, user=usuario)
 
     return render(request, 'admin_alpatex/perfil.html', {'perfil': perfil})
+
+
+#Membresias
+# Listado
+def listar_membresias(request):
+    membresias = Membresia.objects.all()
+    return render(request, 'admin_alpatex/membresia_list.html', {'membresias': membresias})
+
+# Crear
+def crear_membresia(request):
+    if request.method == 'POST':
+        form = MembresiaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_membresias')
+    else:
+        form = MembresiaForm()
+    return render(request, 'admin_alpatex/membresia_form.html', {'form': form})
+
+# Editar
+def editar_membresia(request, membresia_id):
+    membresia = get_object_or_404(Membresia, pk=membresia_id)
+    if request.method == 'POST':
+        form = MembresiaForm(request.POST, instance=membresia)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_membresias')
+    else:
+        form = MembresiaForm(instance=membresia)
+    return render(request, 'admin_alpatex/membresia_form.html', {'form': form})
+
+# Eliminar
+def eliminar_membresia(request, membresia_id):
+    membresia = get_object_or_404(Membresia, pk=membresia_id)
+    membresia.delete()
+    return redirect('listar_membresias')

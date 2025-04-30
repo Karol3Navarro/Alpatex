@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from admin_alpatex.models import Membresia
 
 ##Productos
 #Modelo producto
@@ -57,6 +58,7 @@ class Perfil(models.Model):
     genero = models.CharField(max_length=9, choices=GENERO_CHOICES, default='')
     direccion = models.CharField(max_length=255, null=True, blank=True)
     rut = models.CharField(max_length=12, null=True, blank=True)
+    membresia = models.ForeignKey(Membresia, on_delete=models.SET_DEFAULT, default=1)
 
     def __str__(self):
         return self.user.username

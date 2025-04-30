@@ -10,9 +10,11 @@ urlpatterns = [
     path('perfil/<str:username>/', views.perfil_usuario, name='perfil_usuario'),
     path('exportar_excel/', views.export_to_excel, name='exportar_excel'),
     path('home_admin', views.home_admin, name='home_admin'),
-
-
-
+    path('membresias/', views.listar_membresias, name='listar_membresias'),
+    path('membresias/nueva/', views.crear_membresia, name='crear_membresia'),
+    path('membresias/editar/<int:membresia_id>/', views.editar_membresia, name='editar_membresia'),
+    path('membresias/eliminar/<int:membresia_id>/', views.eliminar_membresia, name='eliminar_membresia'),
+    
 
   # Ruta para el dashboard
 ]
