@@ -2,7 +2,17 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from .models import Perfil, Producto
+from .models import Perfil, Producto, CalificacionProducto
+
+#Calificacion de Producto
+class CalificacionProductoForm(forms.ModelForm):
+    class Meta:
+        model = CalificacionProducto
+        fields = ['puntaje', 'comentario']
+        widgets = {
+            'puntaje': forms.HiddenInput(),
+            'comentario': forms.Textarea(attrs={'rows': 3}),
+        }
 
 class CustomUserCreationForm(UserCreationForm):
     nombre_completo = forms.CharField(max_length=100, label="Nombre completo")

@@ -1,0 +1,6 @@
+<h2>Formulario de Membresía</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Guardar</button>
+</form>

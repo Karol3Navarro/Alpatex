@@ -1,7 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from admin_alpatex.models import Membresia
 
+##Productos
+#Modelo producto
 class Producto(models.Model):
     ESTADO_PRODUCTO = [
         ('Nuevo', 'Nuevo'),
@@ -32,6 +35,18 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
 
+#Modelo calificacion producto
+class CalificacionProducto(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    puntaje = models.IntegerField()
+    comentario = models.TextField(blank=True)
+    
+    def __str__(self):
+        return f'{self.producto.nombre} - {self.usuario.username} ({self.puntaje} estrellas)'
+
+##Perfil
+#Modelo de perfil
 class Perfil(models.Model):
     GENERO_CHOICES = [
         ('Masculino', 'Masculino'),
@@ -43,6 +58,7 @@ class Perfil(models.Model):
     genero = models.CharField(max_length=9, choices=GENERO_CHOICES, default='')
     direccion = models.CharField(max_length=255, null=True, blank=True)
     rut = models.CharField(max_length=12, null=True, blank=True)
+    membresia = models.ForeignKey(Membresia, null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.user.username

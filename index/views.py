@@ -3,11 +3,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from .models import Producto,Perfil
-from .Forms import CustomUserCreationForm, PerfilForm, ProductoForm
+from .models import Producto, Perfil, CalificacionProducto
+from .Forms import CustomUserCreationForm, PerfilForm, ProductoForm, CalificacionProductoForm
 from django.contrib import messages
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Avg
+from admin_alpatex.models import Membresia
 
 def map(request):
     productos = Producto.objects.select_related('usuario').all()
@@ -62,15 +64,45 @@ def index(request):
 
 def home(request):
     usuarios = User.objects.all()
-    productos = Producto.objects.all()  # Obtener todos los productos
-    context = {"usuarios": usuarios, "productos": productos}  # Pasar la variable 'productos'
+    productos = Producto.objects.all()
+
+    # Calcula el promedio de cada producto
+    for producto in productos:
+        calificaciones = CalificacionProducto.objects.filter(producto=producto)
+        if calificaciones.exists():
+            promedio = calificaciones.aggregate(Avg('puntaje'))['puntaje__avg']
+            producto.calificacion_promedio = round(promedio, 1)
+        else:
+            producto.calificacion_promedio = "Sin calificaciones"
+
+    context = {
+        "usuarios": usuarios,
+        "productos": productos,
+    }
     return render(request, 'index/home.html', context)
-
-
 
 def ver_producto(request, id_producto):
     producto = get_object_or_404(Producto, id_producto=id_producto)
-    return render(request, 'index/ver_producto.html', {'producto': producto})
+
+    if request.method == 'POST':
+        form = CalificacionProductoForm(request.POST)
+        if form.is_valid():
+            calificacion = form.save(commit=False)
+            calificacion.producto = producto
+            calificacion.usuario = request.user
+            calificacion.save()
+            return redirect('ver_producto', id_producto=producto.id_producto)
+    else:
+        form = CalificacionProductoForm()
+
+    calificaciones = CalificacionProducto.objects.filter(producto=producto)
+
+    context = {
+        'producto': producto,
+        'form': form,
+        'calificaciones': calificaciones,
+    }
+    return render(request, 'index/ver_producto.html', context)
 
 def registro(request):
     if request.method == 'POST':
@@ -217,3 +249,21 @@ def producto_add_perf(request):
     }
 
     return render(request, 'index/producto_add_perf.html', context)
+
+@login_required
+def ver_membresia_usuario(request):
+    perfil = Perfil.objects.get(user=request.user)
+    membresias = Membresia.objects.all()
+
+    if request.method == 'POST':
+        nueva_id = request.POST.get('membresia_id')
+        if nueva_id:
+            nueva_membresia = Membresia.objects.get(id=nueva_id)
+            perfil.membresia = nueva_membresia
+            perfil.save()
+            return redirect('ver_membresia_usuario')
+
+    return render(request, 'index/ver_membresia.html', {
+        'perfil': perfil,
+        'membresias': membresias,
+    })

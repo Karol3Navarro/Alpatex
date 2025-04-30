@@ -8,6 +8,80 @@
         <p><strong>Detalles del Producto:</strong> (Aquí puedes agregar más detalles)</p>
         <!-- Agrega más detalles según lo necesites -->
         <a href="{% url 'home' %}" class="btn btn-secondary">Volver</a>
+        <a href="{% url 'detailms' username=producto.usuario.username %}" class="btn btn-primary">Me Interesa</a>
     </div>
-    <a href="{% url 'detailms' username=producto.usuario.username %}" class="btn btn-primary">Me Interesa</a>
+    <h3>Deja tu comentario</h3>
+    {% if user.is_authenticated %}
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- ⭐⭐ Aquí agregamos las estrellas ⭐⭐ -->
+            <div id="star-rating" style="font-size: 2rem; color: #ddd; cursor: pointer;">
+                <span data-value="1">★</span>
+                <span data-value="2">★</span>
+                <span data-value="3">★</span>
+                <span data-value="4">★</span>
+                <span data-value="5">★</span>
+            </div>
+
+            <!-- Campo oculto para almacenar el puntaje -->
+            {{ form.puntaje }}
+
+            <div class="form-group mt-3">
+                {{ form.comentario.label_tag }}
+                {{ form.comentario }}
+            </div>
+
+            <button type="submit" class="btn btn-success mt-2">Enviar Calificación</button>
+        </form>
+        {% else %}
+            <p><a href="{% url 'login' %}">Inicia sesión</a para calificar este producto.</p>
+        {% endif %}
+
+    <hr>
+
+    <h3>Opiniones de otros usuarios:</h3>
+    {% for calificacion in calificaciones %}
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title">{{ calificacion.usuario.username }} - {{ calificacion.puntaje }} ⭐</h5>
+                <p class="card-text">{{ calificacion.comentario }}</p>
+            </div>
+        </div>
+    {% empty %}
+        <p>No hay calificaciones todavía.</p>
+    {% endfor %}
+
+
+    <script>
+        const stars = document.querySelectorAll('#star-rating span');
+        const ratingInput = document.getElementById('id_puntaje');  // campo oculto
+        let currentRating = 0;
+    
+        stars.forEach(star => {
+            star.addEventListener('mouseover', () => {
+                const rating = star.getAttribute('data-value');
+                highlightStars(rating);
+            });
+    
+            star.addEventListener('mouseout', () => {
+                highlightStars(currentRating);
+            });
+    
+            star.addEventListener('click', () => {
+                currentRating = star.getAttribute('data-value');
+                ratingInput.value = currentRating;
+            });
+        });
+    
+        function highlightStars(rating) {
+            stars.forEach(star => {
+                if (star.getAttribute('data-value') <= rating) {
+                    star.style.color = '#ffc107'; // color amarillo
+                } else {
+                    star.style.color = '#ddd'; // color gris claro
+                }
+            });
+        }
+    </script>
 {% endblock %}
