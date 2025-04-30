@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+##Productos
+#Modelo producto
 class Producto(models.Model):
     ESTADO_PRODUCTO = [
         ('Nuevo', 'Nuevo'),
@@ -32,6 +34,18 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
 
+#Modelo calificacion producto
+class CalificacionProducto(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    puntaje = models.IntegerField()
+    comentario = models.TextField(blank=True)
+    
+    def __str__(self):
+        return f'{self.producto.nombre} - {self.usuario.username} ({self.puntaje} estrellas)'
+
+##Perfil
+#Modelo de perfil
 class Perfil(models.Model):
     GENERO_CHOICES = [
         ('Masculino', 'Masculino'),
