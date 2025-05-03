@@ -1,6 +1,11 @@
-<h2>Formulario de Membresía</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Guardar</button>
-</form>
+{% extends "admin_alpatex/base.html" %}
+
+
+{% block body %}
+  <h2>Formulario de Membresía</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+  </form>
+{% endblock %}

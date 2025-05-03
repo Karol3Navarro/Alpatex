@@ -1,19 +1,24 @@
-<h2>Listado de Membresías</h2>
-<a href="{% url 'crear_membresia' %}">Nueva Membresía</a>
-<table>
-  <tr>
-    <th>Nombre</th>
-    <th>Precio</th>
-    <th>Opciones</th>
-  </tr>
-  {% for m in membresias %}
-  <tr>
-    <td>{{ m.nombre }}</td>
-    <td>{{ m.precio }}</td>
-    <td>
-      <a href="{% url 'editar_membresia' m.id %}">Editar</a> |
-      <a href="{% url 'eliminar_membresia' m.id %}">Eliminar</a>
-    </td>
-  </tr>
-  {% endfor %}
-</table>
+{% extends "admin_alpatex/base.html" %}
+
+
+{% block body %}
+  <h2>Listado de Membresías</h2>
+  <a href="{% url 'crear_membresia' %}">Nueva Membresía</a>
+  <table>
+    <tr>
+      <th>Nombre</th>
+      <th>Precio</th>
+      <th>Opciones</th>
+    </tr>
+    {% for m in membresias %}
+    <tr>
+      <td>{{ m.nombre }}</td>
+      <td>{{ m.precio }}</td>
+      <td>
+        <a href="{% url 'editar_membresia' m.id %}">Editar</a> |
+        <a href="{% url 'eliminar_membresia' m.id %}">Eliminar</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}
