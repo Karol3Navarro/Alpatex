@@ -1,5 +1,5 @@
 from django.http import HttpResponse, Http404, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import CanalMensaje, CanalUsuario, Canal
 from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -10,16 +10,53 @@ from django.views.generic import View
 
 # Create your views here.
 def home_index(request):
-    # Aquí puedes pasar el contexto que necesites para tu página de inicio
-    return render(request, 'index/index.html')
+	# Aquí puedes pasar el contexto que necesites para tu página de inicio
+	return render(request, 'index/index.html')
 
 class Inbox(View):
-	def get(self, request): #Obtiene los mensajes
+	def get(self, request):
+		inbox = Canal.objects.filter(canalusuario__usuario=request.user)
 
-		inbox = Canal.objects.filter(canalusuario__usuario__in=[request.user.id])
+		canal_id = request.GET.get('canal_id')
+		canal = None
 
-		context = {"inbox":inbox}
+		if canal_id:
+			try:
+				canal = Canal.objects.get(id=canal_id)
+			except Canal.DoesNotExist:
+				canal = None  # O podrías manejar con Http404
 
+		context = {
+			"inbox": inbox,
+			"canal": canal,
+			"form": FormMensajes()
+		}
+
+		return render(request, 'index/inbox.html', context)
+
+	def post(self, request):
+		canal_id = request.GET.get('canal_id')
+		try:
+			canal = Canal.objects.get(id=canal_id)
+		except Canal.DoesNotExist:
+			return redirect("nombre_de_url_inbox")  # fallback si canal no existe
+
+		if request.user.is_authenticated and canal:
+			form = FormMensajes(request.POST)
+			if form.is_valid():
+				mensaje = form.cleaned_data['mensaje']
+				CanalMensaje.objects.create(canal=canal, usuario=request.user, texto=mensaje)
+
+				# ✅ REDIRECCIÓN para evitar duplicación al recargar
+				return redirect(f"{request.path}?canal_id={canal.id}")
+
+		# Si no es válido o algo falla, renderizamos normalmente
+		inbox = Canal.objects.filter(canalusuario__usuario=request.user)
+		context = {
+			"inbox": inbox,
+			"canal": canal,
+			"form": form
+		}
 		return render(request, 'index/inbox.html', context)
 
 
@@ -61,64 +98,57 @@ class CanalFormMixin(FormMixin):
 			return super().form_invalid(form)
 
 class CanalDetailView(LoginRequiredMixin, CanalFormMixin, DetailView):
-	template_name= 'index/canal_detail.html'
+	template_name= 'index/inbox.html'
 	queryset = Canal.objects.all()
 
-	def get_context_data(self, *args, **kwargs):
-		context = super().get_context_data(*args, **kwargs)
-
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
 		obj = context['object']
-		print(obj)
-
-		# if self.request.user not in obj.usuarios.all():
-		# 	raise PermissionDenied
-
 		context['si_canal_mienbro'] = self.request.user in obj.usuarios.all()
-
+		context['inbox'] = Canal.objects.filter(canalusuario__usuario=self.request.user)
+		context['form'] = FormMensajes()
 		return context
-
-	# def get_queryset(self):
-	# 	usuario =self.request.user
-	# 	username = usuario.username
-
-	# 	qs = Canal.objects.all().filtrar_por_username(username)
-	# 	return qs
-    
-     
+	
+	 
 
 
 class DetailMs(LoginRequiredMixin, CanalFormMixin, DetailView):
-    template_name = 'index/canal_detail.html'
+	template_name = 'index/inbox.html'
 
-    def get_object(self, *args, **kwargs):
-        username = self.kwargs.get("username")
-        
-        mi_username = self.request.user.username
-        canal, _ =Canal.objects.obtener_o_crear_canal_ms(mi_username, username)
+	def get_object(self, *args, **kwargs):
+		username = self.kwargs.get("username")
+		
+		mi_username = self.request.user.username
+		canal, _ =Canal.objects.obtener_o_crear_canal_ms(mi_username, username)
 
-        if username == mi_username:
-            mi_canal, _ = Canal.objects.obtener_o_crear_canal_usuario_actual(self.request.user)
-            return mi_canal
+		if username == mi_username:
+			mi_canal, _ = Canal.objects.obtener_o_crear_canal_usuario_actual(self.request.user)
+			return mi_canal
 
-        if canal == None:
-            raise Http404
+		if canal == None:
+			raise Http404
 
-        return canal
+		return canal
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['inbox'] = Canal.objects.filter(canalusuario__usuario=self.request.user)
+		context['form'] = FormMensajes()
+		return context
 
 def mensajes_privados(request, username, *args, **kwargs):
-    if not request.user.is_authenticated:
-        return HttpResponse("Prohibido")
+	if not request.user.is_authenticated:
+		return HttpResponse("Prohibido")
 
-    mi_username = request.user.username
+	mi_username = request.user.username
 
-    canal, created =Canal.objects.obtener_o_crear_canal_ms(mi_username, username)
-    if created:
-        print("Si, fue creado")
-    
-    Usuarios_Canal = canal.canalusuario_set.all().values("usuario__username")
-    print(Usuarios_Canal)
-    mensaje_canal = canal.canalmensaje_set.all().order_by('tiempo')
-    print(mensaje_canal.values("texto"))
+	canal, created =Canal.objects.obtener_o_crear_canal_ms(mi_username, username)
+	if created:
+		print("Si, fue creado")
+	
+	Usuarios_Canal = canal.canalusuario_set.all().values("usuario__username")
+	print(Usuarios_Canal)
+	mensaje_canal = canal.canalmensaje_set.all().order_by('tiempo')
+	print(mensaje_canal.values("texto"))
 
-        
-    return HttpResponse(f"Nuestro Id del Canal - {canal.id}")
+		
+	return HttpResponse(f"Nuestro Id del Canal - {canal.id}")
