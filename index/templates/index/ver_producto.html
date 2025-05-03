@@ -1,6 +1,14 @@
 {% extends "index/base.html" %}
 {% block title %}Producto{% endblock title %}
 {% block body %}
+
+    <div class="reg-btn">
+        <a href="{% url 'home' %}" class="regresar">
+            <span class="material-symbols-outlined">chevron_left</span> Regresar
+        </a>
+    </div>
+    
+
     <div class="container">
         <h2>{{ producto.nombre }}</h2>
         <p><strong>Vendedor:</strong> {{ producto.usuario.username }}</p>

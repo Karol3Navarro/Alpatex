@@ -2,54 +2,63 @@
 {% load static %}
 
 {% block body %}
-  <h1>Mis Productos</h1>
-  <div class="mt-4">
-    <a href="{% url 'producto_add_perf' %}" class="btn btn-primary">Agregar Producto</a>
+
+  <div class="reg-btn">
+    <a href="{% url 'home' %}" class="regresar">
+        <span class="material-symbols-outlined">chevron_left</span> Regresar
+    </a>
+  </div>
+
+  <h1 class="prod-dest">Mis Productos</h1>
+
+  <div class="add-prod">
+    <a href="{% url 'producto_add_perf' %}" class="btn"><span>&#10009;</span>Agregar Producto</a>
   </div>
 
   {% if mensaje %}
+
     <p>{{ mensaje }}</p>
+
   {% else %}
-    <ul class="list-group">
+
+    <div class="list-prod">
       {% for producto in productos %}
-        <li class="list-group-item">
-          <div class="d-flex align-items-center">
-            <!-- Imagen del producto -->
-            <div class="me-3">
-              {% if producto.imagen %}
-                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"
-                     style="width: 100px; height: 100px; object-fit: cover;">
-              {% else %}
-                <img src="{% static 'images/default_product.png' %}" alt="Sin imagen"
-                     style="width: 100px; height: 100px; object-fit: cover;">
-              {% endif %}
-            </div>
-
-            <!-- Detalles del producto -->
-            <div>
-              <strong>{{ producto.nombre }}</strong><br>
-              <small>Publicado por: {{ producto.usuario.username }}</small><br>
-              <small>Estado: {{ producto.estado }}</small><br>
-              <small>Tipo: {{ producto.tipo }}</small><br>
-              <small>Contacto: {{ producto.contacto }}</small><br>
-              <small>Estado de Revisión: 
-                <span
-                  {% if producto.estado_revision == "Pendiente" %} style="color: orange;"
-                  {% elif producto.estado_revision == "Rechazado" %} style="color: red;"
-                  {% elif producto.estado_revision == "Aceptado" %} style="color: green;"
-                  {% endif %}>
-                  {{ producto.estado_revision }}
-                </span>
-              </small><br>
-
-              {% if producto.estado_revision == "Rechazado" %}
-                <small><strong>Motivo de Rechazo:</strong> {{ producto.motivo_rechazo }}</small><br>
-              {% endif %}
-            </div>
+        <div class="list-prod-item">
+          <!-- Imagen del producto -->
+          <div class="img-prod">
+            {% if producto.imagen %}
+              <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"
+                    style="width: 100px; height: 100px; object-fit: cover;">
+            {% else %}
+              <img src="{% static 'images/default_product.png' %}" alt="Sin imagen"
+                    style="width: 100px; height: 100px; object-fit: cover;">
+            {% endif %}
           </div>
-        </li>
+
+          <!-- Detalles del producto -->
+          <div class="info">
+            <strong>{{ producto.nombre }}</strong><br>
+            <small>Publicado por: {{ producto.usuario.username }}</small><br>
+            <small>Estado: {{ producto.estado }}</small><br>
+            <small>Tipo: {{ producto.tipo }}</small><br>
+            <small>Contacto: {{ producto.contacto }}</small><br>
+            <small>Estado de Revisión: 
+              <span
+                {% if producto.estado_revision == "Pendiente" %} style="color: orange;"
+                {% elif producto.estado_revision == "Rechazado" %} style="color: red;"
+                {% elif producto.estado_revision == "Aceptado" %} style="color: green;"
+                {% endif %}>
+                {{ producto.estado_revision }}
+              </span>
+            </small><br>
+
+            {% if producto.estado_revision == "Rechazado" %}
+              <small><strong>Motivo de Rechazo:</strong> {{ producto.motivo_rechazo }}</small><br>
+            {% endif %}
+          </div>
+        </div>
       {% endfor %}
-    </ul>
+    </div>
   {% endif %}
 
 {% endblock %}
