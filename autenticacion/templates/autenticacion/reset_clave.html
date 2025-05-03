@@ -1,0 +1,47 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cambiar Clave</title>
+    <link type='text/css' href="{% static 'css/style.css' %}" rel='stylesheet'>
+</head>
+<body class="cent-body bg-gray-100">
+    <div class="container">
+        <h2 class="titulo">Establecer Nueva Clave</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+                <label for="id_new_password1">Nueva Contraseña</label>
+                {{ form.new_password1 }}
+                {% for error in form.new_password1.errors %}
+                    <p class="error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div class="mt-4">
+                <label for="id_new_password2">Confirmar Nueva Contraseña</label>
+                {{ form.new_password2 }}
+                {% for error in form.new_password2.errors %}
+                    <p class="error">{{ error }}</p>
+                {% endfor %}
+            </div>
+    
+            <button type="submit" class="btn">Guardar Cambios</button>
+        </form>
+
+        <!-- Centrado de instrucciones -->
+        <div class="helptext text-center">
+            <ul class="list-disc pl-5 inline-block text-left">
+                <li>Debe contener al menos 8 caracteres.</li>
+                <li>No debe ser demasiado similar a tu información personal.</li>
+                <li>No debe ser una clave común ni totalmente numérica.</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

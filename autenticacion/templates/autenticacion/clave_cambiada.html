@@ -1,0 +1,29 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clave Cambiada</title>
+    <link type='text/css' href="{% static 'css/style.css' %}" rel='stylesheet'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="cent-body bg-gray-100">
+    <div class="container">
+        <h1 class="titulo">¡Clave Cambiada con Éxito!</h1>
+        <p class="texto-exito">Tu clave ha sido cambiada con éxito. Ahora puedes iniciar sesión con tu nueva clave.</p>
+        <br>
+        <br>
+        <div class="btns text-center">
+            <form action="{% url 'index' %}" method="get">
+                <button type="submit" class="btn">Volver al Inicio</button>
+            </form>
+        </div>
+        
+    
+
+</body>
+</html>

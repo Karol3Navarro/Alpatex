@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Correo enviado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F7F0F0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .message-container {
+            text-align: center;
+            background-color: #FFFFFF;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        .message-container h1 {
+            color: #AD5CA1;
+        }
+        .alpaca-icon {
+            width: 50px;
+            margin-bottom: 20px;
+        }
+        .message-container p {
+            font-size: 18px;
+            color: #333;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #AD5CA1;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #DD1155;
+        }
+    </style>
+</head>
+<body>
+    <div class="message-container">
+        <img src="{% static 'img/logo-fotor-bg-remover-20250420131433.png' %}" alt="Alpatex" width="40" height="40">
+        <h1>¡Correo de recuperación enviado con éxito!</h1>
+        <p>Hemos enviado un correo con las instrucciones para cambiar tu clave. Por favor revisa tu bandeja de entrada.</p>
+        <a href="/" class="btn">Volver al inicio</a>
+    </div>
+
+    <script>
+        setTimeout(function() {
+            window.location.href = "/";
+        }, 5000); // Redirigir automáticamente después de 5 segundos
+    </script>
+</body>
+</html>

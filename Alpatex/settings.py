@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'index',
     'Dm',
-    'admin_alpatex'
+    'admin_alpatex',
+    'autenticacion',
 ]
 
 MIDDLEWARE = [
@@ -134,3 +135,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 import os
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "alpatex.bd@gmail.com"
+EMAIL_HOST_PASSWORD = "vffg irtp ixwh izwx"
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

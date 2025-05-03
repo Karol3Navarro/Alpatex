@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cambiar Clave</title>
+    {% load static %}
+    <link type='text/css' href="{% static 'css/style.css' %}" rel='stylesheet'>
+</head>
+<body class="cent-body bg-gray-100">
+    <div class="container">
+        <h2>Recuperar Clave</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.as_p }}
+            </div>
+            <div class="btns text-center">
+                <button type="submit" class="btn">Enviar Correo</button>
+            </div>
+        </form>
+    </div>
+    
+</body>
+</html>

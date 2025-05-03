@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperación de Clave</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #000000; /* Establecer el color negro para todo el texto */
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #000000; /* Aseguramos que el título también sea negro */
+        }
+        .button {
+            background-color: #AD5CA1;
+            color: #fff;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            display: block;
+            margin: 20px auto 0;
+            width: 100%;
+            text-align: center;
+        }
+        .button:hover {
+            background-color: #AD5CA1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Recuperación de Clave</h2>
+        <p>Has solicitado cambiar tu clave. Para hacerlo, por favor haz clic en el siguiente enlace:</p>
+        <p><a href="{{ reset_link }}" class="button">Cambiar mi clave</a></p>
+        <p>Si no has solicitado este cambio, puedes ignorar este mensaje.</p>
+    </div>
+</body>
+</html>
