@@ -216,7 +216,25 @@ nav ul.menu li a.navegacion{
 nav ul.menu li a.navegacion:hover {
     color: #DD1155;
 }
-
+.custom-menu {
+    border: 1px solid #AD5CA1;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(173, 92, 161, 0.2);
+    padding: 10px 0;
+    margin-top: 8px;
+    min-width: 180px;
+}
+.custom-menu .dropdown-item {
+    color: #5a2d50;
+    font-weight: 500;
+    padding: 10px 20px;
+    transition: background 0.2s ease;
+}
+.custom-menu .dropdown-item:hover {
+    background-color: #fad6f2;
+    color: #DD1155;
+    border-radius: 6px;
+}
 /*-----------------*/
 body {
     overflow-x: hidden;
@@ -429,7 +447,6 @@ PROFILE
     display: flex;
     justify-content: space-between;
     width: 100%;
-    max-width: 1000px;
     margin-top: 20px;
 }
 .profile-container {
