@@ -14,6 +14,4 @@ class Membresia(models.Model):
         return self.nombre
 
 
-#class MembresiaAdmin(admin.ModelAdmin):
-#    list_display = ('nombre', 'prioridad_visibilidad', 'precio')
-#    ordering = ['-prioridad_visibilidad']
+
