@@ -4,7 +4,7 @@ from django.db import models
 class Membresia(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
     descripcion = models.TextField()
-    prioridad_visibilidad = models.BooleanField(default=False)
+    prioridad_visibilidad = models.IntegerField(default=0)
     distintivo = models.CharField(max_length=50, null=True, blank=True)
     verificacion_prioritaria = models.BooleanField(default=False)
     estadisticas = models.BooleanField(default=False)
@@ -12,3 +12,8 @@ class Membresia(models.Model):
 
     def __str__(self):
         return self.nombre
+
+
+#class MembresiaAdmin(admin.ModelAdmin):
+#    list_display = ('nombre', 'prioridad_visibilidad', 'precio')
+#    ordering = ['-prioridad_visibilidad']

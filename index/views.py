@@ -10,6 +10,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Avg
 from admin_alpatex.models import Membresia
+from django.db.models import F
 
 def map(request):
     productos = Producto.objects.select_related('usuario').all()
@@ -65,9 +66,11 @@ def index(request):
 
 def home(request):
     usuarios = User.objects.all()
-    productos = Producto.objects.all()
 
-    # Calcula el promedio de cada producto
+    productos = Producto.objects.select_related('usuario__perfil__membresia').annotate(
+        prioridad_visibilidad=F('usuario__perfil__membresia__prioridad_visibilidad')
+    ).order_by('-prioridad_visibilidad', '-fecha_creacion')  # Asegúrate de tener este campo
+
     for producto in productos:
         calificaciones = CalificacionProducto.objects.filter(producto=producto)
         if calificaciones.exists():
