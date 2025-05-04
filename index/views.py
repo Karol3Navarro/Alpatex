@@ -90,6 +90,10 @@ def home(request):
 
 def ver_producto(request, id_producto):
     producto = get_object_or_404(Producto, id_producto=id_producto)
+    
+    # Incrementar el contador de visitas
+    producto.contador_visitas += 1
+    producto.save()
 
     if request.method == 'POST':
         form = CalificacionProductoForm(request.POST)
@@ -102,7 +106,19 @@ def ver_producto(request, id_producto):
     else:
         form = CalificacionProductoForm()
 
-    calificaciones = CalificacionProducto.objects.filter(producto=producto)
+    # Obtener calificaciones con información de perfil segura
+    calificaciones = []
+    for calificacion in CalificacionProducto.objects.filter(producto=producto):
+        try:
+            perfil = calificacion.usuario.perfil
+            foto_perfil = perfil.foto_perfil.url if perfil.foto_perfil else None
+        except (Perfil.DoesNotExist, AttributeError):
+            foto_perfil = None
+        
+        calificaciones.append({
+            'calificacion': calificacion,
+            'foto_perfil': foto_perfil
+        })
 
     context = {
         'producto': producto,
@@ -219,7 +235,11 @@ def productos_perfil(request):
         mensaje = "No tienes productos agregados."
     else:
         mensaje = None
-    return render(request, 'index/productos_perf.html', {'productos': productos, 'mensaje': mensaje})
+    return render(request, 'index/productos_perf.html', {
+        'productos': productos, 
+        'mensaje': mensaje,
+        'membresia': request.user.perfil.membresia
+    })
 
 
 @login_required

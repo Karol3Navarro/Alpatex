@@ -30,7 +30,7 @@ class Producto(models.Model):
     estado_revision = models.CharField(max_length=10, choices=ESTADO_REVISION, default='Pendiente')
     motivo_rechazo = models.TextField(blank=True)
     fecha_creacion = models.DateTimeField(default=timezone.now)
-
+    contador_visitas = models.IntegerField(default=0)
 
     def __str__(self):
         return self.nombre

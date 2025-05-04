@@ -1,4 +1,5 @@
 {% extends "index/base.html" %}
+{% load static %}
 {% block title %}Producto{% endblock title %}
 {% block body %}
 
@@ -52,7 +53,7 @@
             <button type="submit" class="btn btn-success mt-2">Enviar Calificación</button>
         </form>
         {% else %}
-            <p><a href="{% url 'login' %}">Inicia sesión</a para calificar este producto.</p>
+            <p><a href="{% url 'login' %}">Inicia sesión</a> para calificar este producto.</p>
         {% endif %}
 
     <hr>
@@ -60,34 +61,35 @@
     <h3 class="prod-dest">Opiniones de otros usuarios:</h3>
 
     <div class="calificaciones">
-        {% for calificacion in calificaciones %}
-            
-        <div class="cal-card">
-            <div class="cal-card-body">
-                <div class="cal-header">
-                    {% with perfil=calificacion.usuario.perfil %}
-                        <img src="{{ perfil.foto_perfil.url }}" alt="Foto de perfil" class="cal-avatar">
-                    {% endwith %}
+        {% for calificacion_data in calificaciones %}
+            {% with calificacion=calificacion_data.calificacion %}
+            <div class="cal-card">
+                <div class="cal-card-body">
+                    <div class="cal-header">
+                        {% if calificacion_data.foto_perfil %}
+                            <img src="{{ calificacion_data.foto_perfil }}" alt="Foto de perfil" class="cal-avatar">
+                        {% else %}
+                            <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada" class="cal-avatar">
+                        {% endif %}
         
-                    <div class="cal-user-info">
-                        <h5 class="cal-card-titulo">{{ calificacion.usuario.username }}</h5>
-                        <div class="cal-rating">
-                            {% for i in "12345"|make_list %}
-                                {% if forloop.counter <= calificacion.puntaje %}
-                                    <span class="star full">★</span>
-                                {% else %}
-                                    <span class="star">☆</span>
-                                {% endif %}
-                            {% endfor %}
+                        <div class="cal-user-info">
+                            <h5 class="cal-card-titulo">{{ calificacion.usuario.username }}</h5>
+                            <div class="cal-rating">
+                                {% for i in "12345"|make_list %}
+                                    {% if forloop.counter <= calificacion.puntaje %}
+                                        <span class="star full">★</span>
+                                    {% else %}
+                                        <span class="star">☆</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
+        
+                    <p class="cal-card-texto">{{ calificacion.comentario }}</p>
                 </div>
-        
-                <p class="cal-card-texto">{{ calificacion.comentario }}</p>
             </div>
-        </div>
-        
-
+            {% endwith %}
         {% empty %}
             <p>No hay calificaciones todavía.</p>
         {% endfor %}

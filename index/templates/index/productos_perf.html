@@ -51,6 +51,9 @@
                 {{ producto.estado_revision }}
               </span>
             </small><br>
+            {% if request.user.perfil.membresia.nombre == 'Oro' %}
+            <small>Visitas: {{ producto.contador_visitas }}</small><br>
+            {% endif %}
 
             {% if producto.estado_revision == "Rechazado" %}
               <small><strong>Motivo de Rechazo:</strong> {{ producto.motivo_rechazo }}</small><br>
