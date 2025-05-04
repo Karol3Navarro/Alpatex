@@ -9,6 +9,7 @@
     <input type="date" name="fecha_inicio" value="{{ request.GET.fecha_inicio }}">
     <input type="date" name="fecha_fin" value="{{ request.GET.fecha_fin }}">
     <button type="submit">Filtrar</button>
+    <a href="{% url 'reporte_productos' %}">Limpiar filtros</a>
 </form>
 <a href="{% url 'exportar_excel' %}" class="btn btn-success">Exportar a Excel</a>
 

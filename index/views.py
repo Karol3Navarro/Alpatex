@@ -67,9 +67,12 @@ def index(request):
 def home(request):
     usuarios = User.objects.all()
 
-    productos = Producto.objects.select_related('usuario__perfil__membresia').annotate(
+    productos = Producto.objects.select_related('usuario__perfil__membresia').filter(
+        estado_revision='Aceptado'
+    ).annotate(
         prioridad_visibilidad=F('usuario__perfil__membresia__prioridad_visibilidad')
-    ).order_by('-prioridad_visibilidad', '-fecha_creacion')  # Asegúrate de tener este campo
+    ).order_by('-prioridad_visibilidad', '-fecha_creacion')
+
 
     for producto in productos:
         calificaciones = CalificacionProducto.objects.filter(producto=producto)

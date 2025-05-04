@@ -39,7 +39,8 @@ def gestionar_productos(request):
         # Validar si viene producto_id vacío
         if not producto_id:
             messages.error(request, "Error: No se recibió el ID del producto.")
-            return redirect('nombre_url_gestionar_productos')  # Cambia por el nombre real de tu URL
+            return redirect('gestionar_productos')
+
 
         producto = get_object_or_404(Producto, id_producto=producto_id)
 
@@ -62,6 +63,8 @@ def gestionar_productos(request):
         return redirect('gestionar_productos')
 
     productos_pendientes = Producto.objects.filter(estado_revision='Pendiente')
+    productos_pendientes = sorted(productos_pendientes, key=lambda p: p.prioridad_verificacion)
+
     return render(request, 'admin_alpatex/gestion_productos.html', {'productos_pendientes': productos_pendientes})
 
 @login_required
@@ -170,3 +173,11 @@ def eliminar_membresia(request, membresia_id):
     membresia = get_object_or_404(Membresia, pk=membresia_id)
     membresia.delete()
     return redirect('listar_membresias')
+
+def productos_pendientes(request):
+    productos = Producto.objects.filter(estado_revision='Pendiente')
+    
+    # Ordena manualmente según la prioridad de la membresía
+    productos = sorted(productos, key=lambda p: p.prioridad_verificacion)
+
+    return render(request, 'admin/productos_pendientes.html', {'productos': productos})

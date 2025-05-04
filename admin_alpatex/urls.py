@@ -14,7 +14,7 @@ urlpatterns = [
     path('membresias/nueva/', views.crear_membresia, name='crear_membresia'),
     path('membresias/editar/<int:membresia_id>/', views.editar_membresia, name='editar_membresia'),
     path('membresias/eliminar/<int:membresia_id>/', views.eliminar_membresia, name='eliminar_membresia'),
-    
+    path('gestionar-productos/', views.gestionar_productos, name='gestionar_productos'),
 
   # Ruta para el dashboard
 ]

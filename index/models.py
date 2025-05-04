@@ -34,6 +34,19 @@ class Producto(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+    #para facilitar el ordenamiento de productos para el admin
+    @property
+    def prioridad_verificacion(self):
+        try:
+            membresia = self.usuario.perfil.membresia
+            if membresia and membresia.nombre == 'Oro':
+                return 0
+            elif membresia and membresia.nombre == 'Plata':
+                return 1
+        except:
+            pass
+        return 2  # Básico o sin membresía
 
 #Modelo calificacion producto
 class CalificacionProducto(models.Model):
@@ -62,3 +75,5 @@ class Perfil(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
