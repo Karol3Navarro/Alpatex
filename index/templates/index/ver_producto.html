@@ -9,22 +9,31 @@
     </div>
     
 
-    <div class="container">
-        <h2>{{ producto.nombre }}</h2>
-        <p><strong>Vendedor:</strong> {{ producto.usuario.username }}</p>
-        <p><strong>Dirección:</strong> {{ producto.direccion }}</p>
-        <p><strong>Detalles del Producto:</strong> (Aquí puedes agregar más detalles)</p>
-        <!-- Agrega más detalles según lo necesites -->
-        <a href="{% url 'home' %}" class="btn btn-secondary">Volver</a>
-        <a href="{% url 'detailms' username=producto.usuario.username %}" class="btn btn-primary">Me Interesa</a>
+    <div class="prod-detalle">
+        <div class="izq">
+            <img src="{{ producto.imagen.url }}" class="img">
+        </div>
+        <div class="der">
+            <h2 class="der-titulo">{{ producto.nombre }}</h2>
+            <p class="precio">$ <!--${{ producto.precio }}--></p>
+            <p><strong>Detalles del Producto:</strong> (Aquí puedes agregar más detalles)</p>
+            <p><strong>Publicado por:</strong> {{ producto.usuario.username }}</p>
+            <p><strong>Estado:</strong> {{producto.estado}} </p>
+            <p><strong>Dirección:</strong> {{ producto.direccion }}</p>
+            <p><strong>Para:</strong> {{ producto.tipo }}</p>
+
+            <!-- Agrega más detalles según lo necesites -->
+            <a href="{% url 'detailms' username=producto.usuario.username %}" class="btn">Me Interesa</a>
+        </div>
     </div>
-    <h3>Deja tu comentario</h3>
+
+    <h3 class="prod-dest">Deja tu comentario</h3>
     {% if user.is_authenticated %}
-        <form method="post">
+        <form method="post" class="comment-form">
             {% csrf_token %}
 
             <!-- ⭐⭐ Aquí agregamos las estrellas ⭐⭐ -->
-            <div id="star-rating" style="font-size: 2rem; color: #ddd; cursor: pointer;">
+            <div id="star-rating" class="stars" style="cursor: pointer;">
                 <span data-value="1">★</span>
                 <span data-value="2">★</span>
                 <span data-value="3">★</span>
@@ -35,7 +44,7 @@
             <!-- Campo oculto para almacenar el puntaje -->
             {{ form.puntaje }}
 
-            <div class="form-group mt-3">
+            <div class="form-group">
                 {{ form.comentario.label_tag }}
                 {{ form.comentario }}
             </div>
@@ -48,17 +57,41 @@
 
     <hr>
 
-    <h3>Opiniones de otros usuarios:</h3>
-    {% for calificacion in calificaciones %}
-        <div class="card mb-2">
-            <div class="card-body">
-                <h5 class="card-title">{{ calificacion.usuario.username }} - {{ calificacion.puntaje }} ⭐</h5>
-                <p class="card-text">{{ calificacion.comentario }}</p>
+    <h3 class="prod-dest">Opiniones de otros usuarios:</h3>
+
+    <div class="calificaciones">
+        {% for calificacion in calificaciones %}
+            
+        <div class="cal-card">
+            <div class="cal-card-body">
+                <div class="cal-header">
+                    {% with perfil=calificacion.usuario.perfil %}
+                        <img src="{{ perfil.foto_perfil.url }}" alt="Foto de perfil" class="cal-avatar">
+                    {% endwith %}
+        
+                    <div class="cal-user-info">
+                        <h5 class="cal-card-titulo">{{ calificacion.usuario.username }}</h5>
+                        <div class="cal-rating">
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= calificacion.puntaje %}
+                                    <span class="star full">★</span>
+                                {% else %}
+                                    <span class="star">☆</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+        
+                <p class="cal-card-texto">{{ calificacion.comentario }}</p>
             </div>
         </div>
-    {% empty %}
-        <p>No hay calificaciones todavía.</p>
-    {% endfor %}
+        
+
+        {% empty %}
+            <p>No hay calificaciones todavía.</p>
+        {% endfor %}
+    </div>
 
 
     <script>
