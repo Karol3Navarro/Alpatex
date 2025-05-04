@@ -592,3 +592,34 @@ footer{
     color: white;
     text-decoration: none;
 }
+/*ALERTA*/
+/* Estilo para las alertas */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.alert.success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.alert.error {
+    background-color: #f44336;
+    color: white;
+}
+
+.alert.warning {
+    background-color: #ff9800;
+    color: white;
+}
+
+.alert.info {
+    background-color: #2196F3;
+    color: white;
+}
+/* Alerta */

@@ -79,3 +79,20 @@ function abrirModal(){
 function cerrarModal(){
     document.getElementById("modRecContra").style.display = "none";
 }
+function toggleEditProducto(modo, productoId) {
+    console.log("Modo edición del producto:", modo);
+
+    const editables = document.querySelectorAll(`#producto-${productoId} .editable`);
+    editables.forEach(el => {
+        el.disabled = !modo;  // Habilitar o deshabilitar el campo
+    });
+
+    const btn = document.getElementById(`btn-editar-producto-${productoId}`);
+    if (modo) {
+        btn.textContent = "Cancelar edición";
+        btn.setAttribute("onclick", `toggleEditProducto(false, ${productoId})`);
+    } else {
+        btn.textContent = "Editar producto";
+        btn.setAttribute("onclick", `toggleEditProducto(true, ${productoId})`);
+    }
+}

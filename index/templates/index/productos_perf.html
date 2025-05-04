@@ -56,6 +56,13 @@
               <small><strong>Motivo de Rechazo:</strong> {{ producto.motivo_rechazo }}</small><br>
             {% endif %}
           </div>
+          <div class="product-actions">
+            <!-- Editar producto -->
+            <a href="{% url 'producto_findEdit' pk=producto.id_producto %}" class="btn">Editar</a>
+
+            <!-- Eliminar producto -->
+            <a href="{% url 'producto_del' pk=producto.id_producto %}" class="btn">Eliminar</a>
+          </div>
         </div>
       {% endfor %}
     </div>

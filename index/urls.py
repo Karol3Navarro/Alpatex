@@ -20,4 +20,7 @@ urlpatterns = [
 
     path('membresia/', views.ver_membresia_usuario, name='ver_membresia_usuario'),
 
+    path('producto_del/<str:pk>', views.producto_del, name='producto_del'),
+    path('producto_findEdit/<int:pk>/', views.producto_findEdit, name='producto_findEdit'),
+    path('productoUpdate', views.editar_producto, name='productoUpdate')
 ]

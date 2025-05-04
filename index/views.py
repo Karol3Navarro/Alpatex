@@ -58,6 +58,7 @@ def index(request):
                 return redirect('home')  
         else:
             error_message = "Credenciales incorrectas, por favor intenta nuevamente."
+            messages.error(request, error_message)
             return render(request, 'index/index.html', {'error_message': error_message})
 
     return render(request, 'index/index.html')  
@@ -267,3 +268,45 @@ def ver_membresia_usuario(request):
         'perfil': perfil,
         'membresias': membresias,
     })
+
+#Modificacion de Producto
+def editar_producto(request, pk):
+    producto = get_object_or_404(Producto, id_producto=pk)
+
+    if request.method == "POST":
+        form = ProductoForm(request.POST, request.FILES, instance=producto)
+        if form.is_valid():
+            form.save()
+            return redirect('productos_perf')
+    else:
+        form = ProductoForm(instance=producto)
+
+    return render(request, 'index/editar_producto.html', {'form': form, 'producto': producto})
+
+def producto_findEdit(request, pk):
+    producto = get_object_or_404(Producto, id_producto=pk)
+    if request.method == "POST":
+        form = ProductoForm(request.POST, request.FILES, instance=producto)
+        if form.is_valid():
+            form.save()
+            return redirect('productos_perf')
+    else:
+        form = ProductoForm(instance=producto)
+
+    return render(request, 'index/editar_producto.html', {'form': form, 'producto': producto})
+#Eliminar Producto
+def producto_del(request,pk):
+    context={}
+    try:
+        producto=Producto.objects.get(id_producto=pk)
+
+        producto.delete()
+        mensaje ="Producto Eliminado Correctamente"
+        productos =Producto.objects.all()
+        context = {'productos':productos, 'mensaje':mensaje}
+        return render(request, 'index/producto_perfi.html', context)
+    except:
+        mensaje="Error, producto no existe"
+        productos =Producto.objects.all()
+        context = {'productos':productos, 'mensaje':mensaje}
+        return render(request, 'index/productos_perf.html', context)
