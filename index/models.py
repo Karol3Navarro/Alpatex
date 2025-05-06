@@ -94,6 +94,9 @@ class Perfil(models.Model):
             self.foto_perfil = 'perfil_images/user_defecto.PNG'
         super().save(*args, **kwargs)
 
-Perfil.objects.filter(foto_perfil__isnull=True).update(foto_perfil='perfil_images/user_defecto.PNG')
+@receiver(post_save, sender=User)
+def actualizar_foto_perfil_defecto(sender, instance, created, **kwargs):
+    if created:
+        Perfil.objects.filter(user=instance, foto_perfil__isnull=True).update(foto_perfil='perfil_images/user_defecto.PNG')
 
 
