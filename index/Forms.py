@@ -81,7 +81,8 @@ class PerfilForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if user:
-            self.fields['email'].initial = user.email  
+            self.fields['email'].initial = user.email
+
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exclude(id=self.instance.user.id).exists():
@@ -91,6 +92,11 @@ class PerfilForm(forms.ModelForm):
     def save(self, user, commit=True):
         perfil = super().save(commit=False)
         user.email = self.cleaned_data['email']
+        
+        # Si no se subió una nueva imagen y no hay una imagen existente, usar la imagen por defecto
+        if not self.cleaned_data.get('foto_perfil') and not perfil.foto_perfil:
+            perfil.foto_perfil = 'perfil_images/user_defecto.PNG'
+            
         if commit:
             user.save() 
             perfil.save()  

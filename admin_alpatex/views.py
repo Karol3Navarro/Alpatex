@@ -126,7 +126,7 @@ def export_to_excel(request):
 
 
 def usuarios(request):
-    usuarios = User.objects.all()  # Recupera todos los usuarios registrados
+    usuarios = User.objects.select_related('perfil').all()  # Carga los perfiles de manera eficiente
     return render(request, 'admin_alpatex/usuarios.html', {'usuarios': usuarios})
 
 

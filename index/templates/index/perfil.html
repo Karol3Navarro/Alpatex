@@ -15,11 +15,7 @@
 
             <div class="perfil-cont">
                 <div class="perfil-foto">
-                    {% if perfil.foto_perfil %}
-                    <img src="{{ perfil.foto_perfil.url }}" alt="Foto de perfil" width="150">
-                    {% else %}
-                    <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada" width="150">
-                    {% endif %}
+                    <img src="{{ perfil.get_foto_perfil_url }}" alt="Foto de perfil" width="150">
                 </div>
 
                 <form method="post" enctype="multipart/form-data">
