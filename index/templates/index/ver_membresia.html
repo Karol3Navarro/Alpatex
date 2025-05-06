@@ -1,6 +1,13 @@
 {% extends "index/base.html" %}
 
 {% block body %}
+
+  <div class="reg-btn">
+    <a href="{% url 'perfil_usuario' %}"  class="regresar">
+        <span class="material-symbols-outlined">chevron_left</span> Regresar
+    </a>
+  </div>
+  
   <h1 class="prod-dest">Mi Membresía </h1>
 
   {% if perfil.membresia %}
