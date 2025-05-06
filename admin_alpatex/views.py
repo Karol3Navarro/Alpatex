@@ -41,7 +41,6 @@ def gestionar_productos(request):
             messages.error(request, "Error: No se recibió el ID del producto.")
             return redirect('gestionar_productos')
 
-
         producto = get_object_or_404(Producto, id_producto=producto_id)
 
         if accion == 'aceptar':
@@ -62,6 +61,7 @@ def gestionar_productos(request):
 
         return redirect('gestionar_productos')
 
+    # Obtener productos pendientes y ordenarlos por prioridad
     productos_pendientes = Producto.objects.filter(estado_revision='Pendiente')
     productos_pendientes = sorted(productos_pendientes, key=lambda p: p.prioridad_verificacion)
 
@@ -173,11 +173,3 @@ def eliminar_membresia(request, membresia_id):
     membresia = get_object_or_404(Membresia, pk=membresia_id)
     membresia.delete()
     return redirect('listar_membresias')
-
-def productos_pendientes(request):
-    productos = Producto.objects.filter(estado_revision='Pendiente')
-    
-    # Ordena manualmente según la prioridad de la membresía
-    productos = sorted(productos, key=lambda p: p.prioridad_verificacion)
-
-    return render(request, 'admin/productos_pendientes.html', {'productos': productos})
