@@ -12,6 +12,11 @@ urlpatterns = [
     path('mapa/', views.map, name='mapa'),
     path('gestionar_productos/', admin_views.gestionar_productos, name='gestionar_productos'),
     path('mis-productos/', views.productos_perfil, name='productos_perf'),
+    path('producto/<int:producto_id>/redirigir/', views.redirigir_producto, name='redirigir_producto'),
+    path('libros/', views.libros, name='vista_libros'),
+    path('videojuegos/', views.videojuegos, name='vista_videojuegos'),
+    path('productos/', views.productos, name='vista_productos'),
+
 
     
     path('producto/agregar/', views.producto_add_perf, name='producto_add_perf'),

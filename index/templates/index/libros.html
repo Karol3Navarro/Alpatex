@@ -1,0 +1,35 @@
+{% extends "index/base.html" %}
+{% load static %}
+{% block body %}
+  <h1>Libros Disponibles</h1>
+
+  {% if libros %}
+    <ul class="list-group mt-3">
+      {% for libro in libros %}
+        <li class="list-group-item mb-3">
+          <div class="d-flex align-items-center">
+            <div class="me-3">
+              {% if libro.imagen %}
+                <img src="{{ libro.imagen.url }}" alt="{{ libro.nombre }}"
+                     style="width: 100px; height: 150px; object-fit: cover;">
+              {% else %}
+                <img src="{% static 'images/default_book.png' %}" alt="Sin imagen"
+                     style="width: 100px; height: 150px; object-fit: cover;">
+              {% endif %}
+            </div>
+
+            <div>
+              <strong>{{ libro.nombre }}</strong><br>
+              <small>Publicado por: {{ libro.usuario.username }}</small><br>
+              <small>Estado: {{ libro.estado }}</small><br>
+              <small>Tipo: {{ libro.tipo }}</small><br>
+              <small>Categoría: {{ libro.categoria }}</small><br>  
+            </div>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No hay libros disponibles.</p>
+  {% endif %}
+{% endblock %}

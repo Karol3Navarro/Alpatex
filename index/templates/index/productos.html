@@ -1,0 +1,36 @@
+{% extends "index/base.html" %}
+{% load static %}
+
+{% block body %}
+  <h1>Productos Disponibles</h1>
+
+  {% if productos %}
+    <ul class="list-group mt-3">
+      {% for producto in productos %}
+        <li class="list-group-item mb-3">
+          <div class="d-flex align-items-center">
+            <div class="me-3">
+              {% if producto.imagen %}
+                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"
+                     style="width: 100px; height: 150px; object-fit: cover;">
+              {% else %}
+                <img src="{% static 'images/default_product.png' %}" alt="Sin imagen"
+                     style="width: 100px; height: 150px; object-fit: cover;">
+              {% endif %}
+            </div>
+
+            <div>
+              <strong>{{ producto.nombre }}</strong><br>
+              <small>Publicado por: {{ producto.usuario.username }}</small><br>
+              <small>Estado: {{ producto.estado }}</small><br>
+              <small>Tipo: {{ producto.tipo }}</small><br>
+              <small>Categoría: {{ producto.categoria }}</small><br>  
+            </div>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No hay productos disponibles.</p>
+  {% endif %}
+{% endblock %}

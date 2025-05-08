@@ -135,9 +135,9 @@
                       Productos &#x25BC;
                     </a>
                     <ul class="dropdown-menu custom-menu" aria-labelledby="productosDropdown">
-                      <li><a class="dropdown-item" href="#">Ver Todo</a></li>
-                      <li><a class="dropdown-item" href="#">Libros</a></li>
-                      <li><a class="dropdown-item" href="#">Videojuegos</a></li>
+                    <li><a class="dropdown-item" href="{% url 'vista_libros' %}">Libros</a></li>
+                    <li><a class="dropdown-item" href="{% url 'vista_videojuegos' %}">Videojuegos</a></li>
+                    <li><a class="dropdown-item" href="{% url 'vista_productos' %}">Ver todos</a></li>
                     </ul>
                   </li>
                 <li><a class="navegacion" href="{% url 'mapa' %}">Mapa</a></li>

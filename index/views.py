@@ -336,3 +336,28 @@ def producto_del(request,pk):
         productos =Producto.objects.all()
         context = {'productos':productos, 'mensaje':mensaje}
         return render(request, 'index/productos_perf.html', context)
+def redirigir_producto(request, producto_id):
+    producto = get_object_or_404(Producto, id=producto_id)
+
+    if producto.categoria == "Libro":
+        return redirect('index/videojuegos.html')
+    elif producto.categoria == "Videojuego":
+        return redirect('index/libros.html')
+    else:
+        return redirect('index/productos.html')
+@login_required
+def libros(request):
+    libros = Producto.objects.filter(categoria='Libro', estado_revision='Aceptado')  
+    return render(request, 'index/libros.html', {'libros': libros})
+
+@login_required
+def videojuegos(request):
+    videojuegos = Producto.objects.filter(categoria='Videojuego', estado_revision='Aceptado')  
+    return render(request, 'index/videojuegos.html', {'videojuegos': videojuegos})
+
+
+@login_required
+def productos(request):
+    # Filtrar productos aprobados con estado_revision='Aceptado'
+    productos = Producto.objects.filter(estado_revision='Aceptado')
+    return render(request, 'index/productos.html', {'productos': productos})
