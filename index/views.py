@@ -320,6 +320,7 @@ def producto_findEdit(request, pk):
         form = ProductoForm(instance=producto)
 
     return render(request, 'index/editar_producto.html', {'form': form, 'producto': producto})
+
 #Eliminar Producto
 def producto_del(request,pk):
     context={}
@@ -336,6 +337,7 @@ def producto_del(request,pk):
         productos =Producto.objects.all()
         context = {'productos':productos, 'mensaje':mensaje}
         return render(request, 'index/productos_perf.html', context)
+
 def redirigir_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
 
@@ -345,6 +347,7 @@ def redirigir_producto(request, producto_id):
         return redirect('index/libros.html')
     else:
         return redirect('index/productos.html')
+        
 @login_required
 def libros(request):
     libros = Producto.objects.filter(categoria='Libro', estado_revision='Aceptado')  
