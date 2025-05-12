@@ -15,12 +15,12 @@
               <h5 class="prod-dest title-left">Categoría</h5>
 
               <label class="radio-label">
-                <input type="radio" name="categoria" value="Libro" {% if request.GET.categoria == "Libro" %}checked{% endif %} onchange="this.form.submit()">
+                <input type="radio" name="categoria" value="Libro">
                 <span class="radio-custom"></span> Libros
               </label>
 
               <label class="radio-label">
-                <input type="radio" name="categoria" value="Videojuego" {% if request.GET.categoria == "Videojuego" %}checked{% endif %} onchange="this.form.submit()">
+                <input type="radio" name="categoria" value="Videojuego">
                 <span class="radio-custom"></span> Videojuegos
               </label>
             </div>
@@ -28,12 +28,12 @@
             <div class="filtro-bloque">
               <h5 class="prod-dest title-left">Estado</h5>
               <label class="radio-label">
-                <input type="radio" name="estado" value="Nuevo" {% if request.GET.estado == "Nuevo" %}checked{% endif %} onchange="this.form.submit()">
+                <input type="radio" name="estado" value="Nuevo">
                 <span class="radio-custom"></span> Nuevo
               </label>
 
               <label class="radio-label">
-                <input type="radio" name="estado" value="Usado" {% if request.GET.estado == "Usado" %}checked{% endif %} onchange="this.form.submit()">
+                <input type="radio" name="estado" value="Usado">
                 <span class="radio-custom"></span> Usado
               </label>
             </div>
@@ -41,16 +41,15 @@
             <div class="filtro-bloque">
               <h5 class="prod-dest title-left">Tipo de publicación</h5>
               <label class="radio-label">
-                <input type="radio" name="tipo" value="Venta" {% if request.GET.tipo == "Venta" %}checked{% endif %} onchange="this.form.submit()">
+                <input type="radio" name="tipo" value="Venta">
                 <span class="radio-custom"></span> Venta
               </label>
 
               <label class="radio-label">
-                <input type="radio" name="tipo" value="Intercambio" {% if request.GET.tipo == "Intercambio" %}checked{% endif %} onchange="this.form.submit()">
+                <input type="radio" name="tipo" value="Intercambio">
                 <span class="radio-custom"></span> Intercambio
               </label>
-            </div>
-
+            </div>            
           </div>
         </div>
 
@@ -58,27 +57,30 @@
         {% if productos %}
           <div class="productos-contenedor">
             {% for producto in productos %}
-              <div class="producto-card" 
+              <a href="{% url 'ver_producto' producto.id_producto %}" class="producto-card-link"
                   data-categoria="{{ producto.categoria }}"
                   data-estado="{{ producto.estado }}"
                   data-tipo="{{ producto.tipo }}">
-  
-                <div class="producto-img">
-                  {% if producto.imagen %}
-                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
-                  {% else %}
-                    <img src="{% static 'images/default_product.png' %}" alt="Sin imagen">
-                  {% endif %}
+                <div class="producto-card">
+                    
+    
+                  <div class="producto-img">
+                    {% if producto.imagen %}
+                      <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                    {% else %}
+                      <img src="{% static 'images/default_product.png' %}" alt="Sin imagen">
+                    {% endif %}
+                  </div>
+    
+                  <div class="producto-info">
+                    <strong>{{ producto.nombre }}</strong><br>
+
+                    <small>Estado: {{ producto.estado }}</small><br>
+                    <small>Tipo: {{ producto.tipo }}</small><br>
+                    <small>Categoría: {{ producto.categoria }}</small>
+                  </div>
                 </div>
-  
-                <div class="producto-info">
-                  <strong>{{ producto.nombre }}</strong><br>
-                  <small>Publicado por: {{ producto.usuario.username }}</small><br>
-                  <small>Estado: {{ producto.estado }}</small><br>
-                  <small>Tipo: {{ producto.tipo }}</small><br>
-                  <small>Categoría: {{ producto.categoria }}</small>
-                </div>
-              </div>
+              </a>
             {% endfor %}
           </div>
         {% else %}

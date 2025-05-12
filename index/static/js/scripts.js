@@ -99,24 +99,31 @@ function toggleEditProducto(modo, productoId) {
 }
 
 //FUNCION PARA EL FILTRO DE PRODUCTOS.HTLM 
-
-document.querySelectorAll('input[type=radio]').forEach(function(radio) {
-    radio.addEventListener('change', function() {
-      const categoria = document.querySelector('input[name="categoria"]:checked')?.value;
-      const estado = document.querySelector('input[name="estado"]:checked')?.value;
-      const tipo = document.querySelector('input[name="tipo"]:checked')?.value;
-  
-      document.querySelectorAll('.producto-card').forEach(function(card) {
-        const matchCategoria = !categoria || card.dataset.categoria === categoria;
-        const matchEstado = !estado || card.dataset.estado === estado;
-        const matchTipo = !tipo || card.dataset.tipo === tipo;
-  
-        if (matchCategoria && matchEstado && matchTipo) {
-          card.style.display = 'block';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    });
+document.addEventListener("DOMContentLoaded", function () {
+const filtros = document.querySelectorAll('input[type="radio"]');
+filtros.forEach(filtro => {
+    filtro.addEventListener('change', aplicarFiltros);
 });
 
+    function aplicarFiltros() {
+        const categoria = document.querySelector('input[name="categoria"]:checked')?.value;
+        const estado = document.querySelector('input[name="estado"]:checked')?.value;
+        const tipo = document.querySelector('input[name="tipo"]:checked')?.value;
+
+        const productos = document.querySelectorAll('.producto-card-link');
+
+        productos.forEach(producto => {
+        const matchCategoria = !categoria || producto.dataset.categoria === categoria;
+        const matchEstado = !estado || producto.dataset.estado === estado;
+        const matchTipo = !tipo || producto.dataset.tipo === tipo;
+
+        if (matchCategoria && matchEstado && matchTipo) {
+            producto.style.display = "block";
+        } else {
+            producto.style.display = "none";
+        }
+        });
+    }
+});
+
+  
