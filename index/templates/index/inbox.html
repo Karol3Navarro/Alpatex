@@ -2,7 +2,11 @@
 {% load static %}
 {% block title %}Mis Mensajes{% endblock title %}
 {% block body %}
-
+    <div class="reg-btn">
+        <a onclick="window.history.back();" class="regresar">
+            <span class="material-symbols-outlined">chevron_left</span> Regresar
+        </a>
+    </div>
     <div class="chat-wrapper">
         <!-- Lista de conversaciones -->
         <div class="chat-sidebar">

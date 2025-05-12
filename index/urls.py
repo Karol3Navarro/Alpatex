@@ -18,7 +18,6 @@ urlpatterns = [
     path('productos/', views.productos, name='vista_productos'),
 
 
-    
     path('producto/agregar/', views.producto_add_perf, name='producto_add_perf'),
     path('admin_dashboard/', include('admin_alpatex.urls')),  
 
