@@ -517,8 +517,10 @@ PRODUCTOS DESTACADOS
     font-weight: 700;
     color: #AD5CA1;
     text-align: center;
-    font-size: 1.8em;
     text-shadow: 0px 1px, 1px 0px, 1px 1px;
+}
+.title-left{
+    text-align: left;
 }
 
 .container-items{
@@ -700,7 +702,84 @@ VER PRODUCTO
 .cal-rating .full {
     color: #ffc107;
 }
+/*
+VER TODO
+*/
+.ver-todo{
+    width: 100%;
+    margin-bottom: 0;
+    text-align: center;
+}
+.clear{
+    width: 90%;
+    margin: 0 auto;
+}
+.sidebar{
+    width: 240px;
+    float: left;
+    margin-top: 20px;
+    text-align: left;
+}
+.filtro-bloque{
+    margin-bottom: 20px;
+}
+.radio-label{
+    display: block;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    user-select: none;
+    cursor: pointer;
+}
+.radio-label input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+.radio-custom {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 18px;
+    width: 18px;
+    border-radius: 50%;
+    border: 1px solid #636363;
+    box-sizing: border-box;
+}
+.radio-label input:checked + .radio-custom {
+    background-color: #AD5CA1;
+    border: 2px solid #42213D;
+  }
+.radio-custom::after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+.radio-label input:checked + .radio-custom::after {
+    display: block;
+    top: 4px;
+    left: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+.radio-label .radio-custon::after{
+    top: 4px;
+    left: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+}
 
+.coleccion{
+    width: calc(100% - 240px);
+    float: right;
+    margin-top: 20px;
+}
 /*
 FOOTER
 */

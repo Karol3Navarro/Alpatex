@@ -2,35 +2,89 @@
 {% load static %}
 
 {% block body %}
-  <h1>Productos Disponibles</h1>
+  <h1 class="prod-dest">Productos Disponibles</h1>
 
-  {% if productos %}
-    <ul class="list-group mt-3">
-      {% for producto in productos %}
-        <li class="list-group-item mb-3">
-          <div class="d-flex align-items-center">
-            <div class="me-3">
-              {% if producto.imagen %}
-                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"
-                     style="width: 100px; height: 150px; object-fit: cover;">
-              {% else %}
-                <img src="{% static 'images/default_product.png' %}" alt="Sin imagen"
-                     style="width: 100px; height: 150px; object-fit: cover;">
-              {% endif %}
+  <div class="ver-todo">
+    <div class="clear">
+        <div class="sidebar">
+          <h3 class="prod-dest title-left">Catálogo</h3>
+          <div class="filtro-menu">
+            <div class="filtro-titulo"><h4 class="prod-dest title-left" >Filtrar</h4></div>        
+
+            <div class="filtro-bloque">
+              <h5 class="prod-dest title-left">Categoría</h5>
+
+              <label class="radio-label">
+                <input type="radio" name="categoria" value="Libro" {% if request.GET.categoria == "Libro" %}checked{% endif %} onchange="this.form.submit()">
+                <span class="radio-custom"></span> Libros
+              </label>
+
+              <label class="radio-label">
+                <input type="radio" name="categoria" value="Videojuego" {% if request.GET.categoria == "Videojuego" %}checked{% endif %} onchange="this.form.submit()">
+                <span class="radio-custom"></span> Videojuegos
+              </label>
             </div>
 
-            <div>
-              <strong>{{ producto.nombre }}</strong><br>
-              <small>Publicado por: {{ producto.usuario.username }}</small><br>
-              <small>Estado: {{ producto.estado }}</small><br>
-              <small>Tipo: {{ producto.tipo }}</small><br>
-              <small>Categoría: {{ producto.categoria }}</small><br>  
+            <div class="filtro-bloque">
+              <h5 class="prod-dest title-left">Estado</h5>
+              <label class="radio-label">
+                <input type="radio" name="estado" value="Nuevo" {% if request.GET.estado == "Nuevo" %}checked{% endif %} onchange="this.form.submit()">
+                <span class="radio-custom"></span> Nuevo
+              </label>
+
+              <label class="radio-label">
+                <input type="radio" name="estado" value="Usado" {% if request.GET.estado == "Usado" %}checked{% endif %} onchange="this.form.submit()">
+                <span class="radio-custom"></span> Usado
+              </label>
             </div>
+
+            <div class="filtro-bloque">
+              <h5 class="prod-dest title-left">Tipo de publicación</h5>
+              <label class="radio-label">
+                <input type="radio" name="tipo" value="Venta" {% if request.GET.tipo == "Venta" %}checked{% endif %} onchange="this.form.submit()">
+                <span class="radio-custom"></span> Venta
+              </label>
+
+              <label class="radio-label">
+                <input type="radio" name="tipo" value="Intercambio" {% if request.GET.tipo == "Intercambio" %}checked{% endif %} onchange="this.form.submit()">
+                <span class="radio-custom"></span> Intercambio
+              </label>
+            </div>
+
           </div>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No hay productos disponibles.</p>
-  {% endif %}
+        </div>
+
+      <div class="coleccion">
+        {% if productos %}
+          <div class="productos-contenedor">
+            {% for producto in productos %}
+              <div class="producto-card" 
+                  data-categoria="{{ producto.categoria }}"
+                  data-estado="{{ producto.estado }}"
+                  data-tipo="{{ producto.tipo }}">
+  
+                <div class="producto-img">
+                  {% if producto.imagen %}
+                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                  {% else %}
+                    <img src="{% static 'images/default_product.png' %}" alt="Sin imagen">
+                  {% endif %}
+                </div>
+  
+                <div class="producto-info">
+                  <strong>{{ producto.nombre }}</strong><br>
+                  <small>Publicado por: {{ producto.usuario.username }}</small><br>
+                  <small>Estado: {{ producto.estado }}</small><br>
+                  <small>Tipo: {{ producto.tipo }}</small><br>
+                  <small>Categoría: {{ producto.categoria }}</small>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p>No hay productos disponibles.</p>
+        {% endif %}
+      </div>
+  </div>
+
 {% endblock %}

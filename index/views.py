@@ -262,7 +262,7 @@ def producto_add_perf(request):
             producto.estado_revision = "Pendiente"
             producto.save()
             messages.success(request, "Producto creado con éxito!")
-            return redirect('productos_perf')  # O puedes redirigir a producto_add_perf si prefieres
+            return redirect('productos_perf')
         else:
             messages.error(request, "Por favor corrige los errores en el formulario.")
     else:
@@ -364,3 +364,23 @@ def productos(request):
     # Filtrar productos aprobados con estado_revision='Aceptado'
     productos = Producto.objects.filter(estado_revision='Aceptado')
     return render(request, 'index/productos.html', {'productos': productos})
+
+def ver_todo(request):
+    productos = Producto.objects.filter(estado_revision='Aceptado')
+
+    categoria = request.GET.get('categoria')
+    estado = request.GET.get('estado')
+    tipo = request.GET.get('tipo')
+
+    if categoria:
+        productos = productos.filter(categoria=categoria)
+    if estado:
+        productos = productos.filter(estado=estado)
+    if tipo:
+        productos = productos.filter(tipo=tipo)
+
+    context={
+        'productos': productos,
+    }
+
+    return render(request, 'index/productos.html', context)

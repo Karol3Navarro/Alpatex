@@ -79,6 +79,7 @@ function abrirModal(){
 function cerrarModal(){
     document.getElementById("modRecContra").style.display = "none";
 }
+//FUNCION PARA EDITAR LA INFORMACION DE UN PRODUCTO
 function toggleEditProducto(modo, productoId) {
     console.log("Modo edición del producto:", modo);
 
@@ -96,3 +97,26 @@ function toggleEditProducto(modo, productoId) {
         btn.setAttribute("onclick", `toggleEditProducto(true, ${productoId})`);
     }
 }
+
+//FUNCION PARA EL FILTRO DE PRODUCTOS.HTLM 
+
+document.querySelectorAll('input[type=radio]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      const categoria = document.querySelector('input[name="categoria"]:checked')?.value;
+      const estado = document.querySelector('input[name="estado"]:checked')?.value;
+      const tipo = document.querySelector('input[name="tipo"]:checked')?.value;
+  
+      document.querySelectorAll('.producto-card').forEach(function(card) {
+        const matchCategoria = !categoria || card.dataset.categoria === categoria;
+        const matchEstado = !estado || card.dataset.estado === estado;
+        const matchTipo = !tipo || card.dataset.tipo === tipo;
+  
+        if (matchCategoria && matchEstado && matchTipo) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+});
+
