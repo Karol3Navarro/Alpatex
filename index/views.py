@@ -11,6 +11,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Avg
 from admin_alpatex.models import Membresia
 from django.db.models import F
+from django.contrib.messages import get_messages
 
 def map(request):
     productos = Producto.objects.select_related('usuario').all()
@@ -45,6 +46,9 @@ def menu(request):
 
 
 def index(request):
+    storage = get_messages(request)
+    for _ in storage:
+        pass
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')

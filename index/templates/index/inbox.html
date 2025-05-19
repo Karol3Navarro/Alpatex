@@ -2,11 +2,11 @@
 {% load static %}
 {% block title %}Mis Mensajes{% endblock title %}
 {% block body %}
-    <div class="reg-btn">
+    <!-- <div class="reg-btn">
         <a onclick="window.history.back();" class="regresar">
             <span class="material-symbols-outlined">chevron_left</span> Regresar
         </a>
-    </div>
+    </div> -->
     <div class="chat-wrapper">
         <!-- Lista de conversaciones -->
         <div class="chat-sidebar">
@@ -68,7 +68,7 @@
                     {% for mensaje in canal.canalmensaje_set.all|dictsort:"tiempo" %}
                         <div class="message-bubble {% if request.user == mensaje.usuario %}own{% else %}other{% endif %}">
                             <div class="message-content">
-                                <p>{{ mensaje.texto }}</p>
+                                <p>{{ mensaje.texto|safe }}</p>
                                 <small>{{ mensaje.tiempo }}</small>
                             </div>
                         </div>

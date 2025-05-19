@@ -1,5 +1,5 @@
 from django.http import HttpResponse, Http404, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import CanalMensaje, CanalUsuario, Canal
 from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -7,7 +7,8 @@ from django.core.exceptions import PermissionDenied
 from .forms import FormMensajes
 from django.views.generic.edit import FormMixin
 from django.views.generic import View
-
+from index.models import Producto
+from django.urls import reverse
 # Create your views here.
 def home_index(request):
 	# Aquí puedes pasar el contexto que necesites para tu página de inicio
@@ -117,20 +118,49 @@ class DetailMs(LoginRequiredMixin, CanalFormMixin, DetailView):
 
 	def get_object(self, *args, **kwargs):
 		username = self.kwargs.get("username")
-		
 		mi_username = self.request.user.username
-		canal, _ =Canal.objects.obtener_o_crear_canal_ms(mi_username, username)
+		self.enviar_mensaje = False  # bandera
 
-		if username == mi_username:
-			mi_canal, _ = Canal.objects.obtener_o_crear_canal_usuario_actual(self.request.user)
-			return mi_canal
+		canal, _ = Canal.objects.obtener_o_crear_canal_ms(mi_username, username)
 
-		if canal == None:
-			raise Http404
+		producto_id = self.request.GET.get("producto_id")
+		if producto_id:
+			self.producto = get_object_or_404(Producto, id_producto=producto_id)
+			self.enviar_mensaje = True
 
 		return canal
+
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
+
+		if getattr(self, 'enviar_mensaje', False):
+			canal = self.get_object()
+			usuario = self.request.user
+
+			url_producto = self.request.build_absolute_uri(
+				reverse('ver_producto', kwargs={'id_producto': self.producto.id_producto})
+			)
+
+			texto_mensaje = f""" 
+				¡Hola! Estoy interesado en tu producto: {self.producto.nombre}.<br>
+				<img src="{self.request.build_absolute_uri(self.producto.imagen.url)}" alt="{self.producto.nombre}" style="max-width: 150px; height: auto; margin-top: 10px;" />. <br>
+				<a href="{url_producto}" class="btn btn-primary" style="margin-top: 10px; display: inline-block;">Ver Producto</a>
+			"""
+
+			# Evitar duplicados: revisamos si ya existe este mensaje del usuario
+			ya_enviado = CanalMensaje.objects.filter(
+				canal=canal,
+				usuario=usuario,
+				texto=texto_mensaje
+			).exists()
+
+			if not ya_enviado:
+				CanalMensaje.objects.create(
+					canal=canal,
+					usuario=usuario,
+					texto=texto_mensaje
+				)
+
 		context['inbox'] = Canal.objects.filter(canalusuario__usuario=self.request.user)
 		context['form'] = FormMensajes()
 		return context

@@ -24,7 +24,7 @@
             <p><strong>Para:</strong> {{ producto.tipo }}</p>
 
             <!-- Agrega más detalles según lo necesites -->
-            <a href="{% url 'detailms' username=producto.usuario.username %}" class="btn">Me Interesa</a>
+            <a href="{% url 'detailms' username=producto.usuario.username %}?producto_id={{ producto.id_producto }}" class="btn btn-primary">Me Interesa</a>
         </div>
     </div>
 
