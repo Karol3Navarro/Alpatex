@@ -10,7 +10,7 @@
       <div class="col-md-3 mb-3">
         <div class="card">
           <div class="perfil-foto">
-            <img src="{{ usuario.perfil.get_foto_perfil_url }}" alt="Foto de perfil" width="150">
+            <img src="{{ usuario.perfil.get_foto_perfil_url }}" alt="Foto de perfil">
             {% if usuario.perfil.membresia %}
                 {% if usuario.perfil.membresia.nombre == 'Plata' %}
                     <img src="{% static 'img/plata.png' %}" class="marco-membresia" alt="Marco Plata">
