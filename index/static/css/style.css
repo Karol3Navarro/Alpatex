@@ -464,12 +464,28 @@ PROFILE
     flex: 1;
 }
 
-.perfil-foto img {
+.perfil-foto {
+    position: relative;
     width: 197px;
-    height: 197px; 
+    height: 197px;
+    margin: 0 auto;
+}
+
+.perfil-foto img:first-child {
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
     object-fit: cover;
 }
+
+.marco-membresia {
+    position: absolute;
+    top: -7px;
+    left: -7px;
+    width: 108%;
+    height: 108%;
+}
+
 
 .btns-perfil{
     display: flex;
