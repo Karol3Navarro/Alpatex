@@ -319,7 +319,10 @@ def producto_findEdit(request, pk):
         form = ProductoForm(request.POST, request.FILES, instance=producto)
         if form.is_valid():
             form.save()
+            messages.success(request, "Producto modificado correctamente.")
             return redirect('productos_perf')
+        else:
+            messages.error(request, "Error al modificar el producto.")
     else:
         form = ProductoForm(instance=producto)
 

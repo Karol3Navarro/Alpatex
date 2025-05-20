@@ -126,4 +126,12 @@ filtros.forEach(filtro => {
     }
 });
 
-  
+//FUNCION PARA LAS ALERTAS
+document.addEventListener("DOMContentLoaded", function(){
+    const alerts = document.querySelectorAll(".alert");
+    setTimeout(() => {
+        alerts.forEach(alert => {
+            alert.classList.add("alert-hidden");
+        });
+    }, 3000);
+});
