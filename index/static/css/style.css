@@ -465,7 +465,8 @@ PROFILE
 }
 
 .perfil-foto img {
-    width: 150px;
+    width: 197px;
+    height: 197px; 
     border-radius: 50%;
     object-fit: cover;
 }
