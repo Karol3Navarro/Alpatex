@@ -1,35 +1,37 @@
 {% extends "index/base.html" %}
 {% load static %}
 {% block body %}
-  <h1>Videojuegos Disponibles</h1>
+  <h1 class="prod-dest">Videojuegos Disponibles</h1>
 
-  {% if videojuegos %}
-    <ul class="list-group mt-3">
-      {% for videojuegos in videojuegos %}
-        <li class="list-group-item mb-3">
-          <div class="d-flex align-items-center">
-            <div class="me-3">
-              {% if videojuegos.imagen %}
-                <img src="{{ videojuegos.imagen.url }}" alt="{{ videojuegos.nombre }}"
-                     style="width: 100px; height: 150px; object-fit: cover;">
-              {% else %}
-                <img src="{% static 'images/default_book.png' %}" alt="Sin imagen"
-                     style="width: 100px; height: 150px; object-fit: cover;">
-              {% endif %}
-            </div>
+  <div class="coleccion col-lib-vid">
+    {% if videojuegos %}
+      <div class="productos-contenedor">
+        {% for videojuegos in videojuegos %}
+          <a href="{% url 'ver_producto' videojuegos.id_producto %}" class="producto-card-link">
+            <div class="producto-card">
 
-            <div>
-              <strong>{{ videojuegos.nombre }}</strong><br>
-              <small>Publicado por: {{ videojuegos.usuario.username }}</small><br>
-              <small>Estado: {{ videojuegos.estado }}</small><br>
-              <small>Tipo: {{ videojuegos.tipo }}</small><br>
-              <small>Categoría: {{ videojuegos.categoria }}</small><br>  
+              <div class="producto-img">
+                {% if videojuegos.imagen %}
+                  <img src="{{ videojuegos.imagen.url }}" alt="{{ videojuegos.nombre }}">
+                {% else %}
+                  <img src="{% static 'images/default_book.png' %}" alt="Sin imagen">
+                {% endif %}
+              </div>
+
+              <div class="producto-info">
+                <strong>{{ videojuegos.nombre }}</strong><br>
+                <small>Publicado por: {{ videojuegos.usuario.username }}</small><br>
+                <small>Estado: {{ videojuegos.estado }}</small><br>
+                <small>Tipo: {{ videojuegos.tipo }}</small><br>
+                <small>Categoría: {{ videojuegos.categoria }}</small><br>  
+              </div>
+
             </div>
-          </div>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No hay videojuegos disponibles.</p>
-  {% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No hay videojuegos disponibles.</p>
+    {% endif %}
+  </div>
 {% endblock %}

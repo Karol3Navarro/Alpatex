@@ -1,35 +1,37 @@
 {% extends "index/base.html" %}
 {% load static %}
 {% block body %}
-  <h1>Libros Disponibles</h1>
+  <h1 class="prod-dest">Libros Disponibles</h1>
 
-  {% if libros %}
-    <ul class="list-group mt-3">
-      {% for libro in libros %}
-        <li class="list-group-item mb-3">
-          <div class="d-flex align-items-center">
-            <div class="me-3">
-              {% if libro.imagen %}
-                <img src="{{ libro.imagen.url }}" alt="{{ libro.nombre }}"
-                     style="width: 100px; height: 150px; object-fit: cover;">
-              {% else %}
-                <img src="{% static 'images/default_book.png' %}" alt="Sin imagen"
-                     style="width: 100px; height: 150px; object-fit: cover;">
-              {% endif %}
-            </div>
+  <div class="coleccion col-lib-vid">
+    {% if libros %}
+      <div class="productos-contenedor">
+        {% for libro in libros %}
+          <a href="{% url 'ver_producto' libro.id_producto %}" class="producto-card-link">
+            <div class="producto-card">
+              
+              <div class="producto-img">
+                {% if libro.imagen %}
+                  <img src="{{ libro.imagen.url }}" alt="{{ libro.nombre }}">
+                {% else %}
+                  <img src="{% static 'images/default_book.png' %}" alt="Sin imagen">
+                {% endif %}
+              </div>
 
-            <div>
-              <strong>{{ libro.nombre }}</strong><br>
-              <small>Publicado por: {{ libro.usuario.username }}</small><br>
-              <small>Estado: {{ libro.estado }}</small><br>
-              <small>Tipo: {{ libro.tipo }}</small><br>
-              <small>Categoría: {{ libro.categoria }}</small><br>  
+              <div class="producto-info">
+                <strong>{{ libro.nombre }}</strong><br>
+                <small>Publicado por: {{ libro.usuario.username }}</small><br>
+                <small>Estado: {{ libro.estado }}</small><br>
+                <small>Tipo: {{ libro.tipo }}</small><br>
+                <small>Categoría: {{ libro.categoria }}</small><br>  
+              </div>
             </div>
-          </div>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No hay libros disponibles.</p>
-  {% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No hay libros disponibles.</p>
+    {% endif %}
+  </div>
+  
 {% endblock %}

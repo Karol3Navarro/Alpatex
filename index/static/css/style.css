@@ -797,6 +797,11 @@ VER TODO
     float: right;
     margin-top: 20px;
 }
+.coleccion .col-lib-vid{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
 .productos-contenedor{
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -817,6 +822,7 @@ VER TODO
 .producto-info {
   margin-top: 10px;
   font-size: 14px;
+  text-align: center;
 }
 .producto-card-link {
     text-decoration: none;
