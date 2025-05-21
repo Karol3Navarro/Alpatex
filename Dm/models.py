@@ -3,6 +3,8 @@ from django.conf import settings #Constructor de usuario
 import uuid
 from django.apps import apps
 from django.db.models import Count
+from index.models import Producto
+from django.utils import timezone
 
 User = settings.AUTH_USER_MODEL
 # Create your models here.
@@ -21,6 +23,7 @@ class CanalMensaje(ModelBase):
     canal = models.ForeignKey("Canal", on_delete=models.CASCADE)
     usuario= models.ForeignKey(User, on_delete=models.CASCADE)
     texto = models.TextField()
+    producto = models.ForeignKey(Producto, null=True, blank=True, on_delete=models.SET_NULL)
 
 class CanalUsuario(ModelBase):
     canal = models.ForeignKey("Canal", null=True, on_delete=models.SET_NULL) #SET_NULL, pueda conservar los antiguos mensajes
@@ -85,3 +88,15 @@ class Canal(ModelBase):
     usuarios = models.ManyToManyField(User, blank=True, through=CanalUsuario)
 
     objects = CanalManager()
+
+class ConfirmacionEntrega(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    canal = models.ForeignKey('Canal', on_delete=models.CASCADE)
+    creador = models.ForeignKey(User, on_delete=models.CASCADE)
+    lugar = models.CharField(max_length=255)
+    fecha = models.DateField()
+    hora = models.TimeField()
+    creado_en = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return f"Confirmación para {self.producto.nombre} el {self.fecha} a las {self.hora}"

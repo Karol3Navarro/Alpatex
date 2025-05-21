@@ -1,0 +1,45 @@
+{% extends "index/base.html" %}
+{% load static %}
+{% block title %}Mis Mensajes{% endblock title %}
+{% block body %}
+
+    <div class="reg-btn">
+        <a href="{% url 'perfil_usuario' %}" class="regresar">
+        <span class="material-symbols-outlined">chevron_left</span> Regresar
+        </a>
+    </div>
+
+    <h1 class="prod-dest">Confirmaciones Pendientes</h1>
+
+    {% if confirmaciones %}
+        <div class="list-prod">
+            {% for confirmacion in confirmaciones %}
+                <div class="list-prod-item">
+                    <!-- Imagen del producto -->
+                    <div class="img-prod">
+                        {% if confirmacion.producto.imagen %}
+                        <img src="{{ confirmacion.producto.imagen.url }}" alt="{{ confirmacion.producto.nombre }}"
+                            style="width: 100px; height: 100px; object-fit: cover;">
+                        {% else %}
+                        <img src="{% static 'images/default_product.png' %}" alt="Sin imagen"
+                            style="width: 100px; height: 100px; object-fit: cover;">
+                        {% endif %}
+                    </div>
+
+                    <!-- Detalles de la confirmación -->
+                    <div class="info">
+                        <strong>Producto: {{ confirmacion.producto.nombre }}</strong><br>
+                        <small>Fecha: {{ confirmacion.fecha }}</small><br>
+                        <small>Hora: {{ confirmacion.hora }}</small><br>
+                        <small>Lugar: {{ confirmacion.lugar }}</small><br>
+                        <small>Creado por: {{ confirmacion.creador.username }}</small><br>
+                        <small>Creado en: {{ confirmacion.creado_en|date:"d M Y H:i" }}</small><br>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No tienes confirmaciones de entrega.</p>
+    {% endif %}
+
+{% endblock %}

@@ -12,6 +12,10 @@ from django.db.models import Avg
 from admin_alpatex.models import Membresia
 from django.db.models import F
 from django.contrib.messages import get_messages
+from Dm.models import ConfirmacionEntrega
+from Dm.forms import ConfirmacionEntregaForm
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 
 def map(request):
     productos = Producto.objects.select_related('usuario').all()
@@ -391,3 +395,24 @@ def ver_todo(request):
     }
 
     return render(request, 'index/productos.html', context)
+
+@login_required
+@require_POST
+def guardar_confirmacion_entrega(request):
+    form = ConfirmacionEntregaForm(request.POST)
+    producto_id = request.POST.get("producto_id")
+    canal_id = request.POST.get("canal_id")
+
+    if form.is_valid() and producto_id and canal_id:
+        confirmacion = form.save(commit=False)
+        confirmacion.creador = request.user
+        confirmacion.producto_id = producto_id
+        confirmacion.canal_id = canal_id
+        confirmacion.save()
+        return JsonResponse({"status": "ok", "mensaje": "Confirmación guardada con éxito"})
+    return JsonResponse({"status": "error", "errores": form.errors})
+@login_required
+def mis_compras(request):
+    usuario = request.user
+    confirmaciones = ConfirmacionEntrega.objects.filter(creador=usuario)
+    return render(request, 'index/mis_compras.html', {'confirmaciones': confirmaciones})

@@ -74,6 +74,55 @@
                         </div>
                     {% endfor %}
                 </div>
+                <!-- Boton de Confirmar Entrega Vendedor/Prosumidor -->
+                {% if producto_relacionado and es_duenio_producto %}
+                    <!-- Botón que abre el modal -->
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmModal">
+                        Confirmar Entrega
+                    </button>
+                    
+                    <!-- Modal Bootstrap -->
+                    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form id="confirmForm" method="POST">
+                                    {% csrf_token %}
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="confirmModalLabel">Confirmar Entrega / Intercambio</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label>Producto:</label>
+                                            <p><strong>{{ producto_relacionado.nombre }}</strong></p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="lugar" class="form-label">Lugar</label>
+                                            <input type="text" class="form-control" name="lugar" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="fecha" class="form-label">Fecha</label>
+                                            <input type="date" class="form-control" name="fecha" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="hora" class="form-label">Hora</label>
+                                            <input type="time" class="form-control" name="hora" required>
+                                        </div>
+                                        <!-- Mostrar nombre del producto como texto no editable -->
+                                        
+                                        <!-- Enviar el ID del producto de forma oculta -->
+                                        <input type="hidden" name="producto_id" value="{{ producto_relacionado.id_producto }}">
+                                        <input type="hidden" name="canal_id" value="{{ canal.id }}">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn btn-primary">Confirmar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
 
                 <form class="chat-input" action="?canal_id={{ canal.id }}" method="POST">
                     {% csrf_token %}
@@ -89,5 +138,27 @@
         
     </div>
 
-
+    <script>
+        document.getElementById("confirmForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch("{% url 'guardar_confirmacion_entrega' %}", {
+                method: "POST",
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "ok") {
+                    alert("Confirmación guardada correctamente.");
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+                    modal.hide();
+                } else {
+                    alert("Error: " + JSON.stringify(data.errores));
+                }
+            });
+        });
+    </script>
 {% endblock %}

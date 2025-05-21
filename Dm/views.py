@@ -20,17 +20,26 @@ class Inbox(View):
 
 		canal_id = request.GET.get('canal_id')
 		canal = None
+		producto_relacionado = None
+		es_duenio_producto = False
 
 		if canal_id:
 			try:
 				canal = Canal.objects.get(id=canal_id)
+				# 🔍 Buscamos el último mensaje con producto
+				mensaje_con_producto = canal.canalmensaje_set.filter(producto__isnull=False).order_by('-tiempo').first()
+				if mensaje_con_producto:
+					producto_relacionado = mensaje_con_producto.producto
+					es_duenio_producto = (producto_relacionado.usuario == request.user)
 			except Canal.DoesNotExist:
 				canal = None  # O podrías manejar con Http404
 
 		context = {
 			"inbox": inbox,
 			"canal": canal,
-			"form": FormMensajes()
+			"form": FormMensajes(),
+			"producto_relacionado": producto_relacionado,
+            "es_duenio_producto": es_duenio_producto,
 		}
 
 		return render(request, 'index/inbox.html', context)
@@ -158,7 +167,8 @@ class DetailMs(LoginRequiredMixin, CanalFormMixin, DetailView):
 				CanalMensaje.objects.create(
 					canal=canal,
 					usuario=usuario,
-					texto=texto_mensaje
+					texto=texto_mensaje,
+					producto=self.producto 
 				)
 
 		context['inbox'] = Canal.objects.filter(canalusuario__usuario=self.request.user)

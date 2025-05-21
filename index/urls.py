@@ -1,6 +1,7 @@
 from django.urls import path, include
 from . import views
 from admin_alpatex import views as admin_views
+from .views import guardar_confirmacion_entrega
 
 urlpatterns = [
     path('index', views.index, name='index'),
@@ -26,5 +27,7 @@ urlpatterns = [
 
     path('producto_del/<str:pk>', views.producto_del, name='producto_del'),
     path('producto_findEdit/<int:pk>/', views.producto_findEdit, name='producto_findEdit'),
-    path('productoUpdate', views.editar_producto, name='productoUpdate')
+    path('productoUpdate', views.editar_producto, name='productoUpdate'),
+    path('guardar_confirmacion/', guardar_confirmacion_entrega, name="guardar_confirmacion_entrega"),
+    path('mis-compras/', views.mis_compras, name='mis_compras'),
 ]
