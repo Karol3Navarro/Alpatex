@@ -123,6 +123,51 @@
                         </div>
                     </div>
                 {% endif %}
+                
+                {% if mostrar_botones|default:False %}
+                    <!-- Botón que abre el modal -->
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#calificarModal">
+                        Recibido
+                    </button>
+
+                    <!-- Modal para calificar al vendedor -->
+                    <div class="modal fade" id="calificarModal" tabindex="-1" aria-labelledby="calificarModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form id="calificarForm" method="POST" action="{% url 'calificar_vendedor' %}">
+                                    {% csrf_token %}
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="calificarModalLabel">Calificar al Vendedor</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="puntaje" class="form-label">Calificación al vendedor</label>
+                                            <select name="puntaje" class="form-control" required>
+                                                <option value="1">1 estrella</option>
+                                                <option value="2">2 estrellas</option>
+                                                <option value="3">3 estrellas</option>
+                                                <option value="4">4 estrellas</option>
+                                                <option value="5">5 estrellas</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="comentario" class="form-label">Comentario</label>
+                                            <textarea class="form-control" name="comentario"></textarea>
+                                        </div>
+                                        <!-- Aquí van los campos ocultos con la información del producto y el vendedor -->
+                                        <input type="hidden" name="producto_id" value="{{ producto_relacionado.id_producto }}">
+                                        <input type="hidden" name="vendedor_id" value="{{ producto_relacionado.usuario.id }}">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn btn-primary">Confirmar Calificación</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
 
                 <form class="chat-input" action="?canal_id={{ canal.id }}" method="POST">
                     {% csrf_token %}
@@ -158,6 +203,31 @@
                 } else {
                     alert("Error: " + JSON.stringify(data.errores));
                 }
+            });
+        });
+
+        document.getElementById("calificarForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch("{% url 'calificar_vendedor' %}", {
+                method: "POST",
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "ok") {
+                    // Mostrar el mensaje de éxito aquí
+                    alert("Gracias por calificar al vendedor.");
+                } else {
+                    // Mostrar el mensaje de error aquí
+                    alert("Error: " + data.mensaje);
+                }
+            })
+            .catch(error => {
+                alert("Hubo un problema al enviar la calificación.");
             });
         });
     </script>

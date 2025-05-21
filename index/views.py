@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from .models import Producto, Perfil, CalificacionProducto
+from .models import Producto, Perfil, CalificacionProducto, CalificacionVendedor
 from .Forms import CustomUserCreationForm, PerfilForm, ProductoForm, CalificacionProductoForm
 from django.contrib import messages
 import json
@@ -16,9 +16,16 @@ from Dm.models import ConfirmacionEntrega
 from Dm.forms import ConfirmacionEntregaForm
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
+from django.contrib import messages
+from django.utils import timezone
+from django.urls import reverse
 
 def map(request):
-    productos = Producto.objects.select_related('usuario').all()
+    productos = Producto.objects.select_related('usuario').filter(
+        disponible=True,
+        estado_revision='Aceptado',
+        direccion__isnull=False
+    )
     productos_data = []
     
     for producto in productos:
@@ -76,7 +83,8 @@ def home(request):
     usuarios = User.objects.all()
 
     productos = Producto.objects.select_related('usuario__perfil__membresia').filter(
-        estado_revision='Aceptado'
+        estado_revision='Aceptado',
+        disponible=True,
     ).annotate(
         prioridad_visibilidad=F('usuario__perfil__membresia__prioridad_visibilidad')
     ).order_by('-prioridad_visibilidad', '-fecha_creacion')
@@ -409,10 +417,105 @@ def guardar_confirmacion_entrega(request):
         confirmacion.producto_id = producto_id
         confirmacion.canal_id = canal_id
         confirmacion.save()
+
+        # Marcar producto como no disponible
+        producto = Producto.objects.get(id_producto=producto_id)
+        producto.disponible = False
+        producto.save()
+
         return JsonResponse({"status": "ok", "mensaje": "Confirmación guardada con éxito"})
     return JsonResponse({"status": "error", "errores": form.errors})
+
 @login_required
 def mis_compras(request):
     usuario = request.user
-    confirmaciones = ConfirmacionEntrega.objects.filter(creador=usuario)
-    return render(request, 'index/mis_compras.html', {'confirmaciones': confirmaciones})
+
+    # Pendientes (entregas no confirmadas)
+    pendientes = ConfirmacionEntrega.objects.filter(
+        canal__usuarios=usuario,
+        confirmado=False
+    ).distinct()
+
+    # Compras (productos comprados, confirmados y de tipo venta), excluyendo los que eres vendedor
+    compras = ConfirmacionEntrega.objects.filter(
+        canal__usuarios=usuario,
+        confirmado=True,
+        producto__tipo='Venta'
+    ).exclude(producto__usuario=usuario).distinct()
+
+    # Intercambios (productos intercambiados, confirmados), excluyendo los que eres vendedor
+    intercambios = ConfirmacionEntrega.objects.filter(
+        canal__usuarios=usuario,
+        confirmado=True,
+        producto__tipo='Intercambio'
+    ).exclude(producto__usuario=usuario).distinct()
+
+    # Mis productos vendidos o intercambiados (como vendedor)
+    mis_productos = ConfirmacionEntrega.objects.filter(
+        producto__usuario=usuario,
+        confirmado=True
+    ).distinct()
+
+    return render(request, 'index/mis_compras.html', {
+        'pendientes': pendientes,
+        'compras': compras,
+        'intercambios': intercambios,
+        'mis_productos': mis_productos,
+    })
+
+@login_required
+def calificar_vendedor(request):
+    if request.method == 'POST':
+        producto_id = request.POST.get('producto_id')
+        vendedor_id = request.POST.get('vendedor_id')
+        puntaje = request.POST.get('puntaje')
+        comentario = request.POST.get('comentario')
+
+        # Verificar que se recibieron todos los datos necesarios
+        if not producto_id or not vendedor_id or not puntaje:
+            messages.error(request, "Faltan datos para procesar la calificación.")
+            return redirect(request.META.get('HTTP_REFERER', 'home'))  # Redirigir de vuelta para mostrar el mensaje
+
+        try:
+            # Obtener el producto y vendedor correspondientes
+            producto = Producto.objects.get(id_producto=producto_id)
+            vendedor = User.objects.get(id=vendedor_id)
+
+            # Verificar que el comprador no esté calificando al vendedor más de una vez por el mismo producto
+            if CalificacionVendedor.objects.filter(producto=producto, comprador=request.user).exists():
+                messages.error(request, "Ya has calificado este vendedor para este producto.")
+                return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+            # Guardar la calificación
+            calificacion = CalificacionVendedor(
+                vendedor=vendedor,
+                producto=producto,
+                comprador=request.user,  # El comprador (usuario logueado) deja la calificación
+                puntaje=puntaje,
+                comentario=comentario
+            )
+            calificacion.save()
+            # Cambiar estado del producto a no disponible
+            producto.disponible = False
+            producto.save()
+            # ✅ Marcar confirmación como confirmada
+            confirmacion = ConfirmacionEntrega.objects.filter(producto=producto, canal__usuarios=request.user).first()
+            if confirmacion:
+                confirmacion.confirmado = True
+                confirmacion.save()
+                print("✔ Confirmación marcada como confirmada")
+            else:
+                print("⚠ No se encontró una confirmación para ese producto y usuario.")
+            # Mostrar el mensaje de éxito
+            messages.success(request, "Gracias por calificar al vendedor.")
+            return redirect(request.META.get('HTTP_REFERER', 'home'))  # Redirigir de vuelta para mostrar el mensaje
+
+        except Producto.DoesNotExist:
+            messages.error(request, "Producto no encontrado.")
+            return redirect(request.META.get('HTTP_REFERER', 'home'))
+        except User.DoesNotExist:
+            messages.error(request, "Vendedor no encontrado.")
+            return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+    messages.error(request, "Método no permitido.")
+    return redirect(request.META.get('HTTP_REFERER', 'home'))

@@ -30,4 +30,5 @@ urlpatterns = [
     path('productoUpdate', views.editar_producto, name='productoUpdate'),
     path('guardar_confirmacion/', guardar_confirmacion_entrega, name="guardar_confirmacion_entrega"),
     path('mis-compras/', views.mis_compras, name='mis_compras'),
+    path('calificar_vendedor/', views.calificar_vendedor, name='calificar_vendedor'),
 ]

@@ -9,6 +9,12 @@ from django.views.generic.edit import FormMixin
 from django.views.generic import View
 from index.models import Producto
 from django.urls import reverse
+from datetime import datetime
+from .models import ConfirmacionEntrega
+from django.utils.timezone import localtime
+from datetime import timedelta
+from django.utils.timezone import localtime, make_aware, get_current_timezone, now
+
 # Create your views here.
 def home_index(request):
 	# Aquí puedes pasar el contexto que necesites para tu página de inicio
@@ -22,6 +28,8 @@ class Inbox(View):
 		canal = None
 		producto_relacionado = None
 		es_duenio_producto = False
+		confirmacion = None
+		mostrar_botones = False
 
 		if canal_id:
 			try:
@@ -31,6 +39,24 @@ class Inbox(View):
 				if mensaje_con_producto:
 					producto_relacionado = mensaje_con_producto.producto
 					es_duenio_producto = (producto_relacionado.usuario == request.user)
+
+				confirmacion = ConfirmacionEntrega.objects.filter(canal=canal).order_by('-creado_en').first()
+				
+				if confirmacion:
+					# Combinar fecha y hora en naive datetime
+					fecha_hora_naive = datetime.combine(confirmacion.fecha, confirmacion.hora)
+					
+					# Forzar zona horaria activa de Django
+					zona_local = get_current_timezone()
+					fecha_hora = make_aware(fecha_hora_naive, timezone=zona_local)
+
+					# Obtener el tiempo actual en zona local
+					ahora = localtime(now())
+
+					if ahora >= fecha_hora and not es_duenio_producto:
+						mostrar_botones = True
+					else:
+						mostrar_botones = False
 			except Canal.DoesNotExist:
 				canal = None  # O podrías manejar con Http404
 
@@ -40,6 +66,8 @@ class Inbox(View):
 			"form": FormMensajes(),
 			"producto_relacionado": producto_relacionado,
             "es_duenio_producto": es_duenio_producto,
+			"confirmacion": confirmacion,
+			"mostrar_botones": mostrar_botones,
 		}
 
 		return render(request, 'index/inbox.html', context)
