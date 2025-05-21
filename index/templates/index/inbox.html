@@ -167,6 +167,38 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Botón que abre el modal -->
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#reporteModal">
+                        No se concretó
+                    </button>
+
+                    <!-- Modal para reportar vendedor -->
+                    <div class="modal fade" id="reporteModal" tabindex="-1" aria-labelledby="reporteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form id="reporteForm" method="POST" action="{% url 'reportar_vendedor' %}">
+                                    {% csrf_token %}
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Reportar al Vendedor</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="motivo" class="form-label">Motivo del reporte</label>
+                                            <textarea class="form-control" name="motivo" required></textarea>
+                                        </div>
+                                        <input type="hidden" name="producto_id" value="{{ producto_relacionado.id_producto }}">
+                                        <input type="hidden" name="vendedor_id" value="{{ producto_relacionado.usuario.id }}">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn btn-danger">Enviar Reporte</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 {% endif %}
 
                 <form class="chat-input" action="?canal_id={{ canal.id }}" method="POST">
@@ -229,6 +261,29 @@
             .catch(error => {
                 alert("Hubo un problema al enviar la calificación.");
             });
+        });
+
+        document.getElementById("reporteForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch("{% url 'reportar_vendedor' %}", {
+                method: "POST",
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "ok") {
+                    alert("Reporte enviado correctamente.");
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('reporteModal'));
+                    modal.hide();
+                } else {
+                    alert("Error al enviar reporte: " + JSON.stringify(data.errors || data.message));
+                }
+            })
+            .catch(() => alert("Hubo un problema al enviar el reporte."));
         });
     </script>
 {% endblock %}

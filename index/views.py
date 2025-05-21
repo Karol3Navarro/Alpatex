@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .models import Producto, Perfil, CalificacionProducto, CalificacionVendedor
-from .Forms import CustomUserCreationForm, PerfilForm, ProductoForm, CalificacionProductoForm
+from .Forms import CustomUserCreationForm, PerfilForm, ProductoForm, CalificacionProductoForm, ReporteVendedorForm
 from django.contrib import messages
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -433,6 +433,7 @@ def mis_compras(request):
     # Pendientes (entregas no confirmadas)
     pendientes = ConfirmacionEntrega.objects.filter(
         canal__usuarios=usuario,
+        concretado=True,
         confirmado=False
     ).distinct()
 
@@ -456,11 +457,17 @@ def mis_compras(request):
         confirmado=True
     ).distinct()
 
+    reportados = ConfirmacionEntrega.objects.filter(
+        canal__usuarios=usuario,
+        concretado=False
+    )
+
     return render(request, 'index/mis_compras.html', {
         'pendientes': pendientes,
         'compras': compras,
         'intercambios': intercambios,
         'mis_productos': mis_productos,
+        'reportados': reportados
     })
 
 @login_required
@@ -519,3 +526,25 @@ def calificar_vendedor(request):
 
     messages.error(request, "Método no permitido.")
     return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+@login_required
+@require_POST
+def reportar_vendedor(request):
+    form = ReporteVendedorForm(request.POST)
+    producto_id = request.POST.get('producto_id')
+    vendedor_id = request.POST.get('vendedor_id')
+    if form.is_valid() and producto_id and vendedor_id:
+        reporte = form.save(commit=False)
+        reporte.producto_id = producto_id
+        reporte.vendedor_id = vendedor_id
+        reporte.comprador = request.user
+        reporte.save()
+        ConfirmacionEntrega.objects.filter(producto_id=producto_id).update(concretado=False)
+        # REVISAR ES PARA VER SI EL PRODUCTO QUEDA DISPONIBLE O NO Luego del reporte
+        # producto = Producto.objects.get(id_producto=producto_id)
+        # producto.disponible = True
+        # producto.save()
+        messages.success(request, "Gracias por reportar al vendedor.")
+        return redirect(request.META.get('HTTP_REFERER', 'home')) 
+    else:
+        return JsonResponse({'status': 'error', 'errors': form.errors})

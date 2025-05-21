@@ -2,7 +2,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from .models import Perfil, Producto, CalificacionProducto
+from .models import Perfil, Producto, CalificacionProducto, ReporteVendedor
 
 #Calificacion de Producto
 class CalificacionProductoForm(forms.ModelForm):
@@ -112,3 +112,8 @@ class ProductoForm(forms.ModelForm):
         
         if 'direccion' in self.initial:
             self.fields['direccion'].initial = self.initial['direccion']
+
+class ReporteVendedorForm(forms.ModelForm):
+    class Meta:
+        model = ReporteVendedor
+        fields = ['motivo']

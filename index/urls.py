@@ -31,4 +31,5 @@ urlpatterns = [
     path('guardar_confirmacion/', guardar_confirmacion_entrega, name="guardar_confirmacion_entrega"),
     path('mis-compras/', views.mis_compras, name='mis_compras'),
     path('calificar_vendedor/', views.calificar_vendedor, name='calificar_vendedor'),
+    path('reportar_vendedor/', views.reportar_vendedor, name='reportar_vendedor'),
 ]

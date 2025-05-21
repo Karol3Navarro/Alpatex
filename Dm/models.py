@@ -98,6 +98,7 @@ class ConfirmacionEntrega(models.Model):
     hora = models.TimeField()
     creado_en = models.DateTimeField(default=timezone.now)
     confirmado = models.BooleanField(default=False)
+    concretado = models.BooleanField(default=True) 
     
     def __str__(self):
         return f"Confirmación para {self.producto.nombre} el {self.fecha} a las {self.hora}"
