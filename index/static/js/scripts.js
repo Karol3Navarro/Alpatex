@@ -135,3 +135,50 @@ document.addEventListener("DOMContentLoaded", function(){
         });
     }, 3000);
 });
+
+//FUNCION PARA DESPLEGAR MAS OPCIONES
+document.addEventListener("DOMContentLoaded",() => {
+    document.querySelectorAll(".toggle-btn").forEach(button => {
+        button.addEventListener("click", function(e){
+            e.stopPropagation();
+            const menu = this.closest(".producto-card").querySelector(".drop-opc");
+            document.querySelectorAll(".drop-opc").forEach(m => {
+                if (m !== menu) m.style.display = "none";
+            });
+            menu.style.display = (menu.style.display === "block") ? "none" : "block";
+        });
+    });
+
+    document.addEventListener("click", () =>{
+        document.querySelectorAll(".drop-opc").forEach(menu => {
+            menu.style.display = "none";
+        });
+    });
+});
+
+//CONFIRMACION DE ELIMINAR PRODUCTO PERFIL USUARIO (SWEETALERT2)
+document.addEventListener("DOMContentLoaded", () => {
+    const eliminarLinks = document.querySelectorAll(".btn-eliminar");
+
+    eliminarLinks.forEach(link => {
+        link.addEventListener("click", function(e) {
+        e.preventDefault();
+        const url = this.getAttribute("data-url");
+
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esta acción no se puede deshacer.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+        });
+    });
+});

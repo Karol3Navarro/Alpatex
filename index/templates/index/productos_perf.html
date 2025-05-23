@@ -23,20 +23,18 @@
 
     <div class="list-prod">
       {% for producto in productos %}
-        <div class="list-prod-item">
-          <!-- Imagen del producto -->
-          <div class="img-prod">
+        <div class="producto-card">
+          <!-- imagen del producto -->
+          <div class="producto-img">
             {% if producto.imagen %}
-              <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"
-                    style="width: 100px; height: 100px; object-fit: cover;">
+              <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
             {% else %}
-              <img src="{% static 'images/default_product.png' %}" alt="Sin imagen"
-                    style="width: 100px; height: 100px; object-fit: cover;">
+              <img src="{% static 'images/default_product.png' %}" alt="Sin imagen">
             {% endif %}
           </div>
 
-          <!-- Detalles del producto -->
-          <div class="info">
+          <!-- detalles del producto -->
+          <div class="producto-info">
             <strong>{{ producto.nombre }}</strong><br>
             <small>Publicado por: {{ producto.usuario.username }}</small><br>
             <small>Estado: {{ producto.estado }}</small><br>
@@ -51,6 +49,7 @@
                 {{ producto.estado_revision }}
               </span>
             </small><br>
+            <!--membresia-->
             {% if request.user.perfil.membresia.nombre == 'Oro' %}
             <small>Visitas: {{ producto.contador_visitas }}</small><br>
             {% endif %}
@@ -59,13 +58,20 @@
               <small><strong>Motivo de Rechazo:</strong> {{ producto.motivo_rechazo }}</small><br>
             {% endif %}
           </div>
-          <div class="product-actions">
-            <!-- Editar producto -->
-            <a href="{% url 'producto_findEdit' pk=producto.id_producto %}" class="btn">Editar</a>
 
-            <!-- Eliminar producto -->
-            <a href="{% url 'producto_del' pk=producto.id_producto %}" class="btn">Eliminar</a>
+          <!--boton de más opciones-->
+          <div class="mas-opc">
+            <button class="btn toggle-btn">
+                <span class="material-symbols-rounded">more_vert</span>
+            </button>
           </div>
+
+          <!--despliegue de opciones-->
+          <ul class="drop-opc">
+            <li><a href="{% url 'producto_findEdit' pk=producto.id_producto %}">Editar</a></li>
+            <li><a href="{% url 'producto_del' pk=producto.id_producto %}" class="btn-eliminar" data-url="{% url 'producto_del' pk=producto.id_producto %}">Eliminar</a></li>
+          </ul>
+
         </div>
       {% endfor %}
     </div>

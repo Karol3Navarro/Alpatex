@@ -3,12 +3,12 @@
 
 {% block body %}
   <div class="reg-btn">
-    <a href="{% url 'productos_perf' %}" class="regresar">
+    <a onclick="window.history.back();" class="regresar">
         <span class="material-symbols-outlined">chevron_left</span> Regresar
     </a>
   </div>
 
-  <h1>Editar Producto</h1>
+  <h1 class="prod-dest">Editar Producto</h1>
 
   <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
