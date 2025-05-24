@@ -17,7 +17,12 @@ urlpatterns = [
     path('libros/', views.libros, name='vista_libros'),
     path('videojuegos/', views.videojuegos, name='vista_videojuegos'),
     path('productos/', views.productos, name='vista_productos'),
-
+    path('favoritos/', views.favoritos, name='favoritos'),
+    path('perfil/<str:username>/', views.perfil_publico, name='perfil_publico'),
+    path('perfil/', views.perfil_usuario, name='perfil_usuario'),
+    path('agregar-favorito/<int:producto_id>/', views.agregar_favorito, name='agregar_favorito'),
+    path('quitar-favorito/<int:producto_id>/', views.quitar_favorito, name='quitar_favorito'),
+    path('toggle-favorito/<int:producto_id>/', views.toggle_favorito, name='toggle_favorito'),
 
     path('producto/agregar/', views.producto_add_perf, name='producto_add_perf'),
     path('admin_dashboard/', include('admin_alpatex.urls')),  

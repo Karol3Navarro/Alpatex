@@ -18,13 +18,25 @@
             <h2 class="der-titulo">{{ producto.nombre }}</h2>
             <p class="precio">$ <!--${{ producto.precio }}--></p>
             <p><strong>Detalles del Producto:</strong> (Aquí puedes agregar más detalles)</p>
-            <p><strong>Publicado por:</strong> {{ producto.usuario.username }}</p>
+            <p><strong>Publicado por: <a href="{% url 'perfil_publico' producto.usuario.username %}">
+                {{ producto.usuario.username }}</a></p>
             <p><strong>Estado:</strong> {{producto.estado}} </p>
             <p><strong>Dirección:</strong> {{ producto.direccion }}</p>
             <p><strong>Para:</strong> {{ producto.tipo }}</p>
 
             <!-- Agrega más detalles según lo necesites -->
             <a href="{% url 'detailms' username=producto.usuario.username %}?producto_id={{ producto.id_producto }}" class="btn btn-primary">Me Interesa</a>
+        {% if user.is_authenticated and user != producto.usuario %}
+        <form method="post" action="{% url 'toggle_favorito' producto.id_producto %}">
+            {% csrf_token %}
+            {% if producto in user.perfil.favoritos.all %}
+                <button type="submit" class="btn btn-danger">💔 Quitar de favoritos</button>
+            {% else %}
+                <button type="submit" class="btn btn-primary">❤️ Agregar a favoritos</button>
+            {% endif %}
+        </form>
+        {% endif %}
+        
         </div>
     </div>
 

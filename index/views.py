@@ -19,6 +19,9 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.utils import timezone
 from django.urls import reverse
+from django.core.mail import send_mail
+from django.conf import settings
+
 
 def map(request):
     productos = Producto.objects.select_related('usuario').filter(
@@ -170,6 +173,15 @@ def registro(request):
             rut = form.cleaned_data['rut']
             direccion = form.cleaned_data['direccion']
             Perfil.objects.create(user=user, rut=rut, direccion=direccion)
+
+            # Enviar correo de bienvenida
+            send_mail(
+                subject='¡Bienvenido a Alpatex!',
+                message='Gracias por registrarte en Alpatex. Estamos felices de tenerte con nosotros.',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
 
             messages.success(request, '¡Cuenta creada exitosamente!')
             return redirect('index')
@@ -548,3 +560,49 @@ def reportar_vendedor(request):
         return redirect(request.META.get('HTTP_REFERER', 'home')) 
     else:
         return JsonResponse({'status': 'error', 'errors': form.errors})
+@login_required
+def perfil_publico(request, username):
+    # Verificar si el usuario está viendo su propio perfil
+    if request.user.username == username:
+        return redirect('perfil_usuario')  # Redirigir a su propio perfil (privado)
+
+    # Obtener el perfil del usuario público
+    usuario = get_object_or_404(User, username=username)
+    perfil = get_object_or_404(Perfil, user=usuario)
+
+    # Obtener los productos del usuario público
+    productos = Producto.objects.filter(usuario=usuario)
+
+    return render(request, 'index/perfil_publico.html', {
+        'perfil': perfil,
+        'productos': productos,
+    })
+@login_required
+def agregar_favorito(request, producto_id):
+    producto = get_object_or_404(Producto, id_producto=producto_id)
+    perfil = request.user.perfil
+    perfil.favoritos.add(producto)
+    return redirect('perfil_publico', username=producto.usuario.username)
+
+@login_required
+def quitar_favorito(request, producto_id):
+    producto = get_object_or_404(Producto, id_producto=producto_id)
+    perfil = request.user.perfil
+    perfil.favoritos.remove(producto)
+    return redirect('perfil_usuario')
+@login_required
+def favoritos(request):
+    favoritos = request.user.perfil.favoritos.all()
+    return render(request, 'index/favoritos.html', {'favoritos': favoritos})
+@login_required
+def toggle_favorito(request, producto_id):
+    producto = get_object_or_404(Producto, id_producto=producto_id)
+    perfil = request.user.perfil
+
+    if producto in perfil.favoritos.all():
+        perfil.favoritos.remove(producto)
+    else:
+        perfil.favoritos.add(producto)
+
+    # Redirige a la página anterior o a perfil público
+    return redirect(request.META.get('HTTP_REFERER', 'perfil_usuario'))

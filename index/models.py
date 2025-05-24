@@ -81,6 +81,7 @@ class Perfil(models.Model):
         ('Otro', 'Otro'),
     ]
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    favoritos = models.ManyToManyField(Producto, related_name='favoritos', blank=True)
     foto_perfil = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
     genero = models.CharField(max_length=9, choices=GENERO_CHOICES, default='')
     direccion = models.CharField(max_length=255, null=True, blank=True)

@@ -1,0 +1,30 @@
+{% extends "index/base.html" %}
+{% block body %}
+<h1>Mis Favoritos</h1>
+
+<div id="productos" class="producto-lista">
+    {% if favoritos %}
+        <ul>
+            {% for producto in favoritos %}
+                <li>
+                    <div class="product card-product">
+                        {% if producto.imagen %}
+                            <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ producto.nombre }}</h5>
+                            <p class="card-text">Usuario: {{ producto.usuario.username }}</p>
+                            <p class="card-text">Estado: {{ producto.estado }}</p>
+                            <p class="card-text">Calificación: {{ producto.calificacion_promedio|default:"Sin calificaciones" }}</p>
+                            <a href="{% url 'ver_producto' id_producto=producto.id_producto %}" class="btn btn-primary">Ver</a>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No tienes productos favoritos aún.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

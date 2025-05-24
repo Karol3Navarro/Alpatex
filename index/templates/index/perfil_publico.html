@@ -1,0 +1,172 @@
+{% extends "index/base.html" %}
+{% load static %}
+
+{% block body %}
+<style>
+    .profile-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+
+    .perfil-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .perfil-foto img {
+        border-radius: 8px;
+    }
+
+    .perfil-datos {
+        margin-top: 10px;
+    }
+
+    .productos-seccion {
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .toggle-btn {
+        background-color: #AD5CA1;
+        color: white;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        padding: 8px 12px;
+        border-radius: 5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: bold;
+        user-select: none;
+        white-space: nowrap;
+        margin-bottom: 10px;
+    }
+
+    .producto-lista ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .producto-lista li {
+        margin-bottom: 10px;
+    }
+
+    .product {
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+
+    .card-product {
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 8px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .card-product img {
+        width: 80px;
+        height: auto;
+        border-radius: 4px;
+    }
+
+    .card-product .card-body {
+        flex: 1;
+    }
+
+    .card-title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .card-text {
+        margin: 2px 0;
+    }
+
+    .btn {
+        font-size: 13px;
+        padding: 4px 8px;
+    }
+</style>
+
+<div class="profile-container">
+    <h2>Perfil de {{ perfil.user.username }}</h2>
+
+    <div class="profile-header">
+        <!-- Parte izquierda: Foto y datos del perfil -->
+        <div class="perfil-info">
+            <div class="perfil-foto">
+                {% if perfil.foto_perfil %}
+                    <img src="{{ perfil.foto_perfil.url }}" alt="Foto de perfil" width="150">
+                {% else %}
+                    <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada" width="150">
+                {% endif %}
+            </div>
+
+            <div class="perfil-datos">
+                <p><strong>Correo:</strong> {{ perfil.user.email }}</p>
+                <p><strong>Género:</strong> {{ perfil.get_genero_display }}</p>
+                <p><strong>Dirección:</strong> {{ perfil.direccion }}</p>
+                <p><strong>RUT:</strong> {{ perfil.rut }}</p>
+                <p><strong>Fecha de creación:</strong> {{ perfil.user.date_joined|date:"d M Y" }}</p> 
+            </div>
+        </div>
+
+        <!-- Parte derecha: Botón y productos -->
+        <div class="productos-seccion">
+            <button class="toggle-btn" onclick="toggleProductos()">
+                Productos <span id="signo">+</span>
+            </button>
+
+            <!-- Lista de productos (oculta por defecto) -->
+            <div id="productos" class="producto-lista" style="display: none;">
+                {% if productos %}
+                    <ul>
+                        {% for producto in productos %}
+                            <li>
+                                <div class="product card-product">
+                                    <img src="{{ producto.imagen.url }}" class="card-img-top">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ producto.nombre }}</h5>
+                                        <p class="card-text">Usuario: {{ producto.usuario }}</p>
+                                        <p class="card-text">Estado: {{ producto.estado }}</p>
+                                        <p class="card-text">Calificación: {{ producto.calificacion_promedio }}</p>
+                                        <a href="{% url 'ver_producto' id_producto=producto.id_producto %}" class="btn btn-primary">Ver</a>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Este usuario no tiene productos.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleProductos() {
+        const productos = document.getElementById('productos');
+        const signo = document.getElementById('signo');
+
+        if (productos.style.display === 'none') {
+            productos.style.display = 'block';
+            signo.textContent = '−';
+        } else {
+            productos.style.display = 'none';
+            signo.textContent = '+';
+        }
+    }
+</script>
+{% endblock %}
