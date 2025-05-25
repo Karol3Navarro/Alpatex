@@ -23,7 +23,7 @@
                                     <div class="div_ms_inbox">
                                         {% with ultimo_mensaje=inbox.canalmensaje_set.all|dictsortreversed:"tiempo"|first %}
                                             <strong>{{ second_user.usuario }}</strong><br>
-                                            <small>({{ inbox.canalmensaje_set.count }}) Mensajes: {{ultimo_mensaje.texto}}</small>
+                                            <small>({{ inbox.canalmensaje_set.count }}) Mensajes: {{ ultimo_mensaje.texto|truncatechars:55 }}</small>
                                         {% endwith %}
                                     </div>
                                 {% endif %}
