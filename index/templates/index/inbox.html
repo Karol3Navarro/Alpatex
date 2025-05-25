@@ -2,11 +2,7 @@
 {% load static %}
 {% block title %}Mis Mensajes{% endblock title %}
 {% block body %}
-    <!-- <div class="reg-btn">
-        <a onclick="window.history.back();" class="regresar">
-            <span class="material-symbols-outlined">chevron_left</span> Regresar
-        </a>
-    </div> -->
+
     <div class="chat-wrapper">
         <!-- Lista de conversaciones -->
         <div class="chat-sidebar">
@@ -57,8 +53,9 @@
                                         {% endif %}
                                     </div>
                                     <!-- Nombre del usuario -->
-                                     <p><strong> <a href="{% url 'perfil_publico' usuario.username %}">
-                                        {{usuario.username }}</a></p>
+                                    <div class="chat-username1">   
+                                        <a href="{% url 'perfil_publico' usuario.username %}">{{usuario.username }}</a>
+                                    </div>
                                 </div>
                             {% endif %}
                         {% endfor %}
