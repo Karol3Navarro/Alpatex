@@ -1,1 +1,24 @@
 {% extends "admin_alpatex/base.html" %}
+{% load static %}
+{% block body %}
+    <h1 class="prod-dest">Usuarios Reportados</h1>
+    <div class="row">
+        {% for usuario in usuarios %}
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="perfil-foto">
+                        <img src="{{ usuario.perfil.get_foto_perfil_url }}" alt="Foto de perfil" width="150">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ usuario.username }}</h5>
+                        <p class="card-text"><strong>Dirección:</strong> {{ usuario.perfil.direccion }}</p>
+                        <p class="card-text"><strong>Reportes:</strong> {{ usuario.num_reportes }}</p>
+                        <a href="{% url 'perfil_publico' username=usuario.username %}">Ver Perfil</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>No hay usuarios reportados.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

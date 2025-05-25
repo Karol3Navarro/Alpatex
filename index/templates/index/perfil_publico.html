@@ -124,9 +124,17 @@
 
             <!-- Parte derecha: Botón y productos -->
             <div class="productos-seccion">
-                <button class="toggle-btn" onclick="toggleProductos()">
-                    Productos <span id="signo">+</span>
-                </button>
+                <div class="d-flex gap-2 mb-2">
+                    <button class="toggle-btn" onclick="toggleProductos()">
+                        Productos <span id="signo">+</span>
+                    </button>
+
+                    {% if request.user.is_authenticated and request.user != perfil.user %}
+                        <a href="{% url 'detailms' perfil.user.username %}" class="toggle-btn" style="text-decoration: none;">
+                            💬 Chatear con {{ perfil.user.username }}
+                        </a>
+                    {% endif %}
+                </div>
 
                 <!-- Lista de productos (oculta por defecto) -->
                 <div id="productos" class="producto-lista" style="display: none;">

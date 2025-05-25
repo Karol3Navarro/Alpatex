@@ -11,7 +11,9 @@ from .models import Membresia
 from .forms import MembresiaForm
 from django.core.mail import send_mail
 from django.conf import settings
-
+from django.db.models import Count
+from django.shortcuts import render
+from index.models import ReporteVendedor
 
 def dashboard(request):
     return render(request, 'admin_alpatex/home_admin.html')
@@ -176,12 +178,6 @@ def eliminar_membresia(request, membresia_id):
     membresia.delete()
     return redirect('listar_membresias')
 
-def usuarios_reportados(request):
-    # lógica para mostrar solo los usuarios reportados
-    return render(request, 'admin_alpatex/usuarios_reportados.html')
-
-
-
 def eliminar_usuario(request, user_id):
     user = get_object_or_404(User, id=user_id)
 
@@ -199,3 +195,14 @@ def eliminar_usuario(request, user_id):
         return redirect('usuarios')  # Cambia por el nombre correcto de la url
 
     return render(request, 'admin_alpatex/usuarios.html', {'usuario': user})
+
+@login_required
+def usuarios_reportados(request):
+    # Obtener usuarios que han sido reportados al menos una vez
+    usuarios = User.objects.filter(reportes_recibidos__isnull=False).annotate(
+        num_reportes=Count('reportes_recibidos')
+    ).distinct()
+
+    return render(request, 'admin_alpatex/usuarios_reportados.html', {
+        'usuarios': usuarios
+    })

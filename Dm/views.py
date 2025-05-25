@@ -170,21 +170,45 @@ class DetailMs(LoginRequiredMixin, CanalFormMixin, DetailView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 
-		if getattr(self, 'enviar_mensaje', False):
-			canal = self.get_object()
-			usuario = self.request.user
+		canal = self.get_object()
+		usuario = self.request.user
 
+		# MENSAJE AUTOMÁTICO ADMINISTRADOR
+		if usuario.is_staff or usuario.is_superuser:
+			texto_mensaje = (
+				"Hola, soy el Administrador de Alpatex. <br>"
+				"Veo que tienes reportes en tu perfil. Según las políticas de la plataforma, debes:<br>"
+				"1️⃣ Coordinar otra fecha y lugar para la nueva entrega del producto.<br>"
+				"2️⃣ Si tienes más de 3 reportes, nos veremos en la obligación de eliminar tu perfil.<br>"
+				"3️⃣ Contactar soporte si crees que el reporte fue un error.<br>"
+				"Gracias por tu comprensión."
+			)
+
+			ya_enviado = CanalMensaje.objects.filter(
+				canal=canal,
+				usuario=usuario,
+				texto=texto_mensaje
+			).exists()
+
+			if not ya_enviado:
+				CanalMensaje.objects.create(
+					canal=canal,
+					usuario=usuario,
+					texto=texto_mensaje
+				)
+
+		# MENSAJE DE INTERÉS POR PRODUCTO
+		elif getattr(self, 'enviar_mensaje', False):
 			url_producto = self.request.build_absolute_uri(
 				reverse('ver_producto', kwargs={'id_producto': self.producto.id_producto})
 			)
 
 			texto_mensaje = f""" 
 				¡Hola! Estoy interesado en tu producto: {self.producto.nombre}.<br>
-				<img src="{self.request.build_absolute_uri(self.producto.imagen.url)}" alt="{self.producto.nombre}" style="max-width: 150px; height: auto; margin-top: 10px;" />. <br>
+				<img src="{self.request.build_absolute_uri(self.producto.imagen.url)}" alt="{self.producto.nombre}" style="max-width: 150px; height: auto; margin-top: 10px;" /> <br>
 				<a href="{url_producto}" class="btn btn-primary" style="margin-top: 10px; display: inline-block;">Ver Producto</a>
 			"""
 
-			# Evitar duplicados: revisamos si ya existe este mensaje del usuario
 			ya_enviado = CanalMensaje.objects.filter(
 				canal=canal,
 				usuario=usuario,
@@ -196,10 +220,10 @@ class DetailMs(LoginRequiredMixin, CanalFormMixin, DetailView):
 					canal=canal,
 					usuario=usuario,
 					texto=texto_mensaje,
-					producto=self.producto 
+					producto=self.producto
 				)
 
-		context['inbox'] = Canal.objects.filter(canalusuario__usuario=self.request.user)
+		context['inbox'] = Canal.objects.filter(canalusuario__usuario=usuario)
 		context['form'] = FormMensajes()
 		return context
 
