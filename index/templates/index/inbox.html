@@ -185,6 +185,17 @@
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                                     </div>
                                     <div class="modal-body">
+                                        <!-- ⭐⭐ Estrellas para puntuar ⭐⭐ -->
+                                        <div id="star-rating-report" class="stars mb-3" style="cursor: pointer; font-size: 1.8rem;">
+                                            <span data-value="1">★</span>
+                                            <span data-value="2">★</span>
+                                            <span data-value="3">★</span>
+                                            <span data-value="4">★</span>
+                                            <span data-value="5">★</span>
+                                        </div>
+
+                                        <!-- Campo oculto para almacenar el puntaje del reporte -->
+                                        <input type="hidden" name="puntaje" id="id_puntaje_report" required>
                                         <div class="mb-3">
                                             <label for="motivo" class="form-label">Motivo del reporte</label>
                                             <textarea class="form-control" name="motivo" required></textarea>
@@ -247,6 +258,36 @@
                 }
             });
         }
+        // ⭐ Interactividad de estrellas en reporte ⭐
+        const reportStars = document.querySelectorAll('#star-rating-report span');
+        const ratingInputReport = document.getElementById('id_puntaje_report');
+        let currentReportRating = 0;
+
+        reportStars.forEach(star => {
+            star.addEventListener('mouseover', () => {
+                const rating = star.getAttribute('data-value');
+                highlightReportStars(rating);
+            });
+
+            star.addEventListener('mouseout', () => {
+                highlightReportStars(currentReportRating);
+            });
+
+            star.addEventListener('click', () => {
+                currentReportRating = star.getAttribute('data-value');
+                ratingInputReport.value = currentReportRating;
+            });
+        });
+
+        function highlightReportStars(rating) {
+            reportStars.forEach(star => {
+                if (star.getAttribute('data-value') <= rating) {
+                    star.style.color = '#ffc107';
+                } else {
+                    star.style.color = '#ddd';
+                }
+            });
+        } 
         document.getElementById("confirmForm").addEventListener("submit", function(e) {
             e.preventDefault();
             const formData = new FormData(this);

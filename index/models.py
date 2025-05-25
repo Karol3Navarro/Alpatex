@@ -122,6 +122,7 @@ class ReporteVendedor(models.Model):
     comprador = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reportes_realizados')
     vendedor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reportes_recibidos')
     motivo = models.TextField()
+    puntaje = models.PositiveIntegerField(null=True, blank=True)
     fecha_reporte = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

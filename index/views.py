@@ -509,12 +509,16 @@ def reportar_vendedor(request):
     form = ReporteVendedorForm(request.POST)
     producto_id = request.POST.get('producto_id')
     vendedor_id = request.POST.get('vendedor_id')
+    puntaje = request.POST.get('puntaje')
+
     if form.is_valid() and producto_id and vendedor_id:
         reporte = form.save(commit=False)
         reporte.producto_id = producto_id
         reporte.vendedor_id = vendedor_id
         reporte.comprador = request.user
+        reporte.puntaje = puntaje
         reporte.save()
+        
         ConfirmacionEntrega.objects.filter(producto_id=producto_id).update(concretado=False)
         # REVISAR ES PARA VER SI EL PRODUCTO QUEDA DISPONIBLE O NO Luego del reporte
         # producto = Producto.objects.get(id_producto=producto_id)
