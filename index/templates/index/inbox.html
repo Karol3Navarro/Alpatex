@@ -57,7 +57,8 @@
                                         {% endif %}
                                     </div>
                                     <!-- Nombre del usuario -->
-                                    <h2>{{ usuario.username }}</h2>
+                                     <p><strong> <a href="{% url 'perfil_publico' usuario.username %}">
+                                        {{usuario.username }}</a></p>
                                 </div>
                             {% endif %}
                         {% endfor %}
