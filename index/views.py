@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from .models import Producto, Perfil, CalificacionVendedor
+from .models import Producto, Perfil, CalificacionVendedor, ReporteVendedor
 from .Forms import CustomUserCreationForm, PerfilForm, ProductoForm, ReporteVendedorForm
 from django.contrib import messages
 import json
@@ -518,12 +518,8 @@ def reportar_vendedor(request):
         reporte.comprador = request.user
         reporte.puntaje = puntaje
         reporte.save()
-        
+
         ConfirmacionEntrega.objects.filter(producto_id=producto_id).update(concretado=False)
-        # REVISAR ES PARA VER SI EL PRODUCTO QUEDA DISPONIBLE O NO Luego del reporte
-        # producto = Producto.objects.get(id_producto=producto_id)
-        # producto.disponible = True
-        # producto.save()
         messages.success(request, "Gracias por reportar al vendedor.")
         return redirect(request.META.get('HTTP_REFERER', 'home')) 
     else:
@@ -541,10 +537,47 @@ def perfil_publico(request, username):
     # Obtener los productos del usuario público
     productos = Producto.objects.filter(usuario=usuario)
 
+    opiniones = []
+
+    # Calificaciones
+    calificaciones = CalificacionVendedor.objects.filter(vendedor=usuario).select_related('comprador', 'producto')
+    for calificacion in calificaciones:
+        perfil_comprador = getattr(calificacion.comprador, 'perfil', None)
+        foto = perfil_comprador.get_foto_perfil_url() if perfil_comprador else None
+        opiniones.append({
+            'tipo': 'calificacion',
+            'usuario': calificacion.comprador.username,
+            'foto': foto,
+            'puntaje': calificacion.puntaje,
+            'comentario': calificacion.comentario,
+            'producto': calificacion.producto.nombre,
+            'fecha': calificacion.fecha_creacion,
+        })
+
+    # Reportes
+    reportes = ReporteVendedor.objects.filter(vendedor=usuario).select_related('comprador', 'producto')
+    for reporte in reportes:
+        perfil_comprador = getattr(reporte.comprador, 'perfil', None)
+        foto = perfil_comprador.get_foto_perfil_url() if perfil_comprador else None
+        opiniones.append({
+            'tipo': 'reporte',
+            'usuario': reporte.comprador.username,
+            'foto': foto,
+            'motivo': reporte.motivo,
+            'puntaje': reporte.puntaje,  # ✅ incluimos el puntaje del reporte
+            'producto': reporte.producto.nombre,
+            'fecha': reporte.fecha_reporte,
+        })
+
+    # Ordenar por fecha descendente
+    opiniones.sort(key=lambda x: x['fecha'], reverse=True)
+
     return render(request, 'index/perfil_publico.html', {
         'perfil': perfil,
         'productos': productos,
+        'opiniones': opiniones,
     })
+
 @login_required
 def agregar_favorito(request, producto_id):
     producto = get_object_or_404(Producto, id_producto=producto_id)

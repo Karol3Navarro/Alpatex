@@ -99,62 +99,104 @@
     }
 </style>
 
-<div class="profile-container">
-    <h2>Perfil de {{ perfil.user.username }}</h2>
+    <div class="profile-container">
+        <h2>Perfil de {{ perfil.user.username }}</h2>
 
-    <div class="profile-header">
-        <!-- Parte izquierda: Foto y datos del perfil -->
-        <div class="perfil-info">
-            <div class="perfil-foto">
-                {% if perfil.foto_perfil %}
-                    <img src="{{ perfil.foto_perfil.url }}" alt="Foto de perfil" width="150">
-                {% else %}
-                    <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada" width="150">
-                {% endif %}
+        <div class="profile-header">
+            <!-- Parte izquierda: Foto y datos del perfil -->
+            <div class="perfil-info">
+                <div class="perfil-foto">
+                    {% if perfil.foto_perfil %}
+                        <img src="{{ perfil.foto_perfil.url }}" alt="Foto de perfil" width="150">
+                    {% else %}
+                        <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada" width="150">
+                    {% endif %}
+                </div>
+
+                <div class="perfil-datos">
+                    <p><strong>Correo:</strong> {{ perfil.user.email }}</p>
+                    <p><strong>Género:</strong> {{ perfil.get_genero_display }}</p>
+                    <p><strong>Dirección:</strong> {{ perfil.direccion }}</p>
+                    <p><strong>RUT:</strong> {{ perfil.rut }}</p>
+                    <p><strong>Fecha de creación:</strong> {{ perfil.user.date_joined|date:"d M Y" }}</p> 
+                </div>
             </div>
 
-            <div class="perfil-datos">
-                <p><strong>Correo:</strong> {{ perfil.user.email }}</p>
-                <p><strong>Género:</strong> {{ perfil.get_genero_display }}</p>
-                <p><strong>Dirección:</strong> {{ perfil.direccion }}</p>
-                <p><strong>RUT:</strong> {{ perfil.rut }}</p>
-                <p><strong>Fecha de creación:</strong> {{ perfil.user.date_joined|date:"d M Y" }}</p> 
-            </div>
-        </div>
+            <!-- Parte derecha: Botón y productos -->
+            <div class="productos-seccion">
+                <button class="toggle-btn" onclick="toggleProductos()">
+                    Productos <span id="signo">+</span>
+                </button>
 
-        <!-- Parte derecha: Botón y productos -->
-        <div class="productos-seccion">
-            <button class="toggle-btn" onclick="toggleProductos()">
-                Productos <span id="signo">+</span>
-            </button>
-
-            <!-- Lista de productos (oculta por defecto) -->
-            <div id="productos" class="producto-lista" style="display: none;">
-                {% if productos %}
-                    <ul>
-                        {% for producto in productos %}
-                            <li>
-                                <div class="product card-product">
-                                    <img src="{{ producto.imagen.url }}" class="card-img-top">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ producto.nombre }}</h5>
-                                        <p class="card-text">Usuario: {{ producto.usuario }}</p>
-                                        <p class="card-text">Estado: {{ producto.estado }}</p>
-                                        <p class="card-text">Calificación: {{ producto.calificacion_promedio }}</p>
-                                        <a href="{% url 'ver_producto' id_producto=producto.id_producto %}" class="btn btn-primary">Ver</a>
+                <!-- Lista de productos (oculta por defecto) -->
+                <div id="productos" class="producto-lista" style="display: none;">
+                    {% if productos %}
+                        <ul>
+                            {% for producto in productos %}
+                                <li>
+                                    <div class="product card-product">
+                                        <img src="{{ producto.imagen.url }}" class="card-img-top">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ producto.nombre }}</h5>
+                                            <p class="card-text">Usuario: {{ producto.usuario }}</p>
+                                            <p class="card-text">Estado: {{ producto.estado }}</p>
+                                            <p class="card-text">Calificación: {{ producto.calificacion_promedio }}</p>
+                                            <a href="{% url 'ver_producto' id_producto=producto.id_producto %}" class="btn btn-primary">Ver</a>
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p>Este usuario no tiene productos.</p>
-                {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>Este usuario no tiene productos.</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
-</div>
+    <h3 class="prod-dest">Opiniones de otros usuarios:</h3>
 
+    <div class="calificaciones">
+        {% for op in opiniones %}
+            <div class="cal-card">
+                <div class="cal-card-body">
+                    <div class="cal-header">
+                        {% if op.foto %}
+                            <img src="{{ op.foto }}" alt="Foto de perfil" class="cal-avatar">
+                        {% else %}
+                            <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada" class="cal-avatar">
+                        {% endif %}
+
+                        <div class="cal-user-info">
+                            <h5 class="cal-card-titulo">{{ op.usuario }}</h5>
+                            <div class="cal-rating">
+                                {% if op.puntaje %}
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= op.puntaje %}
+                                            <span class="star full">★</span>
+                                        {% else %}
+                                            <span class="star">☆</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <p class="cal-producto">Producto: <strong>{{ op.producto }}</strong></p>
+                        </div>
+                    </div>
+
+                    <p class="cal-card-texto">
+                        {% if op.tipo == "calificacion" %}
+                            {{ op.comentario }}
+                        {% else %}
+                            {{ op.motivo }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        {% empty %}
+            <p>No hay opiniones todavía.</p>
+        {% endfor %}
+    </div>
 <script>
     function toggleProductos() {
         const productos = document.getElementById('productos');
