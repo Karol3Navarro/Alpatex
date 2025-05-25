@@ -134,7 +134,17 @@
                       <li><a class="dropdown-item" href="{% url 'reporte_productos' %}">Reportes de productos</a></li>
                     </ul>
                 </li>
-                <li><a class="navegacion" href="{% url 'usuarios' %}">Usuarios</a></li>
+            <li class="nav-item dropdown custom-dropdown">
+                <a class="navegacion" href="#" id="usuariosDropdown" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Usuarios &#x25BC;
+                </a>
+                <ul class="dropdown-menu custom-menu" aria-labelledby="usuariosDropdown">
+                    <li><a class="dropdown-item" href="{% url 'usuarios' %}">Todos los usuarios</a></li>
+                    <li><a class="dropdown-item" href="{% url 'usuarios_reportados' %}">Usuarios reportados</a></li>
+                </ul>
+            </li>
+
                 <li><a class="navegacion" href="{% url 'gestionar_productos' %}">Productos</a></li>
                 <li><a class="navegacion" href="{% url 'listar_membresias' %}">Membresías</a></li>
             </ul>

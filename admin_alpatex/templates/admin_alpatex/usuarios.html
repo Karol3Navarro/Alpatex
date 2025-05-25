@@ -22,7 +22,13 @@
           <div class="card-body">
             <h5 class="card-title">{{ usuario.username }}</h5>
             <p class="card-text"><strong>Dirección:</strong> {{ usuario.perfil.direccion }}</p>
-            <a href="{% url 'perfil_usuario' username=usuario.username %}">Ver Perfil</a>
+          <a href="{% url 'perfil_usuario' username=usuario.username %}">Ver Perfil</a>
+            <form action="{% url 'eliminar_usuario' usuario.id %}" method="post" onsubmit="return confirm('¿Estás seguro de eliminar este usuario?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+            </form>
+
+
           </div>
         </div>
       </div>

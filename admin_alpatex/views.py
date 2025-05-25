@@ -2,13 +2,15 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from index.models import Producto, Perfil
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required,user_passes_test
 from django.contrib.auth.models import User
 import openpyxl
 from django.http import HttpResponse
 from datetime import datetime
 from .models import Membresia
 from .forms import MembresiaForm
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 def dashboard(request):
@@ -173,3 +175,27 @@ def eliminar_membresia(request, membresia_id):
     membresia = get_object_or_404(Membresia, pk=membresia_id)
     membresia.delete()
     return redirect('listar_membresias')
+
+def usuarios_reportados(request):
+    # lógica para mostrar solo los usuarios reportados
+    return render(request, 'admin_alpatex/usuarios_reportados.html')
+
+
+
+def eliminar_usuario(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST':
+       
+        subject = "Cuenta eliminada - Alpatex"
+        message = f"Hola {user.username},\n\nTu cuenta ha sido eliminada de la plataforma Alpatex por romper las políticas de uso.\nSi tienes alguna duda, contacta con soporte.\n\nSaludos,\nEquipo Alpatex"
+        from_email = settings.DEFAULT_FROM_EMAIL
+        recipient_list = [user.email]
+
+        send_mail(subject, message, from_email, recipient_list)
+
+        # Eliminar usuario
+        user.delete()
+        return redirect('usuarios')  # Cambia por el nombre correcto de la url
+
+    return render(request, 'admin_alpatex/usuarios.html', {'usuario': user})
