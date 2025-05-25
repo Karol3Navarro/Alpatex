@@ -140,14 +140,17 @@
                                     </div>
                                     <div class="modal-body">
                                         <div class="mb-3">
-                                            <label for="puntaje" class="form-label">Calificación al vendedor</label>
-                                            <select name="puntaje" class="form-control" required>
-                                                <option value="1">1 estrella</option>
-                                                <option value="2">2 estrellas</option>
-                                                <option value="3">3 estrellas</option>
-                                                <option value="4">4 estrellas</option>
-                                                <option value="5">5 estrellas</option>
-                                            </select>
+                                            <!-- ⭐⭐ Estrellas para calificar ⭐⭐ -->
+                                            <div id="star-rating" class="stars mb-3" style="cursor: pointer; font-size: 1.8rem;">
+                                                <span data-value="1">★</span>
+                                                <span data-value="2">★</span>
+                                                <span data-value="3">★</span>
+                                                <span data-value="4">★</span>
+                                                <span data-value="5">★</span>
+                                            </div>
+
+                                            <!-- Campo oculto para almacenar el puntaje -->
+                                            <input type="hidden" name="puntaje" id="id_puntaje" required>
                                         </div>
                                         <div class="mb-3">
                                             <label for="comentario" class="form-label">Comentario</label>
@@ -214,6 +217,36 @@
     </div>
 
     <script>
+        // ⭐ Interactividad de estrellas para calificar vendedor ⭐
+        const stars = document.querySelectorAll('#star-rating span');
+        const ratingInput = document.getElementById('id_puntaje');
+        let currentRating = 0;
+
+        stars.forEach(star => {
+            star.addEventListener('mouseover', () => {
+                const rating = star.getAttribute('data-value');
+                highlightStars(rating);
+            });
+
+            star.addEventListener('mouseout', () => {
+                highlightStars(currentRating);
+            });
+
+            star.addEventListener('click', () => {
+                currentRating = star.getAttribute('data-value');
+                ratingInput.value = currentRating;
+            });
+        });
+
+        function highlightStars(rating) {
+            stars.forEach(star => {
+                if (star.getAttribute('data-value') <= rating) {
+                    star.style.color = '#ffc107'; // amarillo
+                } else {
+                    star.style.color = '#ddd'; // gris claro
+                }
+            });
+        }
         document.getElementById("confirmForm").addEventListener("submit", function(e) {
             e.preventDefault();
             const formData = new FormData(this);
