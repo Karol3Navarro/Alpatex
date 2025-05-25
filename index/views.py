@@ -3,8 +3,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from .models import Producto, Perfil, CalificacionProducto, CalificacionVendedor
-from .Forms import CustomUserCreationForm, PerfilForm, ProductoForm, CalificacionProductoForm, ReporteVendedorForm
+from .models import Producto, Perfil, CalificacionVendedor
+from .Forms import CustomUserCreationForm, PerfilForm, ProductoForm, ReporteVendedorForm
 from django.contrib import messages
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -92,15 +92,6 @@ def home(request):
         prioridad_visibilidad=F('usuario__perfil__membresia__prioridad_visibilidad')
     ).order_by('-prioridad_visibilidad', '-fecha_creacion')
 
-
-    for producto in productos:
-        calificaciones = CalificacionProducto.objects.filter(producto=producto)
-        if calificaciones.exists():
-            promedio = calificaciones.aggregate(Avg('puntaje'))['puntaje__avg']
-            producto.calificacion_promedio = round(promedio, 1)
-        else:
-            producto.calificacion_promedio = "Sin calificaciones"
-
     context = {
         "usuarios": usuarios,
         "productos": productos,
@@ -114,35 +105,8 @@ def ver_producto(request, id_producto):
     producto.contador_visitas += 1
     producto.save()
 
-    if request.method == 'POST':
-        form = CalificacionProductoForm(request.POST)
-        if form.is_valid():
-            calificacion = form.save(commit=False)
-            calificacion.producto = producto
-            calificacion.usuario = request.user
-            calificacion.save()
-            return redirect('ver_producto', id_producto=producto.id_producto)
-    else:
-        form = CalificacionProductoForm()
-
-    # Obtener calificaciones con información de perfil segura
-    calificaciones = []
-    for calificacion in CalificacionProducto.objects.filter(producto=producto):
-        try:
-            perfil = calificacion.usuario.perfil
-            foto_perfil = perfil.foto_perfil.url if perfil.foto_perfil else None
-        except (Perfil.DoesNotExist, AttributeError):
-            foto_perfil = None
-        
-        calificaciones.append({
-            'calificacion': calificacion,
-            'foto_perfil': foto_perfil
-        })
-
     context = {
         'producto': producto,
-        'form': form,
-        'calificaciones': calificaciones,
     }
     return render(request, 'index/ver_producto.html', context)
 
