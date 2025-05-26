@@ -117,7 +117,7 @@
                 </ul>
             </div>
             <div class="busqueda">
-                <form action= "/search" method="get" class="right" role="search">
+                <form action="{% url 'buscar_productos' %}" method="get" class="right" role="search">
                     <input name="q" class="form-search" type="search" placeholder="Buscar" aria-label="Search">
                     <button type="submit">
                         <i class="lupa"></i>

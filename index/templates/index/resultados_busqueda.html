@@ -1,0 +1,29 @@
+{% extends "index/base.html" %}
+
+{% block title %}Resultados{% endblock %}
+
+{% block body %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Resultados para "{{ query }}"</h2>
+
+    {% if resultados %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {% for producto in resultados %}
+                <div class="product">
+                    <div class="card-product">
+                        <div class="card-body">
+                            <img src="{{ producto.imagen.url }}" class="card-img-top">
+                            <h5 class="card-title">{{ producto.nombre }}</h5>
+                            <p class="price card-text">Publicado por: {{producto.usuario }}</p>
+                            <p class="estado card-text">Estado: {{producto.estado }}</p>
+                            <a href="{% url 'ver_producto' id_producto=producto.id_producto %}" class="btn btn-primary">Ver Producto</a>  
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-gray-600">No se encontraron resultados.</p>
+    {% endif %}
+</div>
+{% endblock %}

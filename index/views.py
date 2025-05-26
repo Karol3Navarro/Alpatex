@@ -607,3 +607,12 @@ def toggle_favorito(request, producto_id):
 
     # Redirige a la página anterior o a perfil público
     return redirect(request.META.get('HTTP_REFERER', 'perfil_usuario'))
+
+def buscar_productos(request):
+    query = request.GET.get('q', '')
+    resultados = Producto.objects.filter(nombre__icontains=query, estado_revision='Aceptado')
+    return render(request, 'index/resultados_busqueda.html', {'resultados': resultados, 'query': query})
+def detalle_producto(request, id):
+    producto = get_object_or_404(Producto, id=id)
+    return render(request, 'index/detalle_producto.html', {'producto': producto})
+   

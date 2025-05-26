@@ -17,7 +17,5 @@ urlpatterns = [
     path('gestionar-productos/', views.gestionar_productos, name='gestionar_productos'),
     path('usuarios_reportados/', views.usuarios_reportados, name='usuarios_reportados'),
     path('usuarios/eliminar/<int:user_id>/', views.eliminar_usuario, name='eliminar_usuario'),
-
-
   # Ruta para el dashboard
 ]
