@@ -237,7 +237,7 @@ nav ul.menu li a.navegacion:hover {
 }
 /*-----------------*/
 body {
-    height: 100%;
+    height: 100vh;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -945,4 +945,99 @@ footer{
     background-color: #2196F3;
     color: white;
 }
-/* Alerta */
+/* FIN ALERTA */
+
+/*ADMIN */
+.mem-container{
+    max-width: 1000px;
+    border: 2px solid #ccc;
+    border-radius: 20px;
+    margin: auto;
+    padding: 2rem;
+}
+
+.mem-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+.mem-card{
+    border: 2px solid #ccc;
+    border-radius: 15px;
+    padding: 1rem;
+    background: #fdf9ff;
+}
+.mem-card h3{
+    margin-top: 0;
+    color: #AD5CA1;
+}
+
+.mem-acciones{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+.btn-mem-edit, .btn-mem-del{
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+}
+.btn-mem-edit{
+    background-color: #AD5CA1;
+    color: white;
+}
+.btn-mem-edit:hover{
+    background-color: #DD1155;
+    transform: scale(1.05);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+.btn-mem-del{
+    background-color: #5a2d50;
+    color: white;
+}
+.btn-mem-del:hover{
+    background-color: #42213D;
+    transform: scale(1.05);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.mem-form-container{
+    border: 2px solid #ccc;
+    border-radius: 20px;
+    width: 1000px;
+    margin: auto;
+    padding: 2rem;
+}
+/*EDITAR FORMULARIO*/
+.mem-form-container label{
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+.mem-form-container input,
+.mem-form-container textarea,
+.mem-form-container select{
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #aaa;
+    border-radius: 10px;
+    font-size: 1rem;
+    background-color: #fff;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+
+.mem-form-container input:focus,
+.mem-form-container textarea:focus,
+.mem-form-container select:focus {
+    outline: none;
+    border-color: #AD5CA1;
+}
+.mem-form-container input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+    transform: scale(1.4);
+    vertical-align: middle;
+}

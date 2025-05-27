@@ -2,10 +2,21 @@
 
 
 {% block body %}
-  <h2>Formulario de Membresía</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Guardar</button>
-  </form>
+  <div class="reg-btn">
+    <a onclick="window.history.back();" class="regresar">
+        <span class="material-symbols-outlined">chevron_left</span> Regresar
+    </a>
+  </div>
+  
+  <h2 class="prod-dest">Formulario de Membresía</h2>
+
+  <div class="mem-form-container">
+
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn">Guardar</button>
+    </form>
+
+  </div>
 {% endblock %}
