@@ -14,6 +14,7 @@ from django.conf import settings
 from django.db.models import Count
 from django.shortcuts import render
 from index.models import ReporteVendedor
+from django.db.models import Q
 
 def dashboard(request):
     return render(request, 'admin_alpatex/home_admin.html')
@@ -130,7 +131,19 @@ def export_to_excel(request):
 
 
 def usuarios(request):
+    query = request.GET.get('q')
+    membresia = request.GET.get('membresia')
+
     usuarios = User.objects.select_related('perfil').all()  # Carga los perfiles de manera eficiente
+
+    if query:
+        usuarios = usuarios.filter(username__icontains=query)
+    if membresia:
+        if membresia == 'Sin':
+            usuarios = usuarios.filter(perfil__membresia__isnull=True)
+        else:
+            usuarios = usuarios.filter(perfil__membresia__nombre=membresias)
+
     return render(request, 'admin_alpatex/usuarios.html', {'usuarios': usuarios})
 
 

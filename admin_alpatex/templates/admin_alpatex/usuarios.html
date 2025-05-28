@@ -5,33 +5,59 @@
 {% block body %}
 
   <h1 class="prod-dest">Usuarios Registrados</h1>
-  <div class="row">
+
+  <form method="get" class="filtros-user-admin">
+    
+    <input type="text" name="q" placeholder="Buscar usuario..." value="{{ request.GET.q }}">
+    
+    <select name="membresia">
+      <option value="">Todas las membresías</option>
+      <option value="Plata" {% if request.GET.membresia == 'Plata' %}selected{% endif %}>Plata</option>
+      <option value="Oro" {% if request.GET.membresia == 'Oro' %}selected{% endif %}>Oro</option>
+      <option value="Sin membresía" {% if request.GET.membresia == 'Sin membresía' %}selected{% endif %}>Sin membresía</option>
+    </select>
+    
+    <button type="submit" class="btn">Filtrar</button>
+
+  </form>
+
+  <div class="admin-users">
+
     {% for usuario in usuarios %}
-      <div class="col-md-3 mb-3">
-        <div class="card">
-          <div class="perfil-foto">
-            <img src="{{ usuario.perfil.get_foto_perfil_url }}" alt="Foto de perfil">
-            {% if usuario.perfil.membresia %}
-                {% if usuario.perfil.membresia.nombre == 'Plata' %}
-                    <img src="{% static 'img/plata.png' %}" class="marco-membresia" alt="Marco Plata">
-                {% elif usuario.perfil.membresia.nombre == 'Oro' %}
-                    <img src="{% static 'img/oro.png' %}" class="marco-membresia" alt="Marco Oro">
-                {% endif %}
+
+      <div class="user-card">
+
+        <div class="perfil-foto">
+          <img src="{{ usuario.perfil.get_foto_perfil_url }}" alt="Foto de perfil">
+          {% if usuario.perfil.membresia %}
+            {% if usuario.perfil.membresia.nombre == 'Plata' %}
+              <img src="{% static 'img/plata.png' %}" class="marco-membresia" alt="Marco Plata">
+            {% elif usuario.perfil.membresia.nombre == 'Oro' %}
+              <img src="{% static 'img/oro.png' %}" class="marco-membresia" alt="Marco Oro">
             {% endif %}
-          </div>
-          <div class="card-body">
-            <h5 class="card-title">{{ usuario.username }}</h5>
-            <p class="card-text"><strong>Dirección:</strong> {{ usuario.perfil.direccion }}</p>
-          <a href="{% url 'perfil_usuario' username=usuario.username %}">Ver Perfil</a>
+          {% endif %}
+        </div>
+
+        <div class="card-body">
+          <h5 class="card-title">{{ usuario.username }}</h5>
+          
+          <p class="card-text"><strong>Dirección:</strong> {{ usuario.perfil.direccion }}</p>
+
+          <div class="acciones-usuario">
+            <a href="{% url 'perfil_usuario' username=usuario.username %}" class="btn btn-ver">Ver Perfil</a>
+            
             <form action="{% url 'eliminar_usuario' usuario.id %}" method="post" onsubmit="return confirm('¿Estás seguro de eliminar este usuario?');">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                <button type="submit" class="btn btn-danger btn-eliminar">Eliminar</button>
             </form>
-
-
           </div>
+
         </div>
+
       </div>
+
     {% endfor %}
+
   </div>
+
 {% endblock %}
