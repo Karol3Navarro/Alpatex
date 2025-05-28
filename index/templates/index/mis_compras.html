@@ -38,6 +38,18 @@
                             <span style="color:orange; font-weight:bold;">⏳ Pendiente de Confirmación</span>
                         {% endif %}
                     </div>
+
+                    {% if confirmacion.creador == request.user %}
+						<div class="actions">
+							<a href="{% url 'editar_confirmacion' confirmacion.id %}" class="btn btn-warning">Editar</a>
+							<form action="{% url 'eliminar_confirmacion' confirmacion.id %}" method="POST" style="display:inline;">
+								{% csrf_token %}
+								<button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta confirmación?');">
+									Eliminar
+								</button>
+							</form>
+						</div>
+					{% endif %}
                 </div>
             {% endfor %}
         </div>

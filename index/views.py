@@ -15,7 +15,7 @@ from django.contrib.messages import get_messages
 from Dm.models import ConfirmacionEntrega
 from Dm.forms import ConfirmacionEntregaForm
 from django.views.decorators.http import require_POST
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.contrib import messages
 from django.utils import timezone
 from django.urls import reverse
@@ -615,4 +615,32 @@ def buscar_productos(request):
 def detalle_producto(request, id):
     producto = get_object_or_404(Producto, id=id)
     return render(request, 'index/detalle_producto.html', {'producto': producto})
+
+@login_required
+def editar_confirmacion(request, pk):
+    confirmacion = get_object_or_404(ConfirmacionEntrega, pk=pk, creador=request.user)
+
+    if not confirmacion.concretado or confirmacion.confirmado:
+        return HttpResponseForbidden("No puedes editar esta confirmación.")
+
+    if request.method == 'POST':
+        form = ConfirmacionEntregaForm(request.POST, instance=confirmacion)
+        if form.is_valid():
+            form.save()
+            return redirect('mis_compras')
+    else:
+        form = ConfirmacionEntregaForm(instance=confirmacion)
+
+    return render(request, 'index/editar_confirmacion.html', {'form': form})
+
+@login_required
+@require_POST
+def eliminar_confirmacion(request, pk):
+    confirmacion = get_object_or_404(ConfirmacionEntrega, pk=pk, creador=request.user)
+
+    if not confirmacion.concretado or confirmacion.confirmado:
+        return HttpResponseForbidden("No puedes eliminar esta confirmación.")
+
+    confirmacion.delete()
+    return redirect('mis_compras')
    

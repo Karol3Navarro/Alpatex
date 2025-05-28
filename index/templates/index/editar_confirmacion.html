@@ -1,0 +1,12 @@
+{% extends "index/base.html" %}
+{% block title %}Editar Confirmación{% endblock %}
+
+{% block body %}
+    <h2>Editar Confirmación</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="{% url 'mis_compras' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+{% endblock %}
