@@ -507,23 +507,30 @@ def calificar_vendedor(request):
 @require_POST
 def reportar_vendedor(request):
     form = ReporteVendedorForm(request.POST)
-    producto_id = request.POST.get('producto_id')
-    vendedor_id = request.POST.get('vendedor_id')
-    puntaje = request.POST.get('puntaje')
+    usuario_reportado_id = request.POST.get('usuario_reportado_id')
 
-    if form.is_valid() and producto_id and vendedor_id:
+    if not usuario_reportado_id:
+        messages.error(request, "ID de usuario no proporcionado.")
+        return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+    try:
+        usuario_reportado = get_object_or_404(User, pk=int(usuario_reportado_id))
+    except (ValueError, TypeError):
+        messages.error(request, "ID de usuario inválido.")
+        return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+    if form.is_valid():
         reporte = form.save(commit=False)
-        reporte.producto_id = producto_id
-        reporte.vendedor_id = vendedor_id
         reporte.comprador = request.user
-        reporte.puntaje = puntaje
+        reporte.vendedor = usuario_reportado
         reporte.save()
-
-        ConfirmacionEntrega.objects.filter(producto_id=producto_id).update(concretado=False)
-        messages.success(request, "Gracias por reportar al vendedor.")
-        return redirect(request.META.get('HTTP_REFERER', 'home')) 
+        messages.success(request, "Gracias por reportar a este usuario.")
     else:
-        return JsonResponse({'status': 'error', 'errors': form.errors})
+        for error in form.errors.values():
+            messages.error(request, error)
+
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
+    
 @login_required
 def perfil_publico(request, username):
     # Verificar si el usuario está viendo su propio perfil
@@ -555,7 +562,7 @@ def perfil_publico(request, username):
         })
 
     # Reportes
-    reportes = ReporteVendedor.objects.filter(vendedor=usuario).select_related('comprador', 'producto')
+    reportes = ReporteVendedor.objects.filter(vendedor=usuario).select_related('comprador')
     for reporte in reportes:
         perfil_comprador = getattr(reporte.comprador, 'perfil', None)
         foto = perfil_comprador.get_foto_perfil_url() if perfil_comprador else None
@@ -564,8 +571,6 @@ def perfil_publico(request, username):
             'usuario': reporte.comprador.username,
             'foto': foto,
             'motivo': reporte.motivo,
-            'puntaje': reporte.puntaje,  # ✅ incluimos el puntaje del reporte
-            'producto': reporte.producto.nombre,
             'fecha': reporte.fecha_reporte,
         })
 
@@ -574,7 +579,6 @@ def perfil_publico(request, username):
 
     return render(request, 'index/perfil_publico.html', {
         'perfil': perfil,
-        'productos': productos,
         'opiniones': opiniones,
     })
 

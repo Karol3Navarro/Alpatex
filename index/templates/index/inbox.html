@@ -36,31 +36,74 @@
             {% endfor %}
         </div>
 
-        <!-- Área de mensajes -->
-        <div class="chat-main">
-            {% if canal %}
+  <!-- Área de mensajes -->
+            <div class="chat-main">
+                {% if canal %}
                 <div class="chat-header">
-                    {% if canal %}
-                        {% for usuario in canal.usuarios.all %}
-                            {% if usuario != request.user %}
-                                <div class="chat-header-user1">
-                                    <!-- Foto de perfil -->
-                                    <div class="chat-avatar1">
-                                        {% if usuario.perfil.foto_perfil %}
-                                            <img src="{{ usuario.perfil.foto_perfil.url }}" alt="Avatar" width="40px" height="40px">
-                                        {% else %}
-                                            <img src="{% static 'img/usuario.png' %}" alt="Avatar" width="40px" height="40px">
-                                        {% endif %}
-                                    </div>
-                                    <!-- Nombre del usuario -->
-                                    <div class="chat-username1">   
-                                        <a href="{% url 'perfil_publico' usuario.username %}">{{usuario.username }}</a>
-                                    </div>
-                                </div>
+                    {% for usuario in canal.usuarios.all %}
+                        {% if usuario != request.user %}
+                    <div class="chat-header-user1 d-flex justify-content-between align-items-center w-100">
+                        <div class="d-flex align-items-center">
+                        <!-- Foto de perfil -->
+                        <div class="chat-avatar1 me-2">
+                            {% if usuario.perfil.foto_perfil %}
+                                <img src="{{ usuario.perfil.foto_perfil.url }}" alt="Avatar" width="40" height="40">
+                            {% else %}
+                                <img src="{% static 'img/usuario.png' %}" alt="Avatar" width="40" height="40">
                             {% endif %}
-                        {% endfor %}
-                    {% endif %}
+                        </div>
+                        <!-- Nombre del usuario -->
+                        <div class="chat-username1">
+                            <a href="{% url 'perfil_publico' usuario.username %}">{{ usuario.username }}</a>
+                        </div>
+                    </div>
+
+                <!-- Botón de 3 puntos -->
+                <div class="dropdown">
+                    <button class="btn btn-link text-dark dropdown-toggle" type="button" id="dropdownOpciones" data-bs-toggle="dropdown" aria-expanded="false">
+                        &#8942;
+                    </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownOpciones">
+                    <li>
+                    <a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#reporteModal{{ usuario.id }}">
+                        Reportar usuario
+                    </a>
+                    </li>
+                </ul>
                 </div>
+            </div>
+
+            <!-- Modal para reportar usuario -->
+            <div class="modal fade" id="reporteModal{{ usuario.id }}" tabindex="-1" aria-labelledby="reporteModalLabel{{ usuario.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form id="reporteForm{{ usuario.id }}" method="POST" action="{% url 'reportar_vendedor' %}">
+                            {% csrf_token %}
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="reporteModalLabel{{ usuario.id }}">Reportar al Usuario</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="motivo{{ usuario.id }}" class="form-label">Motivo del reporte</label>
+                                    <textarea class="form-control" id="motivo{{ usuario.id }}" name="motivo" required></textarea>
+                                </div>
+                                <input type="hidden" name="usuario_reportado_id" value="{{ usuario.id }}">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-danger">Enviar Reporte</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        {% endif %}
+    {% endfor %}
+</div>
+
+
 
                 <div class="chat-messages">
                     {% for mensaje in canal.canalmensaje_set.all|dictsort:"tiempo" %}
@@ -169,48 +212,7 @@
                         </div>
                     </div>
 
-                    <!-- Botón que abre el modal -->
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#reporteModal">
-                        No se concretó
-                    </button>
-
-                    <!-- Modal para reportar vendedor -->
-                    <div class="modal fade" id="reporteModal" tabindex="-1" aria-labelledby="reporteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <form id="reporteForm" method="POST" action="{% url 'reportar_vendedor' %}">
-                                    {% csrf_token %}
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Reportar al Vendedor</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <!-- ⭐⭐ Estrellas para puntuar ⭐⭐ -->
-                                        <div id="star-rating-report" class="stars mb-3" style="cursor: pointer; font-size: 1.8rem;">
-                                            <span data-value="1">★</span>
-                                            <span data-value="2">★</span>
-                                            <span data-value="3">★</span>
-                                            <span data-value="4">★</span>
-                                            <span data-value="5">★</span>
-                                        </div>
-
-                                        <!-- Campo oculto para almacenar el puntaje del reporte -->
-                                        <input type="hidden" name="puntaje" id="id_puntaje_report" required>
-                                        <div class="mb-3">
-                                            <label for="motivo" class="form-label">Motivo del reporte</label>
-                                            <textarea class="form-control" name="motivo" required></textarea>
-                                        </div>
-                                        <input type="hidden" name="producto_id" value="{{ producto_relacionado.id_producto }}">
-                                        <input type="hidden" name="vendedor_id" value="{{ producto_relacionado.usuario.id }}">
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                        <button type="submit" class="btn btn-danger">Enviar Reporte</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+                   
                 {% endif %}
 
                 <form class="chat-input" action="?canal_id={{ canal.id }}" method="POST">
