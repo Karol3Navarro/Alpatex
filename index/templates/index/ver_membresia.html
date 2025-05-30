@@ -3,30 +3,40 @@
 {% block body %}
 
   <div class="reg-btn">
-    <a href="{% url 'perfil_usuario' %}"  class="regresar">
+    <a onclick="window.history.back();" class="regresar">
         <span class="material-symbols-outlined">chevron_left</span> Regresar
     </a>
   </div>
   
-  <h1 class="prod-dest">Mi Membresía </h1>
+  <div class="membresia-container">
 
-  {% if perfil.membresia %}
-    <p><strong>Plan:</strong> {{ perfil.membresia.nombre }}</p>
-    <p><strong>Beneficios:</strong> {{ perfil.membresia.descripcion }}</p>
-  {% else %}
-    <p>No tienes una membresía activa.</p>
-  {% endif %}
+    <h1 class="prod-dest">Mi Membresía</h1>
 
-  <h3>Cambiar de Membresía</h3>
-  <form method="post">
-    {% csrf_token %}
-    <select name="membresia_id">
-      {% for m in membresias %}
-        <option value="{{ m.id }}" {% if perfil.membresia and perfil.membresia.id == m.id %}selected{% endif %}>
-          {{ m.nombre }} - ${{ m.precio }} CLP
-        </option>
-      {% endfor %}
-    </select>
-    <button type="submit">Pagar</button>
-  </form>
+    <div class="data-membresia card">
+      {% if perfil.membresia %}
+        <p><strong>Plan:</strong> {{ perfil.membresia.nombre }}</p>
+        <p><strong>Beneficios:</strong> {{ perfil.membresia.descripcion }}</p>
+      {% else %}
+        <p>No tienes una membresía activa.</p>
+      {% endif %}
+    </div>
+
+    <h3 class="prod-dest">Cambiar de Membresía</h3>
+
+    <form method="post" class="membresia-form">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="membresia_id">Selecciona tu plan: </label>
+        <select name="membresia_id" id="membresia_id">
+          {% for m in membresias %}
+            <option value="{{ m.id }}" {% if perfil.membresia and perfil.membresia.id == m.id %}selected{% endif %}>
+              {{ m.nombre }} - ${{ m.precio }} CLP
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn">Pagar</button>
+    </form>
+
+  </div>
 {% endblock %}
