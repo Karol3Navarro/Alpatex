@@ -1,0 +1,32 @@
+{% extends "admin_alpatex/base.html" %}
+{% load static %}
+{% block title %}Producto{% endblock title %}
+{% block body %}
+
+    <div class="reg-btn">
+        <a onclick="window.history.back();" class="regresar">
+            <span class="material-symbols-outlined">chevron_left</span> Regresar
+        </a>
+    </div>
+    
+
+    <div class="prod-detalle">
+        <div class="izq">
+            <img src="{{ producto.imagen.url }}" class="img">
+        </div>
+        <div class="der">
+            <h2 class="der-titulo">{{ producto.nombre }}</h2>
+            <p class="precio">$ <!--${{ producto.precio }}--></p>
+            <p><strong>Detalles del Producto:</strong> (Aquí puedes agregar más detalles)</p>
+            <p><strong>Publicado por: <a href="{% url 'perfil_usuario' producto.usuario.username %}">
+                {{ producto.usuario.username }}</a></p>
+            <p><strong>Estado:</strong> {{producto.estado}} </p>
+            <p><strong>Dirección:</strong> {{ producto.direccion }}</p>
+            <p><strong>Para:</strong> {{ producto.tipo }}</p>
+
+            <!-- Agrega más detalles según lo necesites -->
+
+           
+        </div>
+    </div>
+{% endblock %}

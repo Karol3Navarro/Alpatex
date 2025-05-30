@@ -1,25 +1,24 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from index.models import Producto, Perfil
-from django.contrib.admin.views.decorators import staff_member_required
+from index.models import Producto, Perfil, ReporteVendedor
 from django.contrib.auth.decorators import login_required,user_passes_test
 from django.contrib.auth.models import User
 import openpyxl
+from django.utils.timezone import now
 from django.http import HttpResponse
 from datetime import datetime
 from .models import Membresia
 from .forms import MembresiaForm
-from django.core.mail import send_mail
+from django.core.mail import  EmailMultiAlternatives
 from django.conf import settings
-from django.db.models import Count
-from django.shortcuts import render
-from index.models import ReporteVendedor
-from django.db.models import Q
+from django.db.models import Count, Q
 from io import BytesIO
 from reportlab.lib.pagesizes import letter # type: ignore
 import os
 from reportlab.pdfgen import canvas  # type: ignore
 from reportlab.lib.utils import ImageReader # type: ignore
+from django.template.loader import render_to_string
+from email.mime.image import MIMEImage
 
 
 
@@ -184,7 +183,11 @@ def crear_membresia(request):
     else:
         form = MembresiaForm()
     return render(request, 'admin_alpatex/membresia_form.html', {'form': form})
-
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def ver_producto_admin(request, id_producto):
+    producto = get_object_or_404(Producto, id_producto=id_producto)
+    return render(request, 'admin_alpatex/ver_producto.html', {'producto': producto})
 # Editar
 def editar_membresia(request, membresia_id):
     membresia = get_object_or_404(Membresia, pk=membresia_id)
@@ -210,27 +213,45 @@ def eliminar_usuario(request, user_id):
     if request.method == 'POST':
         motivo = request.POST.get('motivo', '')
 
-        perfil.fecha_eliminacion = datetime.now()
+        perfil.fecha_eliminacion = now()
         perfil.motivo_eliminacion = motivo
         perfil.save()
 
+        # Preparar correo
+        context = {
+            'username': user.username,
+            'motivo': motivo,
+            'site_url': request.build_absolute_uri('/'),
+        }
+
+        html_content = render_to_string('admin_alpatex/cuenta_eliminada.html', context)
         subject = "Cuenta eliminada - Alpatex"
-        message = (
+        from_email = settings.DEFAULT_FROM_EMAIL
+        to = [user.email]
+        text_content = (
             f"Hola {user.username},\n\n"
-            "Tu cuenta ha sido eliminada de la plataforma Alpatex por romper las políticas de uso.\n"
+            "Tu cuenta ha sido eliminada de Alpatex por incumplir nuestras políticas.\n"
             f"Motivo: {motivo}\n\n"
-            "Si tienes alguna duda, contacta con soporte.\n\n"
+            "Si crees que esto fue un error, contáctanos.\n\n"
             "Saludos,\nEquipo Alpatex"
         )
-        from_email = settings.DEFAULT_FROM_EMAIL
-        recipient_list = [user.email]
 
-        send_mail(subject, message, from_email, recipient_list)
-            # Eliminar usuario
-     
-        return redirect('usuarios')
+        msg = EmailMultiAlternatives(subject, text_content, from_email, to)
+        msg.attach_alternative(html_content, "text/html")
 
-    return render(request, 'admin_alpatex/usuarios.html', {'usuario': user})
+        logo_path = os.path.join(settings.BASE_DIR, 'index', 'static', 'img', 'alpatex-v2-tipografía.png')
+        with open(logo_path, 'rb') as img:
+            mime_image = MIMEImage(img.read())
+            mime_image.add_header('Content-ID', '<logo_alpatex>')
+            mime_image.add_header('Content-Disposition', 'inline', filename='alpatex-v2-tipografía.png')
+            msg.attach(mime_image)
+
+        msg.send()
+
+        return redirect('usuarios')  # ✅ CORRECTO
+
+    # 🚫 NUNCA devuelvas usuarios.html directamente desde aquí
+    return redirect('usuarios')
 
 @login_required
 def usuarios_reportados(request):

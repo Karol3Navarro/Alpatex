@@ -8,7 +8,7 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.conf import settings
 from django.core.mail import EmailMessage
-
+from email.mime.image import MIMEImage
 import os
 def cambiar_clave(request):
     if request.method == 'POST':
@@ -21,21 +21,35 @@ def cambiar_clave(request):
                     uid = urlsafe_base64_encode(force_bytes(user.pk))
                     token = default_token_generator.make_token(user)
                     reset_link = request.build_absolute_uri(f"/autenticacion/reset-clave/{uid}/{token}/")
-                    html_message = render_to_string("autenticacion/email_recuperar_clave.html", {
+
+                    context = {
                         'reset_link': reset_link,
-                    })
+                    }
+
+                    html_content = render_to_string("autenticacion/email_recuperar_clave.html", context)
+
                     email = EmailMessage(
                         subject="Recuperación de clave",
-                        body=html_message,
-                        from_email=None,
+                        body=html_content,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
                         to=[correo],
                     )
                     email.content_subtype = "html"
+
+                    # Adjuntar imagen del logo
+                    logo_path = os.path.join(settings.BASE_DIR, 'index', 'static', 'img', 'alpatex-v2-tipografía.png')
+                    with open(logo_path, 'rb') as img:
+                        mime_image = MIMEImage(img.read())
+                        mime_image.add_header('Content-ID', '<logo_alpatex>')
+                        mime_image.add_header('Content-Disposition', 'inline', filename='alpatex-v2-tipografía.png')
+                        email.attach(mime_image)
+
                     email.send()
-            # Redirigimos a una vista temporal que muestra el modal
-            return redirect('autenticacion:correo_modal')
+
+            return redirect('autenticacion:correo_modal')  # Vista que muestra mensaje de correo enviado
     else:
         form = PasswordResetForm()
+
     return render(request, 'autenticacion/cambiar_clave.html', {'form': form})
 
 
