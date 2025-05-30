@@ -8,15 +8,14 @@
         </a>
     </div>
 
+    <h1 class="prod-dest">Mi Perfil</h1>
 
     <div class="profile-main">
 
-        <div class="profile-container">
-            <h1 class="prod-dest">Mi Perfil</h1>
-
-            <div class="perfil-cont">
+        <div class="perfil-cont">
+            <div class="perfil-left">
                 <div class="perfil-foto">
-                    <img src="{{ perfil.get_foto_perfil_url }}" alt="Foto de perfil">
+                    <img src="{{ perfil.get_foto_perfil_url }}" alt="Foto de perfil" class="img-perfil">
                     {% if perfil.membresia %}
                         {% if perfil.membresia.nombre == 'Plata' %}
                             <img src="{% static 'img/plata.png' %}" class="marco-membresia" alt="Marco Plata">
@@ -26,25 +25,29 @@
                     {% endif %}
                 </div>
 
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
+                <button id="btn_editar" onclick="toggleEdit(true)" class="btn editar-btn"> Editar perfil</button>
 
-                    <div>
-                        <label for="foto_perfil_input" id="label_foto_perfil" style="display: none;"></label>
+            </div>
+
+            <div class="perfil-right">
+                <form method="post" enctype="multipart/form-data" class="form-perfil">
+                    {% csrf_token %}
+                    <div class= "form-group">
+                        <label for="foto_perfil_input" id="label_foto_perfil" style="display: none;">Foto de perfil: </label>
                         <input type="file" id="foto_perfil_input" name="foto_perfil" style="display: none;">
                     </div>
 
-                    <div>
+                    <div class="form-group">
                         <label for="username_input">Nombre de usuario:</label>
                         <input type="text" id="username_input" name="username" value="{{ request.user.username }}" disabled>
                     </div>
 
-                    <div>
+                    <div class="form-group">
                         <label for="email_input">Correo:</label>
                         <input type="email" id="email_input" name="email" value="{{ request.user.email }}" disabled>
                     </div>
 
-                    <div>
+                    <div class="form-group">
                         <label for="genero_input">Género:</label>
                         <select id="genero_input" name="genero" disabled>
                             <option value="Masculino" {% if perfil.genero == 'Masculino' %}selected{% endif %}>Masculino</option>
@@ -53,31 +56,33 @@
                         </select>
                     </div>
                     
-                    <div>
+                    <div class="form-group">
                         <label for="rut_input">RUT:</label>
                         <input type="text" id="rut_input" name="rut" value="{{ perfil.rut|default:'RUT no disponible' }}" disabled>
                     </div>
 
-                    <div>
+                    <div class="form-group">
                         <label for="direccion_input">Dirección:</label>
                         <input type="text" id="direccion_input" name="direccion" value="{{ perfil.direccion|default:'Dirección no disponible' }}" disabled>
                     </div>
                     
-                    <button type="submit" id="guardar_editar" class="btn">Guardar cambios</button>
-                </form>
+                    <button type="submit" id="guardar_editar" class="btn guardar-btn">Guardar cambios</button>
 
-                <button id="btn_editar" onclick="toggleEdit(true)" class="btn"> Editar perfil</button>
+                </form>
+            </div>
+            
+            <div class="btns-perfil">
+                <a href="{% url 'productos_perf' %}" class="btn">Mis Productos</a>
+                <a href="{% url 'inbox' %}" class="btn">Mis Mensajes</a>
+                <a href="{% url 'mis_compras' %}" class="btn">Mis Compras</a>
+                <a href="{% url 'ver_membresia_usuario' %}" class="btn">Mi Membresía</a>
+                <a href="{% url 'favoritos' %}" class="btn">Mis Favoritos</a>
             </div>
         </div>
 
-        <div class="btns-perfil">
-            <a href="{% url 'productos_perf' %}" class="btn">Mis Productos</a>
-            <a href="{% url 'inbox' %}" class="btn">Mis Mensajes</a>
-            <a href="{% url 'mis_compras' %}" class="btn">Mis Compras</a>
-            <a href="{% url 'ver_membresia_usuario' %}" class="btn">Mi Membresía</a>
-            <a href="{% url 'favoritos' %}" class="btn">Mis Favoritos</a>
-            
-        </div>
+        
+        
     </div>
+    
 
 {% endblock %}

@@ -262,11 +262,13 @@ body {
     text-decoration: none;
     color: black;
     transition: color 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
 }
 
 .regresar:hover {
     color: #DD1155;
     transform: scale(1.05);
+    cursor: pointer;
 }
 
 .container {
@@ -447,56 +449,100 @@ input:focus + .help-text {
 PROFILE
 */
 .profile-main{
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-top: 20px;
-}
-.profile-container {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    width: 40%;
-    max-width: 800px;
-    margin: 20px;
-    margin-left: 100px;
+    align-items: center;
 }
-
-.perfil-cont{
-    flex: 1;
-}
-
-.perfil-foto {
-    position: relative;
-    width: 197px;
-    height: 197px;
-    margin: 0 auto;
-}
-
-.perfil-foto img:first-child {
+.perfil-cont {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    background-color: #f9f9f9;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 900px;
     width: 100%;
-    height: 100%;
+    justify-content: space-between;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    border: 1px solid #ccc;
+}
+
+.perfil-left{
+    flex: 1;
+    min-width: 220px;
+    text-align: center;
+}
+
+.img-perfil{
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
     object-fit: cover;
+    border: 4px solid #ccc;
 }
 
 .marco-membresia {
     position: absolute;
-    top: -7px;
-    left: -7px;
-    width: 108%;
-    height: 108%;
+    margin-left: -190px;
+    margin-top: -10px;
 }
 
-
-.btns-perfil{
+.perfil-right {
+    flex: 2;
+    min-width: 300px;
+}
+.form-perfil .form-group {
+    margin-bottom: 15px;
+}
+.form-perfil label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.form-perfil input,
+.form-perfil select {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+}
+.btns-perfil {
+    margin-top: 30px;
     display: flex;
-    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+/* MEMBRESIA PERFIL */
+.membresia-container{
+    max-width: 600px;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    margin: 30px auto 50px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.data-membresia.card {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+}
+.membresia-form{
+    display: flex;
+    flex-direction: column;
     gap: 15px;
-    align-items: flex-end;
-    height: 120px;
-    margin: 10px;
+}
+.membresia-form .form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.membresia-form select{
+    padding: 10px;
+    border-radius: 8px;
 }
 /*
 PRODUCTOS PERFIL
