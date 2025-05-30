@@ -1,0 +1,65 @@
+{% extends "admin_alpatex/base.html" %}
+{% block body %}
+
+  <h1 class="prod-dest">Reporte de Usuarios</h1>
+
+  <!-- Filtros -->
+<div class="dropdown my-3 ms-3">
+  <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="bi bi-download me-1"></i> Exportar
+  </button>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="{% url 'export_usuarios_excel' %}"><i class="bi bi-file-earmark-excel me-2 text-success"></i>Exportar a Excel</a></li>
+    <li><a class="dropdown-item" href="{% url 'export_usuarios_pdf' %}"><i class="bi bi-file-earmark-pdf me-2 text-danger"></i>Exportar a PDF</a></li>
+  </ul>
+</div>
+
+  <!-- Tabla de Usuarios -->
+  <div class="container-items mt-4">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Nombre de usuario</th>
+          <th>Correo</th>
+          <th>Dirección</th>
+          <th>Estado</th>
+          <th>Fecha de Registro</th>
+          <th>Fecha de Eliminación</th>
+          <th>Motivo de Eliminación</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in usuarios %}
+          <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.perfil.direccion }}</td>
+            <td>
+              {% if user.perfil.fecha_eliminacion %}
+                Eliminado
+              {% else %}
+                Activo
+              {% endif %}
+            </td>
+            <td>{{ user.date_joined|date:"d M Y" }}</td>
+            <td>
+              {% if user.perfil.fecha_eliminacion %}
+                {{ user.perfil.fecha_eliminacion|date:"d M Y" }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td>
+              {% if user.perfil.motivo_eliminacion %}
+                {{ user.perfil.motivo_eliminacion }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% endblock %}

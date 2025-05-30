@@ -46,10 +46,35 @@
           <div class="acciones-usuario">
             <a href="{% url 'perfil_usuario' username=usuario.username %}" class="btn btn-ver">Ver Perfil</a>
             
-            <form action="{% url 'eliminar_usuario' usuario.id %}" method="post" onsubmit="return confirm('¿Estás seguro de eliminar este usuario?');">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger btn-eliminar">Eliminar</button>
-            </form>
+             <button type="button" class="btn btn-danger btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#modalEliminar{{ usuario.id }}">
+                Eliminar
+              </button>
+
+  <!-- Modal de confirmación con motivo -->
+            <div class="modal fade" id="modalEliminar{{ usuario.id }}" tabindex="-1" aria-labelledby="modalLabel{{ usuario.id }}" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <form method="post" action="{% url 'eliminar_usuario' usuario.id %}">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="modalLabel{{ usuario.id }}">Eliminar Usuario</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                      <p>¿Estás seguro de que deseas eliminar al usuario <strong>{{ usuario.username }}</strong>?</p>
+                      <div class="mb-3">
+                        <label for="motivo{{ usuario.id }}" class="form-label">Motivo de la eliminación</label>
+                        <textarea name="motivo" id="motivo{{ usuario.id }}" class="form-control" rows="3" required></textarea>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                      <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
           </div>
 
         </div>

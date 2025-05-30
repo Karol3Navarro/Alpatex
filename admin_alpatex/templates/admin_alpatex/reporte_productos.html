@@ -12,7 +12,17 @@
     <button type="submit">Filtrar</button>
     <a href="{% url 'reporte_productos' %}">Limpiar filtros</a>
 </form>
-<a href="{% url 'exportar_excel' %}" class="btn btn-success">Exportar a Excel</a>
+<div class="dropdown my-3 ms-3">
+  <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="bi bi-download me-1"></i> Exportar
+  </button>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="{% url 'exportar_excel' %}"><i class="bi bi-file-earmark-excel me-2 text-success"></i>Exportar a Excel</a></li>
+    <li><a class="dropdown-item" href="{% url 'exportar_pdf' %}"><i class="bi bi-file-earmark-pdf me-2 text-danger"></i>Exportar a PDF</a></li>
+  </ul>
+</div>
+
+
 
 
   <!-- Tabla de Productos -->

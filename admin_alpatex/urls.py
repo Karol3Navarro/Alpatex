@@ -17,5 +17,10 @@ urlpatterns = [
     path('gestionar-productos/', views.gestionar_productos, name='gestionar_productos'),
     path('usuarios_reportados/', views.usuarios_reportados, name='usuarios_reportados'),
     path('usuarios/eliminar/<int:user_id>/', views.eliminar_usuario, name='eliminar_usuario'),
+    path('exportar_pdf/', views.export_to_pdf, name='exportar_pdf'),
+    path('reporte/usuarios/', views.reporte_usuarios, name='reporte_usuarios'),
+    path('export/usuarios/excel/', views.export_usuarios_to_excel, name='export_usuarios_excel'),
+    path('export/usuarios/pdf/', views.export_usuarios_to_pdf, name='export_usuarios_pdf'),
+
   # Ruta para el dashboard
 ]

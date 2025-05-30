@@ -83,6 +83,8 @@ class Perfil(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     favoritos = models.ManyToManyField(Producto, related_name='favoritos', blank=True)
     foto_perfil = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
+    fecha_eliminacion = models.DateTimeField(null=True, blank=True)
+    motivo_eliminacion = models.TextField(blank=True, null=True)
     genero = models.CharField(max_length=9, choices=GENERO_CHOICES, default='')
     direccion = models.CharField(max_length=255, null=True, blank=True)
     rut = models.CharField(max_length=12, null=True, blank=True)

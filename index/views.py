@@ -70,17 +70,30 @@ def index(request):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
+            try:
+                perfil = user.perfil
+            except Perfil.DoesNotExist:
+                perfil = None
+
+            if perfil and perfil.fecha_eliminacion is not None:
+                # Usuario eliminado, no puede ingresar
+                error_message = "Tu cuenta ha sido eliminada y no puedes ingresar."
+                messages.error(request, error_message)
+                return render(request, 'index/index.html', {'error_message': error_message})
+
+            # Usuario activo, permite login
             login(request, user)
-            if user.is_staff:  
-                return redirect('admin_dashboard')  
+            if user.is_staff:
+                return redirect('admin_dashboard')
             else:
-                return redirect('home')  
+                return redirect('home')
+
         else:
             error_message = "Credenciales incorrectas, por favor intenta nuevamente."
             messages.error(request, error_message)
             return render(request, 'index/index.html', {'error_message': error_message})
 
-    return render(request, 'index/index.html')  
+    return render(request, 'index/index.html')
 
 def home(request):
     usuarios = User.objects.all()
