@@ -304,7 +304,8 @@ body {
 
 input[type="text"], 
 input[type="password"], 
-input[type="email"], 
+input[type="email"],
+input[type="date"],
 .form-control,
 select {
     border: 1px solid #ccc;
@@ -1088,4 +1089,30 @@ footer{
 }
 .filtros-user-admin button {
     margin-top: 26px;
+}
+
+/* REPORTE DE PRODUCTOS */
+.filtro-report{
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    background-color: #f9f9f9;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+}
+.filtro-report-grupo{
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.filtro-report-grupo input[type="text"],
+.filtro-report-grupo input[type="date"]{
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    min-width: 200px;
+}
+.report-btns{
+    display: flex;
+    gap: 1rem;
 }

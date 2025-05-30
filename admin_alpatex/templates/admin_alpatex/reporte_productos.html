@@ -4,23 +4,32 @@
   <h1 class="prod-dest">Reporte de Productos</h1>
 
   <!-- Filtros -->
-  <form method="get" action="{% url 'reporte_productos' %}">
-    <input type="text" name="nombre" placeholder="Nombre del producto" value="{{ request.GET.nombre }}">
-    <input type="text" name="usuario" placeholder="Nombre de usuario" value="{{ request.GET.usuario }}">
-    <input type="date" name="fecha_inicio" value="{{ request.GET.fecha_inicio }}">
-    <input type="date" name="fecha_fin" value="{{ request.GET.fecha_fin }}">
-    <button type="submit">Filtrar</button>
-    <a href="{% url 'reporte_productos' %}">Limpiar filtros</a>
-</form>
-<div class="dropdown my-3 ms-3">
-  <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-    <i class="bi bi-download me-1"></i> Exportar
-  </button>
-  <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="{% url 'exportar_excel' %}"><i class="bi bi-file-earmark-excel me-2 text-success"></i>Exportar a Excel</a></li>
-    <li><a class="dropdown-item" href="{% url 'exportar_pdf' %}"><i class="bi bi-file-earmark-pdf me-2 text-danger"></i>Exportar a PDF</a></li>
-  </ul>
-</div>
+  <form method="get" action="{% url 'reporte_productos' %}" class="filtro-report">
+    <div class="filtro-report-grupo">
+      <input type="text" name="nombre" placeholder="Nombre del producto" value="{{ request.GET.nombre }}">
+      <input type="text" name="usuario" placeholder="Nombre de usuario" value="{{ request.GET.usuario }}">
+      <input type="date" name="fecha_inicio" value="{{ request.GET.fecha_inicio }}">
+      <input type="date" name="fecha_fin" value="{{ request.GET.fecha_fin }}">
+    </div>
+
+    <div class="report-btns">
+      <button type="submit" class="btn">Filtrar</button>
+
+      <a href="{% url 'reporte_productos' %}" class="btn limpiar-filtros">Limpiar filtros</a>
+
+    </div>
+
+  </form>
+
+  <div class="dropdown my-3 ms-3">
+    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-download me-1"></i> Exportar
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" href="{% url 'exportar_excel' %}"><i class="bi bi-file-earmark-excel me-2 text-success"></i>Exportar a Excel</a></li>
+      <li><a class="dropdown-item" href="{% url 'exportar_pdf' %}"><i class="bi bi-file-earmark-pdf me-2 text-danger"></i>Exportar a PDF</a></li>
+    </ul>
+  </div>
 
 
 
