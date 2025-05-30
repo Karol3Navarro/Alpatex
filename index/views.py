@@ -1,14 +1,15 @@
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .models import Producto, Perfil, CalificacionVendedor, ReporteVendedor
-from .Forms import CustomUserCreationForm, PerfilForm, ProductoForm, ReporteVendedorForm
-from django.contrib import messages
+from .Forms import PerfilForm, ProductoForm, ReporteVendedorForm
 import json
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from email.mime.image import MIMEImage
+import os
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import Avg
 from admin_alpatex.models import Membresia
 from django.db.models import F
 from django.contrib.messages import get_messages
@@ -17,10 +18,8 @@ from Dm.forms import ConfirmacionEntregaForm
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse, HttpResponseForbidden
 from django.contrib import messages
-from django.utils import timezone
-from django.urls import reverse
-from django.core.mail import send_mail
 from django.conf import settings
+
 
 
 def map(request):
@@ -123,52 +122,63 @@ def ver_producto(request, id_producto):
     }
     return render(request, 'index/ver_producto.html', context)
 
-def registro(request):
+def registrar_usuario(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        
-        if form.is_valid():
-            form.save()
-            messages.success(request, '¡Cuenta creada exitosamente!')
-            return redirect('index')  # Redirige a la página principal
-        else:
-            messages.error(request, 'Por favor corrige los errores en el formulario.')
-    else:
-        form = CustomUserCreationForm()
+        username = request.POST['nombre_usuario']
+        nombre_completo = request.POST['nombre_completo']
+        rut = request.POST['rut']
+        direccion = request.POST['direccion']
+        email = request.POST['email']
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
 
-    return render(request, 'index/registro.html', {'form': form})
+        if User.objects.filter(username=username).exists():
+            return render(request, 'index/registro.html', {'error': 'El nombre de usuario ya está en uso.'})
+        if User.objects.filter(email=email).exists():
+            return render(request, 'index/registro.html', {'error': 'El correo ya está registrado.'})
+        if Perfil.objects.filter(rut=rut).exists():
+            return render(request, 'index/registro.html', {'error': 'El RUT ya está registrado.'})
+        if password1 != password2:
+            return render(request, 'index/registro.html', {'error': 'Las claves no coinciden.'})
 
-def registro(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.first_name = form.cleaned_data['nombre_completo']
-            user.email = form.cleaned_data['email']
-            user.save()
-            rut = form.cleaned_data['rut']
-            direccion = form.cleaned_data['direccion']
-            Perfil.objects.create(user=user, rut=rut, direccion=direccion)
+        # Crear usuario y perfil
+        user = User.objects.create_user(username=username, email=email, password=password1)
+        user.first_name = nombre_completo
+        user.save()
 
-            # Enviar correo de bienvenida
-            send_mail(
-                subject='¡Bienvenido a Alpatex!',
-                message='Gracias por registrarte en Alpatex. Estamos felices de tenerte con nosotros.',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=False,
-            )
+        perfil = Perfil.objects.create(user=user, rut=rut, direccion=direccion)
+        perfil.save()
 
-            messages.success(request, '¡Cuenta creada exitosamente!')
-            return redirect('index')
-        else:
-            messages.error(request, 'Por favor corrige los errores en el formulario.')
-    else:
-        form = CustomUserCreationForm()
+        # Contexto del correo
+        context = {
+            'username': username,
+            'site_url': request.build_absolute_uri('/')[:-1],  # URL base sin slash final
+        }
 
-    return render(request, 'index/registro.html', {'form': form})
+        # Renderizar HTML
+        html_content = render_to_string('index/bienvenida.html', context)
 
+        subject = '¡Bienvenido a Alpatex!'
+        from_email = settings.DEFAULT_FROM_EMAIL
+        to = [email]
+
+        msg = EmailMultiAlternatives(subject, 'Gracias por registrarte en Alpatex.', from_email, to)
+        msg.attach_alternative(html_content, "text/html")
+
+        # Adjuntar imagen embebida
+        logo_path = os.path.join(settings.BASE_DIR, 'index', 'static', 'img', 'alpatex-v2-tipografía.png')
+        with open(logo_path, 'rb') as img:
+            mime_image = MIMEImage(img.read())
+            mime_image.add_header('Content-ID', '<logo_alpatex>')
+            mime_image.add_header('Content-Disposition', 'inline', filename='alpatex-v2-tipografía.png')
+            msg.attach(mime_image)
+
+        msg.send()
+
+        messages.success(request, 'Usuario registrado correctamente.')
+        return redirect('index')
+
+    return render(request, 'index/registro.html')
 
 
 @login_required

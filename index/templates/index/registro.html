@@ -1,33 +1,258 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link type='text/css' href='{% static "css/style.css"%}' rel='stylesheet'>
-
-    <!--
-        -ICONOS
-    -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=chevron_left" />
-    <!--
-        -google font
-    -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;500&display=swap" rel="stylesheet">
     <title>Registro</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #f9f4fb;
+            font-family: 'Kumbh Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 450px;
+            width: 100%;
+        }
+        .titulo {
+            color: #AD5CA1;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+        .form-control:focus {
+            border-color: #AD5CA1;
+            outline: none;
+            box-shadow: 0 0 3px #AD5CA1;
+        }
+        label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #444;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .btn {
+            background-color: #AD5CA1;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #944a89;
+        }
+        .regresar {
+            color: #AD5CA1;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 15px;
+        }
+        .text-danger {
+            color: red;
+            margin-bottom: 15px;
+        }
+        ul#sugerencias-direccion {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+            padding-left: 0;
+            list-style-type: none;
+        }
+        ul#sugerencias-direccion li {
+            padding: 8px;
+            cursor: pointer;
+        }
+        ul#sugerencias-direccion li:hover {
+            background: #f0e5f3;
+        }
+    </style>
 </head>
-<body class="cent-body">
+<body>
     <div class="container">
-        <a href="{% url 'index' %}" class="regresar"><span class="material-symbols-outlined">chevron_left</span> Regresar</a>
+        <a href="{% url 'index' %}" class="regresar">← Regresar</a>
         <h1 class="titulo">Registrar Usuario</h1>
+
+        {% if error %}
+            <div class="text-danger">{{ error }}</div>
+        {% endif %}
+
         <form method="POST">
             {% csrf_token %}
-            {{ form.as_p }}
+
+            <div class="col-md-4 mb-3">
+                <label for="nombre_usuario" class="form-label">Nombre de usuario</label>
+                <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario" required>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label for="nombre_completo" class="form-label">Nombre completo</label>
+                <input type="text" class="form-control" id="nombre_completo" name="nombre_completo" required>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label for="rut" class="form-label">RUT</label>
+                <input type="text" class="form-control" id="rut" name="rut" required placeholder="Ej: 12.345.678-9" maxlength="12">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label for="direccion" class="form-label">Dirección</label>
+                <input type="text" class="form-control" id="direccion" name="direccion" required autocomplete="off">
+                <ul id="sugerencias-direccion"></ul>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label for="password1" class="form-label">Clave</label>
+                <input type="password" class="form-control" id="password1" name="password1" required>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label for="password2" class="form-label">Confirmar clave</label>
+                <input type="password" class="form-control" id="password2" name="password2" required>
+            </div>
+
             <button type="submit" class="btn">Registrar</button>
         </form>
     </div>
-    
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const direccionInput = document.querySelector('input[name="direccion"]');
+            const rutInput = document.querySelector('input[name="rut"]');
+            const lista = document.getElementById("sugerencias-direccion");
+
+            // Autocompletado dirección mejorado
+            if (direccionInput) {
+                direccionInput.setAttribute("autocomplete", "off");
+                let timeout;
+
+                direccionInput.addEventListener("input", function () {
+                    clearTimeout(timeout);
+                    const query = direccionInput.value.trim();
+
+                    if (query.length < 3) {
+                        lista.innerHTML = "";
+                        return;
+                    }
+
+                    timeout = setTimeout(() => {
+                        fetch(`https://nominatim.openstreetmap.org/search?format=json&countrycodes=cl&limit=5&q=${encodeURIComponent(query)}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                lista.innerHTML = "";
+                                // Filtrar resultados que contengan "Chile"
+                                const resultadosChile = data.filter(item => item.display_name.toLowerCase().includes("chile"));
+
+                                resultadosChile.forEach(item => {
+                                    const li = document.createElement("li");
+                                    li.textContent = item.display_name;
+                                    li.addEventListener("click", () => {
+                                        direccionInput.value = item.display_name;
+                                        lista.innerHTML = "";
+                                    });
+                                    lista.appendChild(li);
+                                });
+
+                                if (resultadosChile.length === 0) {
+                                    lista.innerHTML = "<li>No se encontraron direcciones en Chile</li>";
+                                }
+                            })
+                            .catch(() => {
+                                lista.innerHTML = "<li>Error al cargar sugerencias</li>";
+                            });
+                    }, 200);
+                });
+
+                document.addEventListener("click", function (e) {
+                    if (!lista.contains(e.target) && e.target !== direccionInput) {
+                        lista.innerHTML = "";
+                    }
+                });
+            }
+
+            // Formato RUT con puntos y guion
+            if (rutInput) {
+                rutInput.setAttribute("maxlength", "12");
+
+                rutInput.addEventListener("input", function () {
+                    let valor = rutInput.value.replace(/\./g, "").replace(/-/g, "").replace(/\s/g, "").toUpperCase();
+                    if (valor.length === 0) {
+                        rutInput.value = "";
+                        return;
+                    }
+
+                    let cuerpo = valor.slice(0, -1);
+                    let dv = valor.slice(-1);
+
+                    let rutFormateado = "";
+                    while (cuerpo.length > 3) {
+                        rutFormateado = "." + cuerpo.slice(-3) + rutFormateado;
+                        cuerpo = cuerpo.slice(0, -3);
+                    }
+                    rutFormateado = cuerpo + rutFormateado;
+                    rutInput.value = rutFormateado + "-" + dv;
+                });
+            }
+
+            // Validación de RUT
+            function validarRut(rut) {
+                rut = rut.replace(/\./g, "").replace("-", "").toUpperCase();
+                if (!/^[0-9]+[0-9K]$/.test(rut)) return false;
+
+                const cuerpo = rut.slice(0, -1);
+                const dv = rut.slice(-1);
+                let suma = 0, multiplo = 2;
+
+                for (let i = cuerpo.length - 1; i >= 0; i--) {
+                    suma += parseInt(cuerpo.charAt(i)) * multiplo;
+                    multiplo = multiplo < 7 ? multiplo + 1 : 2;
+                }
+
+                const dvEsperado = 11 - (suma % 11);
+                const dvCalc = dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
+                return dv === dvCalc;
+            }
+
+            document.querySelector("form").addEventListener("submit", function (e) {
+                if (rutInput) {
+                    const rut = rutInput.value;
+                    if (!validarRut(rut)) {
+                        e.preventDefault();
+                        alert("RUT inválido. Verifica el formato y dígito verificador.");
+                        rutInput.focus();
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>
