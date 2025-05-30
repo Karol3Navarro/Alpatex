@@ -342,7 +342,9 @@ def export_usuarios_to_excel(request):
     # Títulos de columnas
     ws.append(['Username', 'Email', 'Fecha de creación', 'Estado', 'Fecha eliminación'])
 
-    usuarios = User.objects.select_related('perfil').all()
+    usuarios = User.objects.filter(
+        Q(is_superuser=False) & Q(is_staff=False)
+    )
 
     for user in usuarios:
         perfil = getattr(user, 'perfil', None)
@@ -394,7 +396,9 @@ def export_usuarios_to_pdf(request):
         p.drawString(x_list[i], y, header)
 
     # Datos usuarios
-    usuarios = User.objects.select_related('perfil').all()
+    usuarios = User.objects.filter(
+        Q(is_superuser=False) & Q(is_staff=False)
+    )
     y -= 20
     p.setFont("Helvetica", 8)
 
