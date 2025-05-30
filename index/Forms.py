@@ -99,6 +99,8 @@ class ProductoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.fields['imagen'].widget.attrs.update({'id': 'id_imagen'})
         
         if 'direccion' in self.initial:
             self.fields['direccion'].initial = self.initial['direccion']

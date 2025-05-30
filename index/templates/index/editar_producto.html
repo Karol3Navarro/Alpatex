@@ -10,10 +10,21 @@
 
   <h1 class="prod-dest">Editar Producto</h1>
 
-  <form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn">Guardar cambios</button>
-  </form>
+  <div class="add-prod-wrapper">
+
+    <form method="POST" enctype="multipart/form-data" class="add-prod-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn">Guardar cambios</button>
+    </form>
+
+    <div class="img-previa-cont">
+      <p>Vista previa de imagen: </p>
+      <img src="{{ form.instance.imagen.url }}" alt="vista previa" class="img-previa" id="img-previa">
+    </div>
+
+  </div>
+  
+
 
 {% endblock %}
