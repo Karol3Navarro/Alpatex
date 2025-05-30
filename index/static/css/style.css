@@ -317,7 +317,7 @@ select {
     background-color: white;
 }
 
-input[type="password"], input[type="submit"]:focus{
+input[type="password"]:focus, input[type="submit"]:focus, input[type="text"]:focus {
     outline: none;
     border-color: #AD5CA1;
 }
@@ -668,6 +668,44 @@ VER PRODUCTO
 .prod-detalle .der p{
     font-size: 1.1em;
 }
+
+/* AGREGAR PRODUCTO */
+.add-prod-wrapper{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    align-items: flex-start;
+    padding: 20px;
+    margin: 25px auto;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    background-color: #f9f9f9;
+    max-width: 1000px;
+}
+.add-prod-form{
+    flex: 1;
+    min-width: 300px;
+}
+.add-prod-form input,
+.add-prod-form textarea,
+.add-prod-form select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+}
+.img-previa-cont{
+    flex: 1;
+    min-width: 250px;
+    text-align: center;
+}
+.img-previa{
+    width: 100%;
+    max-width: 300px;
+    border: 1px solid #ccc;
+}
+
 /*SECCION DE COMENTAR*/
 .comment-form{
     max-width: 600px;

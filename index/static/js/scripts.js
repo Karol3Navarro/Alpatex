@@ -156,6 +156,26 @@ document.addEventListener("DOMContentLoaded",() => {
     });
 });
 
+//PREVISUALIZACION DE IMAGENES PARA SUBIR PRODUCTO
+document.addEventListener("DOMContentLoaded", () => {
+    const imgInput = document.getElementById('id_imagen');
+    const prevImg = document.getElementById('img-previa');
+    
+    if (imgInput) {
+        imgInput.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    prevImg.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+
+
 //CONFIRMACION DE ELIMINAR PRODUCTO PERFIL USUARIO (SWEETALERT2)
 document.addEventListener("DOMContentLoaded", () => {
     const eliminarLinks = document.querySelectorAll(".btn-eliminar");
