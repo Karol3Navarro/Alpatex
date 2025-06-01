@@ -515,35 +515,138 @@ PROFILE
     justify-content: center;
 }
 /* MEMBRESIA PERFIL */
-.membresia-container{
-    max-width: 600px;
-    background-color: #f9f9f9;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 15px;
-    margin: 30px auto 50px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+.membresia-container {
+    margin-bottom: 60px; 
 }
-.data-membresia.card {
-    background: white;
-    border: 1px solid #ddd;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 25px;
-}
-.membresia-form{
+.membresias-cards {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+  
+  .membresia-card {
+    background: #fff;
+    border: 3px solid #AD5CA1;
+    border-radius: 18px;
+    box-shadow: 0 2px 10px #0001;
+    width: 300px;
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-}
-.membresia-form .form-group label {
+    align-items: center;
+    position: relative;
+    transition: box-shadow 0.2s;
+  }
+  
+  .membresia-card.actual {
+    border: 3px solid #AD5CA1;
+    box-shadow: 0 0 0 4px #e6d6fa;
+  }
+  
+  .membresia-header h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #AD5CA1;
+    letter-spacing: 1px;
+    text-align: center;
+    width: 100%;
+  }
+  
+  .membresia-header .precio {
+    font-size: 2.2rem;
     font-weight: bold;
-    margin-bottom: 5px;
-}
-.membresia-form select{
-    padding: 10px;
-    border-radius: 8px;
-}
+    color: #AD5CA1;
+    margin-bottom: 0.5rem;
+  }
+  
+  .membresia-header .moneda {
+    font-size: 1rem;
+    font-weight: normal;
+  }
+  
+  .plan-actual {
+    background: #AD5CA1;
+    color: #fff;
+    font-size: 0.95rem;
+    padding: 0.18rem 1.8rem;
+    border-radius: 16px;
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: bold;
+    box-shadow: 0 2px 8px #0002;
+    z-index: 2;
+    border: 3px solid #fff;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+  
+  .beneficios {
+    list-style: none;
+    padding: 0;
+    margin: 1.2rem 0 1.5rem 0;
+    width: 100%;
+  }
+  
+  .beneficios li {
+    font-size: 1rem;
+    margin-bottom: 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .check {
+    color: #AD5CA1;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  
+  .cross {
+    color: #e74c3c;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  
+  .acciones {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .btn.cancelar,
+  .btn.contratar {
+    background: #AD5CA1;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 0.7rem 2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: background 0.2s;
+  }
+  
+  .btn.cancelar:hover,
+  .btn.contratar:hover {
+    background: #DD1155;
+  }
+  
+  @media (max-width: 900px) {
+    .membresias-cards {
+      flex-direction: column;
+      align-items: center;
+    }
+    .membresia-card {
+      width: 90%;
+      margin-bottom: 2rem;
+    }
+  }
 /*
 PRODUCTOS PERFIL
 */

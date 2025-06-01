@@ -298,6 +298,13 @@ def ver_membresia_usuario(request):
     membresias = Membresia.objects.all()
 
     if request.method == 'POST':
+        cancelar_id = request.POST.get('cancelar')
+        if cancelar_id:
+            membresia_basica = Membresia.objects.get(nombre="Básico")
+            perfil.membresia = membresia_basica
+            perfil.save()
+            return redirect('ver_membresia_usuario')
+
         nueva_id = request.POST.get('membresia_id')
         if nueva_id:
             nueva_membresia = Membresia.objects.get(id=nueva_id)

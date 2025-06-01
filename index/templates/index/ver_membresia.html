@@ -9,34 +9,50 @@
   </div>
   
   <div class="membresia-container">
-
-    <h1 class="prod-dest">Mi Membresía</h1>
-
-    <div class="data-membresia card">
-      {% if perfil.membresia %}
-        <p><strong>Plan:</strong> {{ perfil.membresia.nombre }}</p>
-        <p><strong>Beneficios:</strong> {{ perfil.membresia.descripcion }}</p>
-      {% else %}
-        <p>No tienes una membresía activa.</p>
-      {% endif %}
+    <h1 class="prod-dest">MEMBRESÍA</h1>
+    <div class="membresias-cards">
+      {% for m in membresias %}
+        <div class="membresia-card {% if perfil.membresia and perfil.membresia.id == m.id %}actual{% endif %}">
+          <div class="membresia-header">
+            <h2>{{ m.nombre|upper }}</h2>
+            <p class="precio">
+              {% if m.precio == 0 %}
+                FREE
+              {% else %}
+                ${{ m.precio }}<span class="moneda">CLP</span>
+              {% endif %}
+            </p>
+            {% if perfil.membresia and perfil.membresia.id == m.id %}
+              <span class="plan-actual">PLAN ACTUAL</span>
+            {% endif %}
+          </div>
+          <ul class="beneficios">
+            <li>{% if m.prioridad_visibilidad %}<span class="check">✔</span>{% else %}<span class="cross">✖</span>{% endif %} Prioridad de aparición en búsquedas</li>
+            <li>{% if m.distintivo == 'plata' or m.distintivo == 'oro' %}<span class="check">✔</span>{% else %}<span class="cross">✖</span>{% endif %} Marco en la foto de perfil</li>
+            <li>{% if m.verificacion_prioritaria %}<span class="check">✔</span>{% else %}<span class="cross">✖</span>{% endif %} Prioridad de verificación de productos</li>
+            <li>{% if m.estadisticas %}<span class="check">✔</span>{% else %}<span class="cross">✖</span>{% endif %} Estadísticas de visualización de productos</li>
+          </ul>
+          <div class="acciones">
+            {% if perfil.membresia and perfil.membresia.id == m.id %}
+              {% if m.precio > 0 %}
+                <form method="post" class="cancelar-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="cancelar" value="{{ m.id }}">
+                  <button type="submit" class="btn cancelar">CANCELAR PLAN</button>
+                </form>
+              {% endif %}
+            {% else %}
+              <form method="post" class="cambiar-form">
+                {% csrf_token %}
+                <input type="hidden" name="membresia_id" value="{{ m.id }}">
+                {% if m.precio > 0 %}
+                <button type="submit" class="btn contratar">CONTRATAR</button>
+                {% endif %}
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
     </div>
-
-    <h3 class="prod-dest">Cambiar de Membresía</h3>
-
-    <form method="post" class="membresia-form">
-      {% csrf_token %}
-      <div class="form-group">
-        <label for="membresia_id">Selecciona tu plan: </label>
-        <select name="membresia_id" id="membresia_id">
-          {% for m in membresias %}
-            <option value="{{ m.id }}" {% if perfil.membresia and perfil.membresia.id == m.id %}selected{% endif %}>
-              {{ m.nombre }} - ${{ m.precio }} CLP
-            </option>
-          {% endfor %}
-        </select>
-      </div>
-      <button type="submit" class="btn">Pagar</button>
-    </form>
-
   </div>
 {% endblock %}
