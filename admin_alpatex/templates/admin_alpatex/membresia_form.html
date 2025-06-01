@@ -11,12 +11,129 @@
   <h2 class="prod-dest">Formulario de Membresía</h2>
 
   <div class="mem-form-container">
-
     <form method="post">
       {% csrf_token %}
-      {{ form.as_p }}
+      
+      <div class="form-group">
+        <label for="{{ form.nombre.id_for_label }}">Nombre del Plan:</label>
+        {{ form.nombre }}
+        <small class="help-text">Ejemplo: Básico, Plata, Oro</small>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.descripcion.id_for_label }}">Descripción:</label>
+        {{ form.descripcion }}
+        <small class="help-text">Describe los beneficios principales de este plan</small>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.precio.id_for_label }}">Precio (CLP):</label>
+        {{ form.precio }}
+        <small class="help-text">Ingrese el precio en pesos chilenos (CLP)</small>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.prioridad_visibilidad.id_for_label }}">Prioridad de Visibilidad:</label>
+        {{ form.prioridad_visibilidad }}
+        <small class="help-text">Número que determina el orden de aparición en búsquedas (menor número = mayor prioridad). Valores actuales: Oro = 10, Plata = 20, Básico = 30. Para agregar un plan entre Oro y Plata, use un número entre 10 y 20.</small>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.distintivo.id_for_label }}">Marco Distintivo:</label>
+        {{ form.distintivo }}
+        <small class="help-text">Marco especial para la foto de perfil (ej: plata, oro)</small>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label for="{{ form.verificacion_prioritaria.id_for_label }}">
+          {{ form.verificacion_prioritaria }}
+          Verificación Prioritaria
+        </label>
+        <small class="help-text">Los productos serán verificados primero, dependiendo del plan de la membresía</small>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label for="{{ form.estadisticas.id_for_label }}">
+          {{ form.estadisticas }}
+          Estadísticas
+        </label>
+        <small class="help-text">Permite a los usuarios ver estadísticas de visualización de sus productos</small>
+      </div>
+
       <button type="submit" class="btn">Guardar</button>
     </form>
-
   </div>
+
+  <style>
+    .mem-form-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+    }
+
+    .help-text {
+      display: block;
+      margin-top: 5px;
+      color: #666;
+      font-size: 0.9em;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: normal;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+    }
+
+    .btn {
+      background-color: #AD5CA1;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+
+    .btn:hover {
+      background-color: #8a4a7f;
+    }
+  </style>
 {% endblock %}

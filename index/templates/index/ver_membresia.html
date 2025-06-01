@@ -27,7 +27,7 @@
             {% endif %}
           </div>
           <ul class="beneficios">
-            <li>{% if m.prioridad_visibilidad %}<span class="check">✔</span>{% else %}<span class="cross">✖</span>{% endif %} Prioridad de aparición en búsquedas</li>
+            <li>{% if m.prioridad_visibilidad > 0 %}<span class="check">✔</span>{% else %}<span class="cross">✖</span>{% endif %} Prioridad de aparición en búsquedas</li>
             <li>{% if m.distintivo == 'plata' or m.distintivo == 'oro' %}<span class="check">✔</span>{% else %}<span class="cross">✖</span>{% endif %} Marco en la foto de perfil</li>
             <li>{% if m.verificacion_prioritaria %}<span class="check">✔</span>{% else %}<span class="cross">✖</span>{% endif %} Prioridad de verificación de productos</li>
             <li>{% if m.estadisticas %}<span class="check">✔</span>{% else %}<span class="cross">✖</span>{% endif %} Estadísticas de visualización de productos</li>
