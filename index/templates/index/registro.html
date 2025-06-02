@@ -101,7 +101,7 @@
             <div class="text-danger">{{ error }}</div>
         {% endif %}
 
-        <form method="POST">
+        <form method="POST" novalidate>
             {% csrf_token %}
 
             <div class="col-md-4 mb-3">
@@ -119,10 +119,10 @@
                 <input type="text" class="form-control" id="rut" name="rut" required placeholder="Ej: 12.345.678-9" maxlength="12">
             </div>
 
-            <div class="col-md-4 mb-3">
+            <div class="col-md-4 mb-3" style="position: relative;">
                 <label for="direccion" class="form-label">Dirección</label>
-                <input type="text" class="form-control" id="direccion" name="direccion" required autocomplete="off">
-                <ul id="sugerencias-direccion"></ul>
+                <input type="text" class="form-control" id="direccion" name="direccion" required autocomplete="off" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" aria-controls="sugerencias-direccion">
+                <ul id="sugerencias-direccion" role="listbox"></ul>
             </div>
 
             <div class="col-md-4 mb-3">
@@ -146,82 +146,85 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const direccionInput = document.querySelector('input[name="direccion"]');
-            const rutInput = document.querySelector('input[name="rut"]');
+            const direccionInput = document.getElementById("direccion");
+            const rutInput = document.getElementById("rut");
             const lista = document.getElementById("sugerencias-direccion");
+            let timeout;
 
             // Autocompletado dirección mejorado
-            if (direccionInput) {
-                direccionInput.setAttribute("autocomplete", "off");
-                let timeout;
+            direccionInput.addEventListener("input", function () {
+                clearTimeout(timeout);
+                const query = direccionInput.value.trim();
 
-                direccionInput.addEventListener("input", function () {
-                    clearTimeout(timeout);
-                    const query = direccionInput.value.trim();
+                if (query.length < 3) {
+                    lista.innerHTML = "";
+                    return;
+                }
 
-                    if (query.length < 3) {
-                        lista.innerHTML = "";
-                        return;
-                    }
+                timeout = setTimeout(() => {
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&countrycodes=cl&limit=5&q=${encodeURIComponent(query)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            lista.innerHTML = "";
+                            const resultadosChile = data.filter(item => item.display_name.toLowerCase().includes("chile"));
 
-                    timeout = setTimeout(() => {
-                        fetch(`https://nominatim.openstreetmap.org/search?format=json&countrycodes=cl&limit=5&q=${encodeURIComponent(query)}`)
-                            .then(res => res.json())
-                            .then(data => {
-                                lista.innerHTML = "";
-                                // Filtrar resultados que contengan "Chile"
-                                const resultadosChile = data.filter(item => item.display_name.toLowerCase().includes("chile"));
+                            if (resultadosChile.length === 0) {
+                                lista.innerHTML = "<li>No se encontraron direcciones en Chile</li>";
+                                return;
+                            }
 
-                                resultadosChile.forEach(item => {
-                                    const li = document.createElement("li");
-                                    li.textContent = item.display_name;
-                                    li.addEventListener("click", () => {
-                                        direccionInput.value = item.display_name;
-                                        lista.innerHTML = "";
-                                    });
-                                    lista.appendChild(li);
+                            resultadosChile.forEach(item => {
+                                const address = item.address;
+
+                                // Extraemos los campos relevantes, usando fallback por si no existen
+                                const calle = address.road || address.pedestrian || address.cycleway || address.footway || address.neighbourhood || "";
+                                const comuna = address.suburb || address.village || address.town || address.city || "";
+                                const region = address.state || address.region || "";
+
+                                const textoSugerencia = [calle, comuna, region].filter(Boolean).join(", ");
+
+                                const li = document.createElement("li");
+                                li.textContent = textoSugerencia;
+                                li.setAttribute("role", "option");
+                                li.addEventListener("click", () => {
+                                    direccionInput.value = textoSugerencia;
+                                    lista.innerHTML = "";
                                 });
-
-                                if (resultadosChile.length === 0) {
-                                    lista.innerHTML = "<li>No se encontraron direcciones en Chile</li>";
-                                }
-                            })
-                            .catch(() => {
-                                lista.innerHTML = "<li>Error al cargar sugerencias</li>";
+                                lista.appendChild(li);
                             });
-                    }, 200);
-                });
+                        })
+                        .catch(() => {
+                            lista.innerHTML = "<li>Error al cargar sugerencias</li>";
+                        });
+                }, 400);
+            });
 
-                document.addEventListener("click", function (e) {
-                    if (!lista.contains(e.target) && e.target !== direccionInput) {
-                        lista.innerHTML = "";
-                    }
-                });
-            }
+            // Cerrar lista al hacer click fuera del input o la lista
+            document.addEventListener("click", function (e) {
+                if (e.target !== direccionInput && !lista.contains(e.target)) {
+                    lista.innerHTML = "";
+                }
+            });
 
             // Formato RUT con puntos y guion
-            if (rutInput) {
-                rutInput.setAttribute("maxlength", "12");
+            rutInput.addEventListener("input", function () {
+                let valor = rutInput.value.replace(/\./g, "").replace(/-/g, "").replace(/\s/g, "").toUpperCase();
+                if (valor.length === 0) {
+                    rutInput.value = "";
+                    return;
+                }
 
-                rutInput.addEventListener("input", function () {
-                    let valor = rutInput.value.replace(/\./g, "").replace(/-/g, "").replace(/\s/g, "").toUpperCase();
-                    if (valor.length === 0) {
-                        rutInput.value = "";
-                        return;
-                    }
+                let cuerpo = valor.slice(0, -1);
+                let dv = valor.slice(-1);
 
-                    let cuerpo = valor.slice(0, -1);
-                    let dv = valor.slice(-1);
-
-                    let rutFormateado = "";
-                    while (cuerpo.length > 3) {
-                        rutFormateado = "." + cuerpo.slice(-3) + rutFormateado;
-                        cuerpo = cuerpo.slice(0, -3);
-                    }
-                    rutFormateado = cuerpo + rutFormateado;
-                    rutInput.value = rutFormateado + "-" + dv;
-                });
-            }
+                let rutFormateado = "";
+                while (cuerpo.length > 3) {
+                    rutFormateado = "." + cuerpo.slice(-3) + rutFormateado;
+                    cuerpo = cuerpo.slice(0, -3);
+                }
+                rutFormateado = cuerpo + rutFormateado;
+                rutInput.value = rutFormateado + "-" + dv;
+            });
 
             // Validación de RUT
             function validarRut(rut) {
@@ -242,14 +245,13 @@
                 return dv === dvCalc;
             }
 
+            // Validar RUT al enviar formulario
             document.querySelector("form").addEventListener("submit", function (e) {
-                if (rutInput) {
-                    const rut = rutInput.value;
-                    if (!validarRut(rut)) {
-                        e.preventDefault();
-                        alert("RUT inválido. Verifica el formato y dígito verificador.");
-                        rutInput.focus();
-                    }
+                const rut = rutInput.value;
+                if (!validarRut(rut)) {
+                    e.preventDefault();
+                    alert("RUT inválido. Verifica el formato y dígito verificador.");
+                    rutInput.focus();
                 }
             });
         });
