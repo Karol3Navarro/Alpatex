@@ -2,30 +2,116 @@
 {% load static %}
 {% block title %}Mapa de Productos{% endblock title %}
 {% block body %}
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <style>
-        #map {
-            height: 600px;
-            width: 100%;
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<style>
+    #map {
+        height: 600px;
+        width: 100%;
+    }
+</style>
+
+<div class="reg-btn">
+    <a onclick="window.history.back();" class="regresar">
+        <span class="material-symbols-outlined">chevron_left</span> Regresar
+    </a>
+</div>
+
+<h1 class="prod-dest">Mapa de Productos</h1>
+
+<div id="map"></div>
+
+<script>
+    window.perfiles = JSON.parse('{{ perfiles_json|escapejs }}');
+</script>
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<script>
+    async function geocode(address) {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data && data.length > 0) {
+            return {
+                lat: parseFloat(data[0].lat),
+                lng: parseFloat(data[0].lon)
+            };
         }
-    </style>
+        return null;
+    }
 
-    <div class="reg-btn">
-        <a onclick="window.history.back();" class="regresar">
-            <span class="material-symbols-outlined">chevron_left</span> Regresar
-        </a>
-    </div>
+    async function initMap() {
+        const defaultLocation = [-33.45, -70.66]; // Santiago, Chile
+        const radiusMeters = 5000; // 5 km
 
-    <h1 class="prod-dest">Mapa de Productos</h1>
+        const map = L.map('map');
 
-    <div id="map"></div>
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
 
-    <!-- Esto genera Productos como JSON directamente -->
-    <script>
-        window.perfiles = JSON.parse('{{ perfiles_json|escapejs }}');
-    </script>
+        // Mostrar productos cercanos dentro del radio
+        async function showProductsNearby(userCoords) {
+            const productos = window.perfiles;
+            let bounds = [];
 
-    <!-- Cargar mapa -->
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="{% static 'js/mapa.js' %}"></script>
+            for (const prod of productos) {
+                const coords = await geocode(prod.direccion);
+                if (coords) {
+                    const distance = map.distance(
+                        L.latLng(userCoords[0], userCoords[1]),
+                        L.latLng(coords.lat, coords.lng)
+                    );
+
+                    if (distance <= radiusMeters) {
+                        const marker = L.marker([coords.lat, coords.lng]).addTo(map);
+                        marker.bindPopup(
+                            `<b>${prod.nombre}</b><br>Vendedor: ${prod.vendedor}<br><i>Ubicación protegida</i><br>
+                            <a href="/index/producto/${prod.id}/" class="btn btn-primary mt-2">Ver Producto</a>`
+                        );
+
+                        marker.on('click', () => {
+                            map.setView([coords.lat, coords.lng], 17);
+                            marker.openPopup();
+                        });
+
+                        bounds.push([coords.lat, coords.lng]);
+                    }
+                }
+            }
+
+            if (bounds.length > 0) {
+                map.fitBounds(bounds, { maxZoom: 15 });
+            } else {
+                // Si no hay productos cercanos, centramos en la ubicación usuario con zoom prudente
+                map.setView(userCoords, 13);
+            }
+        }
+
+        // Evento si se obtiene la ubicación del usuario
+        function onLocationFound(e) {
+            const userCoords = [e.latlng.lat, e.latlng.lng];
+            map.setView(userCoords, 11);
+            L.marker(userCoords).addTo(map).bindPopup("Tu ubicación").openPopup();
+            showProductsNearby(userCoords);
+        }
+
+        // Evento si no se obtiene ubicación
+        function onLocationError() {
+            map.setView(defaultLocation, 6);
+            alert("No se pudo obtener tu ubicación, mostrando productos cercanos a Santiago.");
+            showProductsNearby(defaultLocation);
+        }
+
+        // Intentar obtener la ubicación al cargar el mapa
+        map.locate({ setView: false, maxZoom: 16 });
+        map.on('locationfound', onLocationFound);
+        map.on('locationerror', onLocationError);
+    }
+
+    window.onload = initMap;
+</script>
+
 {% endblock %}
