@@ -1,18 +1,27 @@
 {% extends "index/base.html" %}
+{% load static %}
 
 {% block body %}
-
+  {% now "Y-m-d H:i:s" as now %}
   <div class="reg-btn">
     <a onclick="window.history.back();" class="regresar">
-        <span class="material-symbols-outlined">chevron_left</span> Regresar
+      <span class="material-symbols-outlined">chevron_left</span> Regresar
     </a>
   </div>
   
   <div class="membresia-container">
     <h1 class="prod-dest">MEMBRESÍA</h1>
+
+    <!-- Mensaje de cancelacion de membresia -->
+    {% if suscripcion_activa and suscripcion_activa.estado == "cancelled" and suscripcion_activa.fecha_fin > now %}
+      <div class="alert alert-warning" style="font-weight:bold; font-size:1.1em; margin-bottom: 20px; text-align:center;">
+        Tu plan fue cancelado y estará activo hasta que se cumpla un mes desde el último pago válido.
+      </div>
+    {% endif %}
+    
     <div class="membresias-cards">
       {% for m in membresias %}
-        <div class="membresia-card {% if perfil.membresia and perfil.membresia.id == m.id %}actual{% endif %}">
+        <div class="membresia-card {% if membresia_activa and membresia_activa.id == m.id %}actual{% endif %}">
           <div class="membresia-header">
             <h2>{{ m.nombre|upper }}</h2>
             <p class="precio">
@@ -22,37 +31,157 @@
                 ${{ m.precio }}<span class="moneda">CLP</span>
               {% endif %}
             </p>
-            {% if perfil.membresia and perfil.membresia.id == m.id %}
+            {% if membresia_activa and membresia_activa.id == m.id %}
               <span class="plan-actual">PLAN ACTUAL</span>
             {% endif %}
           </div>
           <ul class="beneficios">
-            <li>{% if m.prioridad_visibilidad > 0 %}<span class="check">✔</span>{% else %}<span class="cross">✖</span>{% endif %} Prioridad de aparición en búsquedas</li>
-            <li>{% if m.distintivo == 'plata' or m.distintivo == 'oro' %}<span class="check">✔</span>{% else %}<span class="cross">✖</span>{% endif %} Marco en la foto de perfil</li>
-            <li>{% if m.verificacion_prioritaria %}<span class="check">✔</span>{% else %}<span class="cross">✖</span>{% endif %} Prioridad de verificación de productos</li>
-            <li>{% if m.estadisticas %}<span class="check">✔</span>{% else %}<span class="cross">✖</span>{% endif %} Estadísticas de visualización de productos</li>
+            <li>
+              {% if m.prioridad_visibilidad > 0 %}
+                <span class="check">✔</span>
+              {% else %}
+                <span class="cross">✖</span>
+              {% endif %}
+              Prioridad de aparición en búsquedas
+            </li>
+            <li>
+              {% if m.distintivo == 'plata' or m.distintivo == 'oro' %}
+                <span class="check">✔</span>
+              {% else %}
+                <span class="cross">✖</span>
+              {% endif %}
+              Marco en la foto de perfil
+            </li>
+            <li>
+              {% if m.verificacion_prioritaria %}
+                <span class="check">✔</span>
+              {% else %}
+                <span class="cross">✖</span>
+              {% endif %}
+              Prioridad de verificación de productos
+            </li>
+            <li>
+              {% if m.estadisticas %}
+                <span class="check">✔</span>
+              {% else %}
+                <span class="cross">✖</span>
+              {% endif %}
+              Estadísticas de visualización de productos
+            </li>
           </ul>
           <div class="acciones">
-            {% if perfil.membresia and perfil.membresia.id == m.id %}
+            {% if membresia_activa and membresia_activa.id == m.id %}
               {% if m.precio > 0 %}
-                <form method="post" class="cancelar-form">
+                <form method="post" class="cancelar-form" id="form-cancelar-plan">
                   {% csrf_token %}
                   <input type="hidden" name="cancelar" value="{{ m.id }}">
-                  <button type="submit" class="btn cancelar">CANCELAR PLAN</button>
+                  <button type="button" class="btn btn-danger" id="btn-cancelar-plan" data-bs-toggle="modal" data-bs-target="#modalCancelar">
+                    Cancelar plan
+                  </button>
                 </form>
+                <div id="mensaje-cancelacion" style="display:none;"></div>
               {% endif %}
             {% else %}
-              <form method="post" class="cambiar-form">
-                {% csrf_token %}
-                <input type="hidden" name="membresia_id" value="{{ m.id }}">
-                {% if m.precio > 0 %}
-                <button type="submit" class="btn contratar">CONTRATAR</button>
-                {% endif %}
-              </form>
+              {% if m.precio > 0 %}
+                <!-- Al hacer click, abrimos el modal para tokenizar -->
+                <button type="button"
+                        class="btn contratar"
+                        onclick="mostrarFormularioPago('{{ m.id }}', '{{ m.precio }}')">
+                  CONTRATAR
+                </button>
+              {% endif %}
             {% endif %}
           </div>
         </div>
       {% endfor %}
     </div>
   </div>
+
+  <!-- Modal de pago -->
+  <div id="modal-pago" class="modal-pago">
+    <div class="modal-contenido">
+      <span class="cerrar">&times;</span>
+      <h2>¡Finaliza tu compra!</h2>
+      <p>Completa los datos para realizar el pago de tu membresía.</p>
+      <form id="form-pago">
+        <!-- Campos que montará Mercado Pago (cardForm) -->
+        <input type="email"
+               id="form-checkout__cardholderEmail"
+               name="cardholderEmail"
+               placeholder="Email"
+               required />
+        <input type="text"
+               id="form-checkout__cardNumber"
+               placeholder="Número de tarjeta (ej: 5031 7557 3453 0604)" />
+        <input type="text"
+               id="form-checkout__expirationDate"
+               placeholder="MM/YY (ej: 12/27)" />
+        <input type="text"
+               id="form-checkout__securityCode"
+               placeholder="CVV (ej: 123)" />
+        <input type="text"
+               id="form-checkout__cardholderName"
+               placeholder="Nombre y Apellido" />
+        <select id="form-checkout__issuer"></select>
+        <select id="form-checkout__installments"></select>
+        <select id="form-checkout__identificationType"></select>
+        <input type="text"
+               id="form-checkout__identificationNumber"
+               placeholder="DNI (ej: 12345678-9)" />
+        <!-- Botón para enviar el formulario -->
+        <button type="submit" id="form-checkout__submit">Pagar</button>
+      </form>
+      <div id="form-result"></div>
+      <p style="font-size: 0.9em; color: #888; margin-top: 10px;">
+        Tu pago es procesado de forma segura por MercadoPago.
+      </p>
+    </div>
+  </div>
+
+  <!-- Modal para cancelar el plan Bootstrap -->
+  <div class="modal fade" id="modalCancelar" tabindex="-1" aria-labelledby="modalCancelarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalCancelarLabel">¿Estás seguro que deseas cancelar tu plan?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          Tu plan permanecerá activo hasta que se cumpla un mes desde el último pago válido.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, volver</button>
+          <button type="button" class="btn btn-danger" id="confirmar-cancelacion">Sí, cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de exito de cancelacion de membresia -->
+  <div class="modal fade" id="modalMensaje" tabindex="-1" aria-labelledby="modalMensajeLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalMensajeLabel">Mensaje</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body" id="modalMensajeBody">
+          <!-- Aquí va el mensaje -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script
+    src="https://sdk.mercadopago.com/js/v2"
+    data-client-id="{{ mercadopago_public_key_sandbox }}">
+  </script>
+
+
+  <script>
+    const MERCADOPAGO_PUBLIC_KEY = "{{ mercadopago_public_key_sandbox }}";
+  </script>
 {% endblock %}

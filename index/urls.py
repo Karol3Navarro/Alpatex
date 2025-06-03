@@ -28,9 +28,6 @@ urlpatterns = [
     path('producto/agregar/', views.producto_add_perf, name='producto_add_perf'),
     path('admin_dashboard/', include('admin_alpatex.urls')),  
 
-
-    path('membresia/', views.ver_membresia_usuario, name='ver_membresia_usuario'),
-
     path('producto_del/<str:pk>', views.producto_del, name='producto_del'),
     path('producto_findEdit/<int:pk>/', views.producto_findEdit, name='producto_findEdit'),
     path('productoUpdate', views.editar_producto, name='productoUpdate'),
@@ -40,4 +37,11 @@ urlpatterns = [
     path('reportar_vendedor/', views.reportar_vendedor, name='reportar_vendedor'),
     path('confirmacion/<int:pk>/editar/', views.editar_confirmacion, name='editar_confirmacion'),
     path('confirmacion/<int:pk>/eliminar/', views.eliminar_confirmacion, name='eliminar_confirmacion'),
+    
+
+    path('membresia/', views.ver_membresia_usuario, name='ver_membresia_usuario'),
+    path('membresia/api/', views.crear_suscripcion_api, name='crear_suscripcion_api'),
+    path('membresia/cancelar/', views.cancelar_suscripcion_view, name='cancelar_suscripcion'),
+
+    path('webhook/mercadopago/', views.mercadopago_webhook, name='mercadopago_webhook'),
 ]

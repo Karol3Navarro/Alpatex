@@ -10,15 +10,23 @@ from django.template.loader import render_to_string
 from email.mime.image import MIMEImage
 import os
 from django.core.serializers.json import DjangoJSONEncoder
-from admin_alpatex.models import Membresia
+from admin_alpatex.models import Membresia, SuscripcionMercadoPago
 from django.db.models import F
 from django.contrib.messages import get_messages
 from Dm.models import ConfirmacionEntrega
 from Dm.forms import ConfirmacionEntregaForm
 from django.views.decorators.http import require_POST
-from django.http import JsonResponse, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
 from django.contrib import messages
 from django.conf import settings
+from admin_alpatex.services import MercadoPagoService
+from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from admin_alpatex.mercadopago_config import (
+    MERCADOPAGO_PUBLIC_KEY,
+    MERCADOPAGO_PUBLIC_KEY_PROD
+)
 
 
 
@@ -294,27 +302,66 @@ def producto_add_perf(request):
 
 @login_required
 def ver_membresia_usuario(request):
-    perfil = Perfil.objects.get(user=request.user)
+    perfil = request.user.perfil
     membresias = Membresia.objects.all()
+    mp_service = MercadoPagoService()
 
     if request.method == 'POST':
         cancelar_id = request.POST.get('cancelar')
         if cancelar_id:
-            membresia_basica = Membresia.objects.get(nombre="Básico")
-            perfil.membresia = membresia_basica
-            perfil.save()
+            try:
+                suscripciones = SuscripcionMercadoPago.objects.filter(perfil=perfil, estado="active")
+                if suscripciones.count() == 0:
+                    return JsonResponse({"success": False, "error": "No tienes una suscripción activa."}, status=400)
+                elif suscripciones.count() > 1:
+                    for suscripcion in suscripciones:
+                        mp_service.cancelar_suscripcion(suscripcion)
+                    return JsonResponse({"success": True, "warning": "Había más de una suscripción activa, todas han sido canceladas."})
+                else:
+                    mp_service.cancelar_suscripcion(suscripciones.first())
+                    return JsonResponse({"success": True})
+            except Exception as e:
+                messages.error(request, f"Error al cancelar la suscripción: {str(e)}")
             return redirect('ver_membresia_usuario')
 
         nueva_id = request.POST.get('membresia_id')
         if nueva_id:
-            nueva_membresia = Membresia.objects.get(id=nueva_id)
-            perfil.membresia = nueva_membresia
-            perfil.save()
+            try:
+                membresia = Membresia.objects.get(id=nueva_id)
+                token_tarjeta = request.POST.get('token_tarjeta')
+                
+                if not token_tarjeta:
+                    messages.error(request, "Error: No se recibió el token de la tarjeta")
+                    return redirect('ver_membresia_usuario')
+
+                suscripcion = mp_service.crear_suscripcion(perfil, membresia, token_tarjeta)
+                perfil.membresia = membresia
+                perfil.save()
+                messages.success(request, "¡Suscripción creada exitosamente!")
+            except Exception as e:
+                messages.error(request, f"Error al crear la suscripción: {str(e)}")
             return redirect('ver_membresia_usuario')
+
+    # Obtener la suscripción vigente (estado active o cancelled y fecha_fin > ahora)
+    now = timezone.now()
+    suscripcion_vigente = SuscripcionMercadoPago.objects.filter(
+        perfil=perfil,
+        fecha_fin__gt=now,
+        estado__in=["active", "cancelled"]
+    ).order_by('-fecha_inicio').first()
+    membresia_activa = None
+    if suscripcion_vigente:
+        membresia_activa = suscripcion_vigente.membresia
+        perfil.membresia = membresia_activa
+        perfil.save()
 
     return render(request, 'index/ver_membresia.html', {
         'perfil': perfil,
         'membresias': membresias,
+        'suscripcion_activa': suscripcion_vigente,
+        'membresia_activa': membresia_activa,
+        'mercadopago_public_key_sandbox': MERCADOPAGO_PUBLIC_KEY,
+        'now': now,
     })
 
 #Modificacion de Producto
@@ -677,4 +724,114 @@ def eliminar_confirmacion(request, pk):
 
     confirmacion.delete()
     return redirect('mis_compras')
+
+@csrf_exempt
+def mercadopago_webhook(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            mp_service = MercadoPagoService()
+            mp_service.procesar_webhook(data)
+            return HttpResponse(status=200)
+        except Exception as e:
+            return HttpResponse(status=400)
+    return HttpResponse(status=405)
+
+@csrf_exempt
+def webhook_mercadopago(request):
+    """
+    Webhook que recibe notificaciones de Mercado Pago
+    """
+    if request.method == "POST":
+        try:
+            payload = json.loads(request.body.decode('utf-8'))
+            print("Webhook recibido:", payload)
+            
+            # Verificar el tipo de notificación
+            if payload.get('type') == 'payment':
+                payment_id = payload.get('data', {}).get('id')
+                if not payment_id:
+                    print("Error: No se recibió payment_id en el webhook")
+                    return JsonResponse({"error": "payment_id no encontrado"}, status=400)
+                
+                # Procesar el pago
+                mp_service = MercadoPagoService()
+                try:
+                    mp_service.procesar_webhook(payload)
+                    return JsonResponse({"status": "procesado"}, status=200)
+                except Exception as e:
+                    print(f"Error al procesar webhook: {str(e)}")
+                    return JsonResponse({"error": str(e)}, status=500)
+            else:
+                print(f"Tipo de webhook no manejado: {payload.get('type')}")
+                return JsonResponse({"status": "ignorado"}, status=200)
+                
+        except json.JSONDecodeError:
+            print("Error: JSON inválido en el webhook")
+            return JsonResponse({"error": "payload inválido"}, status=400)
+        except Exception as e:
+            print(f"Error inesperado en webhook: {str(e)}")
+            return JsonResponse({"error": str(e)}, status=500)
+            
+    return HttpResponse(status=405)
+
+@csrf_exempt
+def crear_suscripcion_api(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        token_tarjeta = data.get('token_tarjeta')
+        email = data.get('email')
+        membresia_id = data.get('membresia_id')
+
+        if not token_tarjeta:
+            return JsonResponse({'error': 'El token de tarjeta es requerido'}, status=400)
+        if not (email and membresia_id):
+            return JsonResponse({'error': 'Faltan datos requeridos'}, status=400)
+
+        perfil = Perfil.objects.get(user__email=email)
+        membresia = Membresia.objects.get(id=membresia_id)
+
+        mp_service = MercadoPagoService()
+        respuesta = mp_service.crear_suscripcion(perfil, membresia, token_tarjeta)
+        init_point = respuesta.get("sandbox_init_point") or respuesta.get("init_point")
+        subscription_id = respuesta.get("id")
+
+        return JsonResponse({
+            'success': True,
+            'init_point': init_point,
+            'suscripcion_id': subscription_id
+        })
+    except Perfil.DoesNotExist:
+        return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+    except Membresia.DoesNotExist:
+        return JsonResponse({'error': 'Membresía no encontrada'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+   
+@csrf_exempt
+@login_required
+def cancelar_suscripcion_view(request):
+    if request.method == "POST":
+        try:
+            perfil = request.user.perfil
+            suscripciones = SuscripcionMercadoPago.objects.filter(perfil=perfil, estado="active")
+            mp_service = MercadoPagoService()
+            if suscripciones.count() == 0:
+                return JsonResponse({"success": False, "error": "No tienes una suscripción activa."}, status=400)
+            elif suscripciones.count() > 1:
+             
+                for suscripcion in suscripciones:
+                    mp_service.cancelar_suscripcion(suscripcion)
+                return JsonResponse({"success": True, "warning": "Había más de una suscripción activa, todas han sido canceladas."})
+            else:
+                mp_service.cancelar_suscripcion(suscripciones.first())
+                return JsonResponse({"success": True})
+        except SuscripcionMercadoPago.DoesNotExist:
+            return JsonResponse({"success": False, "error": "No tienes una suscripción activa."}, status=400)
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+    return JsonResponse({"success": False, "error": "Método no permitido."}, status=405)
    
