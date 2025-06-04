@@ -2,6 +2,72 @@
 {% load static %}
 
 {% block body %}
+<style>
+  .profile-container {
+    max-width: 480px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    padding: 30px 25px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+  }
+
+  .profile-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 700;
+    color:  #AD5CA1; /* color elegante púrpura */
+  }
+
+  .perfil-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .perfil-foto {
+    position: relative;
+    width: 160px;
+    height: 160px;
+  }
+
+  .perfil-foto img {
+    border-radius: 50%;
+    object-fit: cover;
+    width: 150px;
+    height: 150px;
+    border: 4px solid #AD5CA1;
+    box-shadow: 0 0 10px #AD5CA1(173,92,161,0.4);
+  }
+
+  .marco-membresia {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    width: 162px;
+    height: 162px;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .perfil-info p {
+    font-size: 1.1rem;
+    margin: 0;
+    width: 100%;
+    max-width: 380px;
+    background: #f7f7f7;
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .perfil-info p strong {
+    color: #AD5CA1;
+  }
+</style>
 <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
     <div class="profile-container">
         <h2>Perfil de {{ perfil.user.username }}</h2>
