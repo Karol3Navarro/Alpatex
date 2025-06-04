@@ -13,7 +13,7 @@
     <h1 class="prod-dest">MEMBRESÍA</h1>
 
     <!-- Mensaje de cancelacion de membresia -->
-    {% if suscripcion_activa and suscripcion_activa.estado == "cancelled" and suscripcion_activa.fecha_fin > now %}
+    {% if mostrar_mensaje_cancelada %}
       <div class="alert alert-warning" style="font-weight:bold; font-size:1.1em; margin-bottom: 20px; text-align:center;">
         Tu plan fue cancelado y estará activo hasta que se cumpla un mes desde el último pago válido.
       </div>
@@ -71,7 +71,7 @@
           </ul>
           <div class="acciones">
             {% if membresia_activa and membresia_activa.id == m.id %}
-              {% if m.precio > 0 %}
+              {% if m.precio > 0 and not mostrar_mensaje_cancelada %}
                 <form method="post" class="cancelar-form" id="form-cancelar-plan">
                   {% csrf_token %}
                   <input type="hidden" name="cancelar" value="{{ m.id }}">

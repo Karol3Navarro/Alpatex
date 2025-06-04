@@ -349,11 +349,18 @@ def ver_membresia_usuario(request):
         fecha_fin__gt=now,
         estado__in=["active", "cancelled"]
     ).order_by('-fecha_inicio').first()
+    
     membresia_activa = None
+    mostrar_mensaje_cancelada = False
+    
     if suscripcion_vigente:
         membresia_activa = suscripcion_vigente.membresia
         perfil.membresia = membresia_activa
         perfil.save()
+        
+        # Verificar si la suscripción está cancelada pero aún vigente
+        if suscripcion_vigente.estado == "cancelled" and suscripcion_vigente.fecha_fin > now:
+            mostrar_mensaje_cancelada = True
 
     return render(request, 'index/ver_membresia.html', {
         'perfil': perfil,
@@ -361,7 +368,7 @@ def ver_membresia_usuario(request):
         'suscripcion_activa': suscripcion_vigente,
         'membresia_activa': membresia_activa,
         'mercadopago_public_key_sandbox': MERCADOPAGO_PUBLIC_KEY,
-        'now': now,
+        'mostrar_mensaje_cancelada': mostrar_mensaje_cancelada,
     })
 
 #Modificacion de Producto
