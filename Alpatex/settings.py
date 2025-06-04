@@ -144,3 +144,5 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = "alpatex.bd@gmail.com"
 EMAIL_HOST_PASSWORD = "vffg irtp ixwh izwx"
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+BASE_URL = "http://localhost:8000"
+

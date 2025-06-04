@@ -22,6 +22,9 @@ urlpatterns = [
     path('export/usuarios/excel/', views.export_usuarios_to_excel, name='export_usuarios_excel'),
     path('export/usuarios/pdf/', views.export_usuarios_to_pdf, name='export_usuarios_pdf'),
     path('admin/producto/<int:id_producto>/', views.ver_producto_admin, name='ver_producto_admin'),
+    path('usuarios/eliminados/', views.usuarios_eliminados, name='usuarios_eliminados'),
+    path('usuarios/reactivar/<int:user_id>/', views.reactivar_usuario, name='reactivar_usuario'),
+
 
   # Ruta para el dashboard
 ]

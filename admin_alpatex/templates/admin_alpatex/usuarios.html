@@ -1,11 +1,9 @@
-<!-- admin_alpatex/templates/admin_alpatex/usuarios.html -->
 {% extends "admin_alpatex/base.html" %}
 {% load static %}
 
 {% block body %}
-
-  <h1 class="prod-dest">Usuarios Registrados</h1>
-
+<link rel="stylesheet" href="{% static 'css/usuarios.css' %}">
+<h1 class="prod-dest">Usuarios Registrados</h1>
   <form method="get" class="filtros-user-admin">
     
     <input type="text" name="q" placeholder="Buscar usuario..." value="{{ request.GET.q }}">
@@ -21,12 +19,28 @@
 
   </form>
 
-  <div class="admin-users">
-
-    {% for usuario in usuarios %}
-
-      <div class="user-card">
-
+<div class="admin-users">
+  {% for usuario in usuarios %}
+    <div class="user-card">
+      <!-- Botón 3 puntos en esquina superior derecha SIN la flechita -->
+      <div class="acciones-usuario dropdown">
+        <button class="btn-menu" type="button" id="dropdownMenuButton{{ usuario.id }}" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Menú opciones usuario">
+          &#x22EE;
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ usuario.id }}">
+          <li><a class="dropdown-item" href="{% url 'perfil_usuario' username=usuario.username %}">Ver Perfil</a></li>
+          <li>
+            <button
+              class="dropdown-item text-danger"
+              data-bs-toggle="modal"
+              data-bs-target="#modalEliminar"
+              data-username="{{ usuario.username }}"
+              data-userid="{{ usuario.id }}">
+              Eliminar
+            </button>
+          </li>
+        </ul>
+      </div>
         <div class="perfil-foto">
           <img src="{{ usuario.perfil.get_foto_perfil_url }}" alt="Foto de perfil">
           {% if usuario.perfil.membresia %}
@@ -37,52 +51,61 @@
             {% endif %}
           {% endif %}
         </div>
-
-        <div class="card-body">
-          <h5 class="card-title">{{ usuario.username }}</h5>
-          
-          <p class="card-text"><strong>Dirección:</strong> {{ usuario.perfil.direccion }}</p>
-
-          <div class="acciones-usuario">
-            <a href="{% url 'perfil_usuario' username=usuario.username %}" class="btn btn-ver">Ver Perfil</a>
-            
-             <button type="button" class="btn btn-danger btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#modalEliminar{{ usuario.id }}">
-                Eliminar
-              </button>
-
-  <!-- Modal de confirmación con motivo -->
-            <div class="modal fade" id="modalEliminar{{ usuario.id }}" tabindex="-1" aria-labelledby="modalLabel{{ usuario.id }}" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <form method="post" action="{% url 'eliminar_usuario' usuario.id %}">
-                    {% csrf_token %}
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="modalLabel{{ usuario.id }}">Eliminar Usuario</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                      <p>¿Estás seguro de que deseas eliminar al usuario <strong>{{ usuario.username }}</strong>?</p>
-                      <div class="mb-3">
-                        <label for="motivo{{ usuario.id }}" class="form-label">Motivo de la eliminación</label>
-                        <textarea name="motivo" id="motivo{{ usuario.id }}" class="form-control" rows="3" required></textarea>
-                      </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                      <button type="submit" class="btn btn-danger">Eliminar</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
+      <div class="card-body">
+        <h5>{{ usuario.username }}</h5>
+        <p><strong>Dirección:</strong> {{ usuario.perfil.direccion }}</p>
       </div>
+    </div>
+  {% empty %}
+    <p>No hay usuarios registrados.</p>
+  {% endfor %}
+</div>
 
-    {% endfor %}
-
+<!-- Modal único para eliminar usuario -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" id="formEliminarUsuario">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLabel">Eliminar Usuario</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p>¿Estás seguro de que deseas eliminar al usuario <strong id="nombreUsuario"></strong>?</p>
+          <div class="mb-3">
+            <label for="motivo" class="form-label">Motivo de la eliminación</label>
+            <textarea name="motivo" id="motivo" class="form-control" rows="3" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </div>
+      </form>
+    </div>
   </div>
+</div>
+
+<script>
+  // Actualizar modal al abrirse con los datos del botón que activó el modal
+  const modalEliminar = document.getElementById('modalEliminar');
+  modalEliminar.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget; // Botón que disparó el modal
+    const username = button.getAttribute('data-username');
+    const userid = button.getAttribute('data-userid');
+
+    // Mostrar el nombre del usuario en el modal
+    const nombreUsuario = modalEliminar.querySelector('#nombreUsuario');
+    nombreUsuario.textContent = username;
+
+    // Ajustar acción del formulario para enviar a la URL correcta
+    const form = modalEliminar.querySelector('#formEliminarUsuario');
+    form.action = "{% url 'eliminar_usuario' 0 %}".replace('0', userid);
+
+    // Limpiar textarea motivo
+    form.motivo.value = '';
+  });
+</script>
 
 {% endblock %}

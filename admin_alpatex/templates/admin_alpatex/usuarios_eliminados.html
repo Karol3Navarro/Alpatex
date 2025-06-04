@@ -1,0 +1,79 @@
+{% extends "admin_alpatex/base.html" %}
+{% load static %}
+
+{% block body %}
+
+  <h1 class="prod-dest">Usuarios Eliminados</h1>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Motivo</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for perfil in perfiles %}
+        <tr>
+          <td>{{ perfil.user.username }}</td>
+          <td>{{ perfil.user.email }}</td>
+          <td>{{ perfil.motivo_eliminacion }}</td>
+          <td>
+            <!-- Botón que abre el modal -->
+            <button type="button"
+                    class="btn btn-success btn-sm btn-abrir-modal"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalReactivar"
+                    data-usuario-id="{{ perfil.user.id }}"
+                    data-usuario-nombre="{{ perfil.user.username }}">
+              Reactivar
+            </button>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Modal único -->
+  <div class="modal fade" id="modalReactivar" tabindex="-1" aria-labelledby="modalLabelReactivar" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="post" id="formReactivar">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLabelReactivar">Reactivar Usuario</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <p>¿Seguro quieres <strong>reactivar</strong> al usuario <strong id="nombreUsuarioModal"></strong>?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-success">Reactivar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script para actualizar el modal -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var modalReactivar = document.getElementById('modalReactivar');
+      var nombreUsuarioModal = document.getElementById('nombreUsuarioModal');
+      var formReactivar = document.getElementById('formReactivar');
+
+      modalReactivar.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var usuarioId = button.getAttribute('data-usuario-id');
+        var usuarioNombre = button.getAttribute('data-usuario-nombre');
+
+        nombreUsuarioModal.textContent = usuarioNombre;
+        formReactivar.action = `/admin_dashboard/usuarios/reactivar/${usuarioId}/`;
+      });
+    });
+  </script>
+
+{% endblock %}

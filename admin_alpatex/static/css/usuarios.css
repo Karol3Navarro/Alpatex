@@ -1,0 +1,91 @@
+.user-card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  width: 200px;          /* Ancho igual */
+  height: 230px;         /* Menos altura */
+  padding: 12px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding-top: 20px;     /* Un poco menos espacio arriba */
+}
+
+.perfil-foto img {
+  width: 85px;           /* Imagen un poco más chica */
+  height: 85px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}
+
+.card-body h5 {
+  margin: 0 0 5px;
+  font-size: 0.95rem;    /* Texto un poco más pequeño */
+  font-weight: 600;
+}
+
+.card-body p {
+  font-size: 0.8rem;
+  margin: 0 0 8px;
+  color: #555;
+}
+
+/* Contenedor para las tarjetas */
+.admin-users {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  padding: 15px 0;
+}
+
+/* Posicionamos el botón de menú en la esquina superior derecha */
+.acciones-usuario {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  display: block;
+  z-index: 10;
+}
+
+.btn-menu {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #555;
+  padding: 0 6px;
+  user-select: none;
+}
+
+.btn-menu:hover {
+  color: #AD5CA1;
+}
+
+/* Menú desplegable */
+.dropdown-menu a,
+.dropdown-menu button.dropdown-item {
+  color: #333;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 0.25rem 1rem;
+}
+
+.dropdown-menu a:hover,
+.dropdown-menu button.dropdown-item:hover {
+  background-color: #AD5CA1;
+  color: white;
+}
+
+.dropdown-menu button.dropdown-item.text-danger:hover {
+  background-color: #a0458e;
+}

@@ -155,6 +155,53 @@ def usuarios(request):
             usuarios = usuarios.filter(perfil__membresia__nombre=membresia)
 
     return render(request, 'admin_alpatex/usuarios.html', {'usuarios': usuarios})
+def reactivar_usuario(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    perfil = user.perfil
+
+    if request.method == 'POST':
+        perfil.fecha_eliminacion = None
+        perfil.motivo_eliminacion = ''
+        perfil.save()
+        user.is_active = True
+        user.save()
+
+        # Contexto para el correo
+        context = {
+            'username': user.username,
+            'site_url': request.build_absolute_uri('/'),
+        }
+
+        html_content = render_to_string('admin_alpatex/cuenta_reactivada.html', context)
+        subject = "Tu cuenta fue reactivada - Alpatex"
+        from_email = settings.DEFAULT_FROM_EMAIL
+        to = [user.email]
+        text = (
+            f"Hola {user.username},\n\n"
+            "Tu cuenta en Alpatex ha sido reactivada.\n\n"
+            "Saludos,\nEquipo Alpatex"
+        )
+
+        msg = EmailMultiAlternatives(subject, text, from_email, to)
+        msg.attach_alternative(html_content, "text/html")
+
+        # Adjuntar imagen
+        logo_path = os.path.join(settings.BASE_DIR, 'index', 'static', 'img', 'alpatex-v2-tipografía.png')
+        with open(logo_path, 'rb') as img:
+            mime_image = MIMEImage(img.read())
+            mime_image.add_header('Content-ID', '<logo_alpatex>')
+            mime_image.add_header('Content-Disposition', 'inline', filename='alpatex-v2-tipografía.png')
+            msg.attach(mime_image)
+
+        msg.send()
+
+        return redirect('usuarios_eliminados')
+    return redirect('usuarios_eliminados')
+
+def usuarios_eliminados(request):
+    perfiles = Perfil.objects.filter(fecha_eliminacion__isnull=False)
+    return render(request, 'admin_alpatex/usuarios_eliminados.html', {'perfiles': perfiles})
+
 
 
 
@@ -249,10 +296,8 @@ def eliminar_usuario(request, user_id):
         msg.send()
 
         return redirect('usuarios')  # ✅ CORRECTO
-
     # 🚫 NUNCA devuelvas usuarios.html directamente desde aquí
     return redirect('usuarios')
-
 @login_required
 def usuarios_reportados(request):
     # Obtener usuarios que han sido reportados al menos una vez
