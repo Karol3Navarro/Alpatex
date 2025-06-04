@@ -15,7 +15,7 @@
     <!-- Mensaje de cancelacion de membresia -->
     {% if mostrar_mensaje_cancelada %}
       <div class="alert alert-warning" style="font-weight:bold; font-size:1.1em; margin-bottom: 20px; text-align:center;">
-        Tu plan fue cancelado y estará activo hasta que se cumpla un mes desde el último pago válido.
+        Tu plan fue cancelado y estará activo hasta que se cumpla un mes desde el último pago válido.  Después podrás contratar nuevamente.
       </div>
     {% endif %}
     
@@ -76,13 +76,13 @@
                   {% csrf_token %}
                   <input type="hidden" name="cancelar" value="{{ m.id }}">
                   <button type="button" class="btn btn-danger" id="btn-cancelar-plan" data-bs-toggle="modal" data-bs-target="#modalCancelar">
-                    Cancelar plan
+                    CANCELAR PLAN
                   </button>
                 </form>
                 <div id="mensaje-cancelacion" style="display:none;"></div>
               {% endif %}
             {% else %}
-              {% if m.precio > 0 %}
+              {% if m.precio > 0 and not mostrar_mensaje_cancelada %}
                 <!-- Al hacer click, abrimos el modal para tokenizar -->
                 <button type="button"
                         class="btn contratar"
@@ -147,7 +147,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
-          Tu plan permanecerá activo hasta que se cumpla un mes desde el último pago válido.
+          Tu plan permanecerá activo hasta que se cumpla un mes desde el último pago válido. Después podrás contratar nuevamente.
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, volver</button>
