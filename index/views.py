@@ -793,11 +793,10 @@ def mercadopago_webhook(request):
             return HttpResponse(status=400)
     return HttpResponse(status=405)
 
+#Webhook que recibe notificaciones de Mercado Pago
 @csrf_exempt
 def webhook_mercadopago(request):
-    """
-    Webhook que recibe notificaciones de Mercado Pago
-    """
+
     if request.method == "POST":
         try:
             payload = json.loads(request.body.decode('utf-8'))

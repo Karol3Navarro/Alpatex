@@ -101,7 +101,7 @@ class MercadoPagoService:
         Actualiza el registro de SuscripcionMercadoPago cuando llegue un payment o una cancelación.
         """
         try:
-            # --- CASO PAGO ---
+            # PAgo
             if data.get("type") == "payment":
                 payment_id = data["data"]["id"]
                 payment_info = self.sdk.payment().get(payment_id)
@@ -119,7 +119,7 @@ class MercadoPagoService:
                             suscripcion.actualizar_proximo_pago()
                             suscripcion.save()
 
-                            # ASIGNA LA MEMBRESÍA
+                            # asigna la membresia
                             perfil.membresia = suscripcion.membresia
                             perfil.save()
 
@@ -127,14 +127,14 @@ class MercadoPagoService:
                             suscripcion.estado = "expired"
                             suscripcion.save()
 
-                            # QUITA LA MEMBRESÍA
+                            # quita membresia
                             perfil.membresia = None
                             perfil.save()
 
-            # --- CASO CANCELACIÓN DE SUSCRIPCIÓN ---
+            # cancelacion de suscripcion
             elif data.get("type") == "subscription":
                 subscription_id = data["data"]["id"]
-                # Obtén el estado de la suscripción desde la API de MercadoPago
+                # Obtiene el estado de la suscripción desde la API de MercadoPago
                 subscription_info = self.sdk.subscription().get(subscription_id)
                 if subscription_info["status"] == 200:
                     subscription_data = subscription_info["response"]
@@ -146,7 +146,7 @@ class MercadoPagoService:
                         suscripcion.fecha_cancelacion = timezone.now()
                         suscripcion.save()
 
-                        # QUITA LA MEMBRESÍA
+                        # quita membresia
                         perfil.membresia = None
                         perfil.save()
 
