@@ -89,7 +89,7 @@
                 <div id="mensaje-cancelacion" style="display:none;"></div>
               {% endif %}
             {% else %}
-              {% if m.precio > 0 and not mostrar_mensaje_cancelada %}
+              {% if not membresia_activa and m.precio > 0 and not mostrar_mensaje_cancelada %}
                 <!-- Al hacer click, abrimos el modal para tokenizar -->
                 <button type="button"
                         class="btn contratar"
@@ -111,7 +111,7 @@
       <h2>¡Finaliza tu compra!</h2>
       <p>Completa los datos para realizar el pago de tu membresía.</p>
       <form id="form-pago">
-        <!-- Campos que montará Mercado Pago (cardForm) -->
+        <!-- Formulario de pago (cardForm de Mercado Pago) -->
         <input type="email"
                id="form-checkout__cardholderEmail"
                name="cardholderEmail"
@@ -145,7 +145,7 @@
     </div>
   </div>
 
-  <!-- Modal para cancelar el plan Bootstrap -->
+  <!-- Modal para cancelar el plan -->
   <div class="modal fade" id="modalCancelar" tabindex="-1" aria-labelledby="modalCancelarLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
