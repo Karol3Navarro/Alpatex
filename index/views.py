@@ -771,6 +771,10 @@ def editar_confirmacion(request, pk):
 def eliminar_confirmacion(request, pk):
     confirmacion = get_object_or_404(ConfirmacionEntrega, pk=pk, creador=request.user)
 
+    producto = confirmacion.producto
+    producto.disponible = True
+    producto.save()
+
     if not confirmacion.concretado or confirmacion.confirmado:
         return HttpResponseForbidden("No puedes eliminar esta confirmación.")
 
