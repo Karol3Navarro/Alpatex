@@ -25,7 +25,7 @@ window.mostrarFormularioPago = function(membresiaId, precio) {
     return;
   }
 
-  // Limpiamos cualquier <input name="membresia_id"> previo
+  // Limpia cualquier <input name="membresia_id"> previo
   const formPago = document.getElementById("form-pago");
   if (!formPago) {
     console.error("No se encontró el formulario de pago");
@@ -37,7 +37,7 @@ window.mostrarFormularioPago = function(membresiaId, precio) {
     prevHidden.remove();
   }
 
-  // Insertamos el campo hidden con el ID de la membresía
+  // Inserta el campo hidden con el ID de la membresía
   const membresiaInput = document.createElement("input");
   membresiaInput.type = "hidden";
   membresiaInput.name = "membresia_id";
@@ -66,13 +66,13 @@ window.mostrarFormularioPago = function(membresiaId, precio) {
 
 // Función para inicializar MercadoPago
 function inicializarMercadoPago() {
-  // 1) Validamos que la llave esté definida
+  // 1) Valida que la llave esté definida
   if (typeof MERCADOPAGO_PUBLIC_KEY === 'undefined' || !MERCADOPAGO_PUBLIC_KEY) {
     console.error("MERCADOPAGO_PUBLIC_KEY no está definida");
     return;
   }
 
-  // 2) Validamos que MercadoPago esté disponible
+  // 2) Valida que MercadoPago esté disponible
   if (typeof MercadoPago === 'undefined') {
     console.error("El SDK de MercadoPago no está cargado");
     return;
@@ -81,7 +81,7 @@ function inicializarMercadoPago() {
   console.log("Inicializando MercadoPago con llave:", MERCADOPAGO_PUBLIC_KEY);
   const mp = new MercadoPago(MERCADOPAGO_PUBLIC_KEY, { locale: 'es-CL' });
 
-  // 3) Creamos el cardForm de Mercado Pago
+  // 3) Crea el cardForm de Mercado Pago
   cardForm = mp.cardForm({
     amount: "0", 
     autoMount: true,
@@ -140,7 +140,7 @@ function inicializarMercadoPago() {
         console.log("Fetching recurso:", resource);
       },
       onError: (error) => {
-        // Si el error es sobre cuotas/payer_costs, lo ignoramos (no mostramos nada al usuario)
+        // Si el error es sobre cuotas/payer_costs, no se muestra nada al usuario
         let mensaje = error && error.message ? error.message : JSON.stringify(error);
         if (
           mensaje.includes("payer_costs") ||
@@ -151,7 +151,7 @@ function inicializarMercadoPago() {
           // No mostramos nada, es un error esperado en Sandbox o sin cuotas
           return;
         }
-        // Para cualquier otro error, sí lo mostramos
+        // Para cualquier otro error, si se muestra
         console.error("Error en cardForm:", error);
         document.getElementById('form-result').innerHTML =
           `<div class="alert alert-error">Error en el formulario de pago: ${mensaje}</div>`;
@@ -160,13 +160,13 @@ function inicializarMercadoPago() {
   });
 }
 
-// Esperamos a que el DOM esté listo
+// esperar a que el dom este elisto
 document.addEventListener("DOMContentLoaded", function() {
-  // Verificamos si MercadoPago ya está cargado
+  // Verifica que MercadoPago  está cargado
   if (typeof MercadoPago !== 'undefined') {
     inicializarMercadoPago();
   } else {
-    // Si no está cargado, esperamos a que se cargue
+    // si no esta cargado, se espera a que  cargue
     const checkMercadoPago = setInterval(() => {
       if (typeof MercadoPago !== 'undefined') {
         clearInterval(checkMercadoPago);
@@ -174,7 +174,7 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     }, 100);
 
-    // Timeout de seguridad después de 10 segundos
+    // Timeout de seguridad  10 segundos
     setTimeout(() => {
       clearInterval(checkMercadoPago);
       if (typeof MercadoPago === 'undefined') {
