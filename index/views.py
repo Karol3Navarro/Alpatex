@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from .models import Producto, Perfil, CalificacionVendedor, ReporteVendedor
+from .models import Producto, Perfil, CalificacionVendedor, ReporteVendedor, CalificacionCliente
 from .Forms import PerfilForm, ProductoForm, ReporteVendedorForm
 import json
 from django.core.mail import EmailMultiAlternatives
@@ -529,6 +529,51 @@ def mis_compras(request):
         'mis_productos': mis_productos,
         'reportados': reportados
     })
+@login_required
+def calificar_cliente(request):
+    if request.method == 'POST':
+        producto_id = request.POST.get('producto_id')
+        cliente_id = request.POST.get('cliente_id')
+        puntaje = request.POST.get('puntaje')
+        comentario = request.POST.get('comentario')
+
+        if not producto_id or not cliente_id or not puntaje:
+            messages.error(request, "Faltan datos para calificar al cliente.")
+            return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+        try:
+            if cliente_id.isdigit():
+                cliente = User.objects.get(id=cliente_id)
+            producto = Producto.objects.get(id_producto=producto_id)
+            cliente = User.objects.get(id=cliente_id)
+
+
+            # Verificar que no se haya calificado ya
+            if CalificacionCliente.objects.filter(producto=producto, vendedor=request.user).exists():
+                messages.error(request, "Ya calificaste a este cliente para este producto.")
+                return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+            # Guardar calificación
+            calificacion = CalificacionCliente(
+                cliente=cliente,
+                producto=producto,
+                vendedor=request.user,
+                puntaje=puntaje,
+                comentario=comentario
+            )
+            calificacion.save()
+            messages.success(request, "Has calificado al cliente exitosamente.")
+            return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+        except Producto.DoesNotExist:
+            messages.error(request, "Producto no encontrado.")
+        except User.DoesNotExist:
+            messages.error(request, "Cliente no encontrado.")
+
+    else:
+        messages.error(request, "Método no permitido.")
+
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
 
 @login_required
 def calificar_vendedor(request):

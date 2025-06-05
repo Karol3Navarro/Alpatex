@@ -128,3 +128,14 @@ class ReporteVendedor(models.Model):
 
     def __str__(self):
         return f"Reporte de {self.comprador} a {self.vendedor} - {self.fecha_reporte}"
+
+class CalificacionCliente(models.Model):
+    cliente = models.ForeignKey(User, on_delete=models.CASCADE, related_name='calificaciones_recibidas_cliente')
+    vendedor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='calificaciones_hechas_vendedor')
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    puntaje = models.IntegerField()
+    comentario = models.TextField(blank=True, null=True)
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Calificación de {self.vendedor} para {self.cliente} en {self.puntaje}'

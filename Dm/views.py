@@ -31,6 +31,9 @@ class Inbox(View):
 		confirmacion = None
 		mostrar_botones = False
 
+		calificacion_cliente = False
+		cliente = None
+
 		if canal_id:
 			try:
 				canal = Canal.objects.get(id=canal_id)
@@ -39,6 +42,10 @@ class Inbox(View):
 				if mensaje_con_producto:
 					producto_relacionado = mensaje_con_producto.producto
 					es_duenio_producto = (producto_relacionado.usuario == request.user)
+
+					cliente = canal.canalusuario_set.exclude(usuario=producto_relacionado.usuario).first()
+					if cliente:
+						cliente = cliente.usuario
 
 				confirmacion = ConfirmacionEntrega.objects.filter(canal=canal).order_by('-creado_en').first()
 				
@@ -57,6 +64,10 @@ class Inbox(View):
 						mostrar_botones = True
 					else:
 						mostrar_botones = False
+
+					if confirmacion.confirmado == True:
+						calificacion_cliente = True
+
 			except Canal.DoesNotExist:
 				canal = None  # O podrías manejar con Http404
 
@@ -68,6 +79,8 @@ class Inbox(View):
             "es_duenio_producto": es_duenio_producto,
 			"confirmacion": confirmacion,
 			"mostrar_botones": mostrar_botones,
+			"cliente":cliente,
+			"calificacion_cliente": calificacion_cliente
 		}
 
 		return render(request, 'index/inbox.html', context)

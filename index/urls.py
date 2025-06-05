@@ -44,4 +44,5 @@ urlpatterns = [
     path('membresia/cancelar/', views.cancelar_suscripcion_view, name='cancelar_suscripcion'),
 
     path('webhook/mercadopago/', views.mercadopago_webhook, name='mercadopago_webhook'),
+    path('calificar_cliente/', views.calificar_cliente, name='calificar_cliente'),
 ]
