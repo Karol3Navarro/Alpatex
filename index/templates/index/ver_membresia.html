@@ -36,38 +36,45 @@
             {% endif %}
           </div>
           <ul class="beneficios">
-            <li>
-              {% if m.prioridad_visibilidad > 0 %}
-                <span class="check">✔</span>
-              {% else %}
-                <span class="cross">✖</span>
-              {% endif %}
-              Prioridad de aparición en búsquedas
-            </li>
-            <li>
-              {% if m.distintivo == 'plata' or m.distintivo == 'oro' %}
-                <span class="check">✔</span>
-              {% else %}
-                <span class="cross">✖</span>
-              {% endif %}
-              Marco en la foto de perfil
-            </li>
-            <li>
-              {% if m.verificacion_prioritaria %}
-                <span class="check">✔</span>
-              {% else %}
-                <span class="cross">✖</span>
-              {% endif %}
-              Prioridad de verificación de productos
-            </li>
-            <li>
-              {% if m.estadisticas %}
-                <span class="check">✔</span>
-              {% else %}
-                <span class="cross">✖</span>
-              {% endif %}
-              Estadísticas de visualización de productos
-            </li>
+            {% if m.precio == 0 %}
+              <li><span class="cross">✖</span> Prioridad de aparición en búsquedas</li>
+              <li><span class="cross">✖</span> Marco en la foto de perfil</li>
+              <li><span class="cross">✖</span> Prioridad de verificación de productos</li>
+              <li><span class="cross">✖</span> Estadísticas de visualización de productos</li>
+            {% else %}
+              <li>
+                {% if m.prioridad_visibilidad > 0 %}
+                  <span class="check">✔</span>
+                {% else %}
+                  <span class="cross">✖</span>
+                {% endif %}
+                Prioridad de aparición en búsquedas
+              </li>
+              <li>
+                {% if m.distintivo == 'plata' or m.distintivo == 'oro' %}
+                  <span class="check">✔</span>
+                {% else %}
+                  <span class="cross">✖</span>
+                {% endif %}
+                Marco en la foto de perfil
+              </li>
+              <li>
+                {% if m.verificacion_prioritaria %}
+                  <span class="check">✔</span>
+                {% else %}
+                  <span class="cross">✖</span>
+                {% endif %}
+                Prioridad de verificación de productos
+              </li>
+              <li>
+                {% if m.estadisticas %}
+                  <span class="check">✔</span>
+                {% else %}
+                  <span class="cross">✖</span>
+                {% endif %}
+                Estadísticas de visualización de productos
+              </li>
+            {% endif %}
           </ul>
           <div class="acciones">
             {% if membresia_activa and membresia_activa.id == m.id %}
