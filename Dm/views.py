@@ -30,7 +30,7 @@ class Inbox(View):
 		es_duenio_producto = False
 		confirmacion = None
 		mostrar_botones = False
-
+		mostrar_boton_entrega = False 
 		calificacion_cliente = False
 		cliente = None
 
@@ -42,6 +42,11 @@ class Inbox(View):
 				if mensaje_con_producto:
 					producto_relacionado = mensaje_con_producto.producto
 					es_duenio_producto = (producto_relacionado.usuario == request.user)
+
+					if producto_relacionado:
+						confirmacion = ConfirmacionEntrega.objects.filter(canal=canal, producto=producto_relacionado).first()
+						if not confirmacion: 
+							mostrar_boton_entrega = True
 
 					cliente = canal.canalusuario_set.exclude(usuario=producto_relacionado.usuario).first()
 					if cliente:
@@ -75,6 +80,7 @@ class Inbox(View):
 			"inbox": inbox,
 			"canal": canal,
 			"form": FormMensajes(),
+			"mostrar_boton_entrega": mostrar_boton_entrega,
 			"producto_relacionado": producto_relacionado,
             "es_duenio_producto": es_duenio_producto,
 			"confirmacion": confirmacion,

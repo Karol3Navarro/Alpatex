@@ -118,9 +118,11 @@
 				<!-- Boton de Confirmar Entrega Vendedor/Prosumidor -->
 				{% if producto_relacionado and es_duenio_producto %}
 					<!-- Botón que abre el modal -->
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmModal">
-						Confirmar Entrega
-					</button>
+					{% if mostrar_boton_entrega %}
+						<button id="confirmar_entrega_btn" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmModal">
+							Confirmar Entrega
+						</button>
+					{% endif %}
 					
 					<!-- Modal Bootstrap -->
 					<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
@@ -334,6 +336,7 @@
 						alert("Confirmación guardada correctamente.");
 						const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
 						modal.hide();
+						location.reload();
 					} else {
 						alert("Error al guardar confirmación: " + JSON.stringify(data.errores || data.message));
 					}
