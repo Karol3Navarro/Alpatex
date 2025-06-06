@@ -636,29 +636,21 @@ def calificar_vendedor(request):
 @require_POST
 def reportar_vendedor(request):
     form = ReporteVendedorForm(request.POST)
-    usuario_reportado_id = request.POST.get('usuario_reportado_id')
-
-    if not usuario_reportado_id:
-        messages.error(request, "ID de usuario no proporcionado.")
-        return redirect(request.META.get('HTTP_REFERER', 'home'))
-
-    try:
-        usuario_reportado = get_object_or_404(User, pk=int(usuario_reportado_id))
-    except (ValueError, TypeError):
-        messages.error(request, "ID de usuario inválido.")
-        return redirect(request.META.get('HTTP_REFERER', 'home'))
-
-    if form.is_valid():
+    producto_id = request.POST.get('producto_id')
+    vendedor_id = request.POST.get('vendedor_id')
+    puntaje = request.POST.get('puntaje') 
+    if form.is_valid() and producto_id and vendedor_id:
         reporte = form.save(commit=False)
+        reporte.producto_id = producto_id
+        reporte.vendedor_id = vendedor_id
         reporte.comprador = request.user
-        reporte.vendedor = usuario_reportado
+        reporte.puntaje = puntaje 
         reporte.save()
-        messages.success(request, "Gracias por reportar a este usuario.")
+        ConfirmacionEntrega.objects.filter(producto_id=producto_id).update(concretado=False)
+        messages.success(request, "Gracias por reportar al vendedor.")
+        return redirect(request.META.get('HTTP_REFERER', 'home')) 
     else:
-        for error in form.errors.values():
-            messages.error(request, error)
-
-    return redirect(request.META.get('HTTP_REFERER', 'home'))
+        return JsonResponse({'status': 'error', 'errors': form.errors})
     
 @login_required
 def perfil_publico(request, username):

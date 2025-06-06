@@ -109,22 +109,23 @@ def actualizar_foto_perfil_defecto(sender, instance, created, **kwargs):
         Perfil.objects.filter(user=instance, foto_perfil__isnull=True).update(foto_perfil='perfil_images/user_defecto.PNG')
 
 class CalificacionVendedor(models.Model):
-    vendedor = models.ForeignKey(User, on_delete=models.CASCADE, related_name="calificaciones_recibidas")  # El vendedor que recibe la calificación
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)  # El producto asociado
-    comprador = models.ForeignKey(User, on_delete=models.CASCADE, related_name="calificaciones_hechas")  # El comprador que deja la calificación
-    puntaje = models.IntegerField()  # La calificación (por ejemplo, 1 a 5)
-    comentario = models.TextField(blank=True, null=True)  # Comentario adicional
+    vendedor = models.ForeignKey(User, on_delete=models.CASCADE, related_name="calificaciones_recibidas") 
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    comprador = models.ForeignKey(User, on_delete=models.CASCADE, related_name="calificaciones_hechas") 
+    puntaje = models.IntegerField() 
+    comentario = models.TextField(blank=True, null=True) 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'Calificación de {self.comprador.username} para {self.vendedor.username} en {self.producto.nombre}'
 
 class ReporteVendedor(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     comprador = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reportes_realizados')
     vendedor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reportes_recibidos')
     motivo = models.TextField()
+    puntaje = models.PositiveIntegerField(null=True, blank=True)
     fecha_reporte = models.DateTimeField(auto_now_add=True)
-   
 
     def __str__(self):
         return f"Reporte de {self.comprador} a {self.vendedor} - {self.fecha_reporte}"

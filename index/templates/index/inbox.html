@@ -211,98 +211,99 @@
 				{% endif %}
 				
 				{% if mostrar_botones|default:False %}
-					<!-- Botón para abrir el modal -->
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#calificarReporteModal">
-						Finalizar Transacción
-					</button>
+                        <!-- Botón para abrir el modal -->
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#calificarReporteModal">
+                            Finalizar Transacción
+                        </button>
 
-					<!-- Modal Combinado: Calificar o Reportar -->
-					<div class="modal fade" id="calificarReporteModal" tabindex="-1" aria-labelledby="modalAccionLabel" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="modalAccionLabel">Acción con el Vendedor</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-								</div>
-								<div class="modal-body">
-									<!-- Botones para seleccionar -->
-									<div class="mb-3">
-										<label for="accion" class="form-label">¿Qué deseas hacer con el vendedor?</label>
-										<select id="accion" class="form-select" name="accion">
-											<option value="" selected disabled>Selecciona una opción</option>
-											<option value="calificar">Calificar al Vendedor</option>
-											<option value="reportar">Reportar al Vendedor</option>
-										</select>
-									</div>
-				
-									<!-- Formulario de Calificación al Vendedor (Oculto al principio) -->
-									<div id="formCalificar" class="form-accion" style="display: none;">
-										<form id="calificarForm" method="POST" action="{% url 'calificar_vendedor' %}">
-											{% csrf_token %}
+                        <!-- Modal Combinado: Calificar o Reportar -->
+                        <div class="modal fade" id="calificarReporteModal" tabindex="-1" aria-labelledby="modalAccionLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalAccionLabel">Acción con el Vendedor</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!-- Botones para seleccionar -->
+                                        <div class="mb-3">
+                                            <label for="accion" class="form-label">¿Qué deseas hacer con el vendedor?</label>
+                                            <select id="accion" class="form-select" name="accion">
+                                                <option value="" selected disabled>Selecciona una opción</option>
+                                                <option value="calificar">Calificar al Vendedor</option>
+                                                <option value="reportar">Reportar al Vendedor</option>
+                                            </select>
+                                        </div>
+                
+                                        <!-- Formulario de Calificación al Vendedor (Oculto al principio) -->
+                                        <div id="formCalificar" class="form-accion" style="display: none;">
+                                            <form id="calificarForm" method="POST" action="{% url 'calificar_vendedor' %}">
+                                                {% csrf_token %}
 
-											<h5 class="modal-title" id="calificarModalLabel">Calificar al Vendedor</h5>   
-											<div class="modal-body">
-												<!-- ⭐⭐ Estrellas para calificar ⭐⭐ -->
-												<div id="star-rating" class="stars mb-3" style="cursor: pointer; font-size: 1.8rem;">
-													<span data-value="1">★</span>
-													<span data-value="2">★</span>
-													<span data-value="3">★</span>
-													<span data-value="4">★</span>
-													<span data-value="5">★</span>
-												</div>
+                                                <h5 class="modal-title" id="calificarModalLabel">Calificar al Vendedor</h5>
+                               
+                                                <div class="modal-body">
+                                                    <!-- ⭐⭐ Estrellas para calificar ⭐⭐ -->
+                                                    <div id="star-rating" class="stars mb-3" style="cursor: pointer; font-size: 1.8rem;">
+                                                        <span data-value="1">★</span>
+                                                        <span data-value="2">★</span>
+                                                        <span data-value="3">★</span>
+                                                        <span data-value="4">★</span>
+                                                        <span data-value="5">★</span>
+                                                    </div>
 
-												<!-- Campo oculto para almacenar el puntaje -->
-												<input type="hidden" name="puntaje" id="id_puntaje" required>
-												<div class="mb-3">
-													<label for="comentario" class="form-label">Comentario</label>
-													<textarea class="form-control" name="comentario"></textarea>
-												</div>
-												<!-- Aquí van los campos ocultos con la información del producto y el vendedor -->
-												<input type="hidden" name="producto_id" value="{{ producto_relacionado.id_producto }}">
-												<input type="hidden" name="vendedor_id" value="{{ producto_relacionado.usuario.id }}">
-											</div>
-											 <div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-												<button type="submit" class="btn btn-primary">Confirmar Calificación</button>
-											</div>
-										</form>
-									</div>
+                                                    <!-- Campo oculto para almacenar el puntaje -->
+                                                    <input type="hidden" name="puntaje" id="id_puntaje" required>
+                                                    <div class="mb-3">
+                                                        <label for="comentario" class="form-label">Comentario</label>
+                                                        <textarea class="form-control" name="comentario"></textarea>
+                                                    </div>
+                                                    <!-- Aquí van los campos ocultos con la información del producto y el vendedor -->
+                                                    <input type="hidden" name="producto_id" value="{{ producto_relacionado.id_producto }}">
+                                                    <input type="hidden" name="vendedor_id" value="{{ producto_relacionado.usuario.id }}">
+                                                </div>
+                                                 <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <button type="submit" class="btn btn-primary">Confirmar Calificación</button>
+                                                </div>
+                                            </form>
+                                        </div>
 
-									<!-- Formulario de Reporte al Vendedor (Oculto al principio) -->
-									<div id="formReportar" class="form-accion" style="display: none;">
-										<form id="reporteForm" method="POST" action="{% url 'reportar_vendedor' %}">
-											{% csrf_token %}
-											<h5 class="modal-title">Reportar al Vendedor</h5>
-											<div class="modal-body">
-												<!-- ⭐⭐ Estrellas para puntuar ⭐⭐ -->
-												<div id="star-rating-report" class="stars mb-3" style="cursor: pointer; font-size: 1.8rem;">
-													<span data-value="1">★</span>
-													<span data-value="2">★</span>
-													<span data-value="3">★</span>
-													<span data-value="4">★</span>
-													<span data-value="5">★</span>
-												</div>
+                                        <!-- Formulario de Reporte al Vendedor (Oculto al principio) -->
+                                        <div id="formReportar" class="form-accion" style="display: none;">
+                                            <form id="reporteForm" method="POST" action="{% url 'reportar_vendedor' %}">
+                                                {% csrf_token %}
+                                                <h5 class="modal-title">Reportar al Vendedor</h5>
+                                                <div class="modal-body">
+                                                    <!-- ⭐⭐ Estrellas para puntuar ⭐⭐ -->
+                                                    <div id="star-rating-report" class="stars mb-3" style="cursor: pointer; font-size: 1.8rem;">
+                                                        <span data-value="1">★</span>
+                                                        <span data-value="2">★</span>
+                                                        <span data-value="3">★</span>
+                                                        <span data-value="4">★</span>
+                                                        <span data-value="5">★</span>
+                                                    </div>
 
-												<!-- Campo oculto para almacenar el puntaje del reporte -->
-												<input type="hidden" name="puntaje" id="id_puntaje_report" required>
-												<div class="mb-3">
-													<label for="motivo" class="form-label">Motivo del reporte</label>
-													<textarea class="form-control" name="motivo" required></textarea>
-												</div>
-												<input type="hidden" name="producto_id" value="{{ producto_relacionado.id_producto }}">
-												<input type="hidden" name="vendedor_id" value="{{ producto_relacionado.usuario.id }}">
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-												<button type="submit" class="btn btn-danger">Enviar Reporte</button>
-											</div>
-										</form>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				{% endif %}
+                                                    <!-- Campo oculto para almacenar el puntaje del reporte -->
+                                                    <input type="hidden" name="puntaje" id="id_puntaje_report" required>
+                                                    <div class="mb-3">
+                                                        <label for="motivo" class="form-label">Motivo del reporte</label>
+                                                        <textarea class="form-control" name="motivo" required></textarea>
+                                                    </div>
+                                                    <input type="hidden" name="producto_id" value="{{ producto_relacionado.id_producto }}">
+                                                    <input type="hidden" name="vendedor_id" value="{{ producto_relacionado.usuario.id }}">
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <button type="submit" class="btn btn-danger">Enviar Reporte</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
 
 				<form class="chat-input" action="?canal_id={{ canal.id }}" method="POST">
 					{% csrf_token %}
@@ -319,13 +320,99 @@
 	</div>
 
 	<script>
-		document.addEventListener("DOMContentLoaded", function () {
-			// Lógica para el formulario de confirmación
-			document.getElementById("confirmForm").addEventListener("submit", function(e) {
+        document.addEventListener("DOMContentLoaded", function () {
+            // Lógica para el formulario de confirmación
+            document.getElementById("confirmForm").addEventListener("submit", function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+
+                fetch("{% url 'guardar_confirmacion_entrega' %}", {
+                    method: "POST",
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    },
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "ok") {
+                        alert("Confirmación guardada correctamente.");
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+                        modal.hide();
+                        location.reload();
+                    } else {
+                        alert("Error al guardar confirmación: " + JSON.stringify(data.errores || data.message));
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al confirmar:", error);
+                    alert("Hubo un problema al guardar la confirmación.");
+                });
+            });
+
+            // Lógica para el formulario de calificación
+            document.getElementById("calificarForm").addEventListener("submit", function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+
+                fetch("{% url 'calificar_vendedor' %}", {
+                    method: "POST",
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    },
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "ok") {
+                        alert("Gracias por calificar al vendedor.");
+                    } else {
+                        alert("Error al calificar al vendedor: " + data.mensaje);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al calificar:", error);
+                    alert("Hubo un problema al enviar la calificación.");
+                });
+            });
+
+            // Lógica para el formulario de reporte
+            document.getElementById("reporteForm").addEventListener("submit", function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+
+                fetch("{% url 'reportar_vendedor' %}", {
+                    method: "POST",
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    },
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "ok") {
+                        alert("Reporte enviado correctamente.");
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('reporteModal'));
+                        modal.hide();
+                    } else {
+                        alert("Error al enviar el reporte: " + JSON.stringify(data.errors || data.message));
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al enviar reporte:", error);
+                    alert("Hubo un problema al enviar el reporte.");
+                });
+            });
+            // Lógica para el formulario de calificación
+				document.getElementById("calificarClienteForm").addEventListener("submit", function(e) {
 				e.preventDefault();
 				const formData = new FormData(this);
 
-				fetch("{% url 'guardar_confirmacion_entrega' %}", {
+				// Verifica los datos antes de enviarlos
+				console.log("Formulario enviado:", formData);
+				console.log('Cliente ID:', document.querySelector('input[name="cliente_id"]').value);
+
+				fetch("{% url 'calificar_cliente' %}", {
 					method: "POST",
 					headers: {
 						'X-CSRFToken': formData.get('csrfmiddlewaretoken')
@@ -335,249 +422,163 @@
 				.then(res => res.json())
 				.then(data => {
 					if (data.status === "ok") {
-						alert("Confirmación guardada correctamente.");
-						const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+						alert("Cliente calificado correctamente.");
+						const modal = bootstrap.Modal.getInstance(document.getElementById('calificarClienteModal'));
 						modal.hide();
 						location.reload();
 					} else {
-						alert("Error al guardar confirmación: " + JSON.stringify(data.errores || data.message));
+						alert("Error al enviar la calificación del cliente: " + JSON.stringify(data.errors || data.message));
 					}
 				})
 				.catch(error => {
-					console.error("Error al confirmar:", error);
-					alert("Hubo un problema al guardar la confirmación.");
+					console.error("Error al enviar calificación del cliente:", error);
 				});
 			});
 
-			// Lógica para el formulario de calificación
-			document.getElementById("calificarForm").addEventListener("submit", function(e) {
-				e.preventDefault();
-				const formData = new FormData(this);
+            // Lógica para cambiar entre calificación y reporte
+            const selectAccion = document.getElementById('accion');
+            const calificarSeccion = document.getElementById('formCalificar');
+            const reportarSeccion = document.getElementById('formReportar');
 
-				fetch("{% url 'calificar_vendedor' %}", {
-					method: "POST",
-					headers: {
-						'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-					},
-					body: formData
-				})
-				.then(res => res.json())
-				.then(data => {
-					if (data.status === "ok") {
-						alert("Gracias por calificar al vendedor.");
-					} else {
-						alert("Error al calificar al vendedor: " + data.mensaje);
-					}
-				})
-				.catch(error => {
-					console.error("Error al calificar:", error);
-					alert("Hubo un problema al enviar la calificación.");
-				});
-			});
+            function toggleSections() {
+                const accion = selectAccion.value;
+                calificarSeccion.style.display = 'none';
+                reportarSeccion.style.display = 'none';
 
-			// Lógica para el formulario de reporte
-			document.getElementById("reporteForm").addEventListener("submit", function(e) {
-				e.preventDefault();
-				const formData = new FormData(this);
+                if (accion === 'calificar') {
+                    calificarSeccion.style.display = 'block';
+                } else if (accion === 'reportar') {
+                    reportarSeccion.style.display = 'block';
+                }
+            }
 
-				fetch("{% url 'reportar_vendedor' %}", {
-					method: "POST",
-					headers: {
-						'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-					},
-					body: formData
-				})
-				.then(res => res.json())
-				.then(data => {
-					if (data.status === "ok") {
-						alert("Reporte enviado correctamente.");
-						const modal = bootstrap.Modal.getInstance(document.getElementById('reporteModal'));
-						modal.hide();
-					} else {
-						alert("Error al enviar el reporte: " + JSON.stringify(data.errors || data.message));
-					}
-				})
-				.catch(error => {
-					console.error("Error al enviar reporte:", error);
-					alert("Hubo un problema al enviar el reporte.");
-				});
-			});
-			// Lógica para el formulario de calificación
-			document.getElementById("calificarClienteForm").addEventListener("submit", function(e) {
-			e.preventDefault();
-			const formData = new FormData(this);
+            if (selectAccion) {
+                selectAccion.addEventListener('change', toggleSections);
+            }
 
-			// Verifica los datos antes de enviarlos
-			console.log("Formulario enviado:", formData);
-			console.log('Cliente ID:', document.querySelector('input[name="cliente_id"]').value);
+        });
+    
+        document.addEventListener('DOMContentLoaded', function () {
+            const selectAccion = document.getElementById('accion');
+            const calificarSeccion = document.getElementById('formCalificar');
+            const reportarSeccion = document.getElementById('formReportar');
 
-			fetch("{% url 'calificar_cliente' %}", {
-				method: "POST",
-				headers: {
-					'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-				},
-				body: formData
-			})
-			.then(res => res.json())
-			.then(data => {
-				if (data.status === "ok") {
-					alert("Cliente calificado correctamente.");
-					const modal = bootstrap.Modal.getInstance(document.getElementById('calificarClienteModal'));
-					modal.hide();
-					location.reload();
-				} else {
-					alert("Error al enviar la calificación del cliente: " + JSON.stringify(data.errors || data.message));
-				}
-			})
-			.catch(error => {
-				console.error("Error al enviar calificación del cliente:", error);
-			});
-		});
+            // Función que controla qué formulario mostrar
+            function toggleSections() {
+                const accion = selectAccion.value; // Obtenemos el valor del select
 
-			// Lógica para cambiar entre calificación y reporte
-			const selectAccion = document.getElementById('accion');
-			const calificarSeccion = document.getElementById('formCalificar');
-			const reportarSeccion = document.getElementById('formReportar');
+                // Ocultamos ambas secciones por defecto
+                calificarSeccion.style.display = 'none';
+                reportarSeccion.style.display = 'none';
 
-			function toggleSections() {
-				const accion = selectAccion.value;
-				calificarSeccion.style.display = 'none';
-				reportarSeccion.style.display = 'none';
+                // Dependiendo de la opción seleccionada, mostramos la sección correspondiente
+                if (accion === 'calificar') {
+                    calificarSeccion.style.display = 'block';  // Mostrar sección de calificación
+                } else if (accion === 'reportar') {
+                    reportarSeccion.style.display = 'block';   // Mostrar sección de reporte
+                }
+            }
 
-				if (accion === 'calificar') {
-					calificarSeccion.style.display = 'block';
-				} else if (accion === 'reportar') {
-					reportarSeccion.style.display = 'block';
-				}
-			}
+            // Asignamos el evento change al select para que detecte el cambio de opción
+            if (selectAccion) {
+                selectAccion.addEventListener('change', toggleSections);
+            }
+        });
 
-			if (selectAccion) {
-				selectAccion.addEventListener('change', toggleSections);
-			}
+        // Interactividad de estrellas para calificar vendedor
+        const stars = document.querySelectorAll('#star-rating span');
+        const ratingInput = document.getElementById('id_puntaje');
+        let currentRating = 0;
 
-		});
-	
-		document.addEventListener('DOMContentLoaded', function () {
-			const selectAccion = document.getElementById('accion');
-			const calificarSeccion = document.getElementById('formCalificar');
-			const reportarSeccion = document.getElementById('formReportar');
+        // Función para resaltar las estrellas al pasar el ratón
+        function highlightStars(rating) {
+            stars.forEach(star => {
+                if (star.getAttribute('data-value') <= rating) {
+                    star.style.color = '#ffc107'; // amarillo
+                } else {
+                    star.style.color = '#ddd'; // gris claro
+                }
+            });
+        }
 
-			// Función que controla qué formulario mostrar
-			function toggleSections() {
-				const accion = selectAccion.value; // Obtenemos el valor del select
+        // Asignación de eventos a las estrellas
+        stars.forEach(star => {
+            // Evento mouseover: resalta las estrellas hasta la que pasamos el ratón
+            star.addEventListener('mouseover', () => {
+                const rating = star.getAttribute('data-value');
+                highlightStars(rating);
+            });
 
-				// Ocultamos ambas secciones por defecto
-				calificarSeccion.style.display = 'none';
-				reportarSeccion.style.display = 'none';
+            // Evento mouseout: resalta las estrellas según la calificación actual
+            star.addEventListener('mouseout', () => {
+                highlightStars(currentRating);
+            });
 
-				// Dependiendo de la opción seleccionada, mostramos la sección correspondiente
-				if (accion === 'calificar') {
-					calificarSeccion.style.display = 'block';  // Mostrar sección de calificación
-				} else if (accion === 'reportar') {
-					reportarSeccion.style.display = 'block';   // Mostrar sección de reporte
-				}
-			}
+            // Evento click: selecciona la calificación
+            star.addEventListener('click', () => {
+                currentRating = star.getAttribute('data-value'); // Obtiene el valor de la estrella seleccionada
+                ratingInput.value = currentRating; // Asigna el valor al input oculto
+                highlightStars(currentRating); // Resalta las estrellas de acuerdo con la selección
+            });
+        });
 
-			// Asignamos el evento change al select para que detecte el cambio de opción
-			if (selectAccion) {
-				selectAccion.addEventListener('change', toggleSections);
-			}
-		});
+        // ⭐ Interactividad de estrellas en reporte ⭐
+        const reportStars = document.querySelectorAll('#star-rating-report span');
+        const ratingInputReport = document.getElementById('id_puntaje_report');
+        let currentReportRating = 0;
 
-		// Interactividad de estrellas para calificar vendedor
-		const stars = document.querySelectorAll('#star-rating span');
-		const ratingInput = document.getElementById('id_puntaje');
-		let currentRating = 0;
+        reportStars.forEach(star => {
+            star.addEventListener('mouseover', () => {
+                const rating = star.getAttribute('data-value');
+                highlightReportStars(rating);
+            });
 
-		// Función para resaltar las estrellas al pasar el ratón
-		function highlightStars(rating) {
-			stars.forEach(star => {
-				if (star.getAttribute('data-value') <= rating) {
-					star.style.color = '#ffc107'; // amarillo
-				} else {
-					star.style.color = '#ddd'; // gris claro
-				}
-			});
-		}
+            star.addEventListener('mouseout', () => {
+                highlightReportStars(currentReportRating);
+            });
 
-		// Asignación de eventos a las estrellas
-		stars.forEach(star => {
-			// Evento mouseover: resalta las estrellas hasta la que pasamos el ratón
-			star.addEventListener('mouseover', () => {
-				const rating = star.getAttribute('data-value');
-				highlightStars(rating);
-			});
+            star.addEventListener('click', () => {
+                currentReportRating = star.getAttribute('data-value');
+                ratingInputReport.value = currentReportRating;
+            });
+        });
 
-			// Evento mouseout: resalta las estrellas según la calificación actual
-			star.addEventListener('mouseout', () => {
-				highlightStars(currentRating);
-			});
+        function highlightReportStars(rating) {
+            reportStars.forEach(star => {
+                if (star.getAttribute('data-value') <= rating) {
+                    star.style.color = '#ffc107';
+                } else {
+                    star.style.color = '#ddd';
+                }
+            });
+        } 
+    
+        // Interactividad estrellas cliente
+const clienteStars = document.querySelectorAll('#star-rating-cliente span');
+const ratingInputCliente = document.getElementById('id_puntaje_cliente');
+let currentClienteRating = 0;
 
-			// Evento click: selecciona la calificación
-			star.addEventListener('click', () => {
-				currentRating = star.getAttribute('data-value'); // Obtiene el valor de la estrella seleccionada
-				ratingInput.value = currentRating; // Asigna el valor al input oculto
-				highlightStars(currentRating); // Resalta las estrellas de acuerdo con la selección
-			});
-		});
+clienteStars.forEach(star => {
+    star.addEventListener('mouseover', () => {
+        highlightClienteStars(star.dataset.value);
+    });
 
-		// ⭐ Interactividad de estrellas en reporte ⭐
-		const reportStars = document.querySelectorAll('#star-rating-report span');
-		const ratingInputReport = document.getElementById('id_puntaje_report');
-		let currentReportRating = 0;
+    star.addEventListener('mouseout', () => {
+        highlightClienteStars(currentClienteRating);
+    });
 
-		reportStars.forEach(star => {
-			star.addEventListener('mouseover', () => {
-				const rating = star.getAttribute('data-value');
-				highlightReportStars(rating);
-			});
+    star.addEventListener('click', () => {
+    currentClienteRating = star.dataset.value;
+    ratingInputCliente.value = currentClienteRating;  // Asignar el valor del puntaje
+    highlightClienteStars(currentClienteRating);      // Resaltar las estrellas
+});
+});
 
-			star.addEventListener('mouseout', () => {
-				highlightReportStars(currentReportRating);
-			});
+function highlightClienteStars(rating) {
+    clienteStars.forEach(star => {
+        star.style.color = (star.dataset.value <= rating) ? '#ffc107' : '#ddd';
+    });
+}
 
-			star.addEventListener('click', () => {
-				currentReportRating = star.getAttribute('data-value');
-				ratingInputReport.value = currentReportRating;
-			});
-		});
-
-		function highlightReportStars(rating) {
-			reportStars.forEach(star => {
-				if (star.getAttribute('data-value') <= rating) {
-					star.style.color = '#ffc107';
-				} else {
-					star.style.color = '#ddd';
-				}
-			});
-		} 
-	
-		// Interactividad estrellas cliente
-		const clienteStars = document.querySelectorAll('#star-rating-cliente span');
-		const ratingInputCliente = document.getElementById('id_puntaje_cliente');
-		let currentClienteRating = 0;
-
-		clienteStars.forEach(star => {
-			star.addEventListener('mouseover', () => {
-				highlightClienteStars(star.dataset.value);
-			});
-
-			star.addEventListener('mouseout', () => {
-				highlightClienteStars(currentClienteRating);
-			});
-
-			star.addEventListener('click', () => {
-			currentClienteRating = star.dataset.value;
-			ratingInputCliente.value = currentClienteRating;  // Asignar el valor del puntaje
-			highlightClienteStars(currentClienteRating);      // Resaltar las estrellas
-		});
-		});
-
-		function highlightClienteStars(rating) {
-			clienteStars.forEach(star => {
-				star.style.color = (star.dataset.value <= rating) ? '#ffc107' : '#ddd';
-			});
-		}
-
-	</script>
+    </script>
 {% endblock %}

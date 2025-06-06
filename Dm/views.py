@@ -1,6 +1,6 @@
 from django.http import HttpResponse, Http404, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import CanalMensaje, CanalUsuario, Canal, ConfirmacionEntrega
+from .models import CanalMensaje, CanalUsuario, Canal
 from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
@@ -9,11 +9,12 @@ from django.views.generic.edit import FormMixin
 from django.views.generic import View
 from index.models import Producto, CalificacionCliente
 from django.urls import reverse
-from datetime import datetime
+from django.utils import timezone
+from datetime import datetime, time
+from .models import ConfirmacionEntrega
 from django.utils.timezone import localtime
 from datetime import timedelta
 from django.utils.timezone import localtime, make_aware, get_current_timezone, now
-
 # Create your views here.
 def home_index(request):
 	# Aquí puedes pasar el contexto que necesites para tu página de inicio
@@ -29,11 +30,12 @@ class Inbox(View):
 		es_duenio_producto = False
 		confirmacion = None
 		mostrar_botones = False
-		mostrar_boton_entrega = False
-		mostrar_boton_calificar = False
+
 		calificacion_cliente = False
 		cliente = None
 
+		mostrar_boton_entrega = False 
+		mostrar_boton_calificar = False
 		if canal_id:
 			try:
 				canal = Canal.objects.get(id=canal_id)
@@ -44,10 +46,11 @@ class Inbox(View):
 					es_duenio_producto = (producto_relacionado.usuario == request.user)
 
 					if producto_relacionado:
+						# Verificamos si ya existe una confirmación de entrega
 						confirmacion = ConfirmacionEntrega.objects.filter(canal=canal, producto=producto_relacionado).first()
-						if not confirmacion: 
+						if not confirmacion:  # Si no hay confirmación, mostramos el botón
 							mostrar_boton_entrega = True
-						
+
 						calificacion_cliente = CalificacionCliente.objects.filter(producto=producto_relacionado, vendedor=request.user).exists()
 						if not calificacion_cliente:
 							mostrar_boton_calificar = True
@@ -84,12 +87,12 @@ class Inbox(View):
 			"inbox": inbox,
 			"canal": canal,
 			"form": FormMensajes(),
-			"mostrar_boton_entrega": mostrar_boton_entrega,
+			"mostrar_boton_entrega": mostrar_boton_entrega, # NUEVO_V3
 			"producto_relacionado": producto_relacionado,
-            "es_duenio_producto": es_duenio_producto,
+			"es_duenio_producto": es_duenio_producto,
 			"confirmacion": confirmacion,
 			"mostrar_botones": mostrar_botones,
-			"mostrar_boton_calificar": mostrar_boton_calificar,
+			"mostrar_boton_calificar": mostrar_boton_calificar, # NUEVO_V4
 			"cliente":cliente,
 			"calificacion_cliente": calificacion_cliente
 		}
@@ -120,7 +123,6 @@ class Inbox(View):
 			"form": form
 		}
 		return render(request, 'index/inbox.html', context)
-
 
 
 class CanalFormMixin(FormMixin):
@@ -172,7 +174,6 @@ class CanalDetailView(LoginRequiredMixin, CanalFormMixin, DetailView):
 		return context
 	
 	 
-
 
 class DetailMs(LoginRequiredMixin, CanalFormMixin, DetailView):
 	template_name = 'index/inbox.html'
