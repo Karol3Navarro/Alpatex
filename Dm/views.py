@@ -1,16 +1,15 @@
 from django.http import HttpResponse, Http404, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import CanalMensaje, CanalUsuario, Canal
+from .models import CanalMensaje, CanalUsuario, Canal, ConfirmacionEntrega
 from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from .forms import FormMensajes
 from django.views.generic.edit import FormMixin
 from django.views.generic import View
-from index.models import Producto
+from index.models import Producto, CalificacionCliente
 from django.urls import reverse
 from datetime import datetime
-from .models import ConfirmacionEntrega
 from django.utils.timezone import localtime
 from datetime import timedelta
 from django.utils.timezone import localtime, make_aware, get_current_timezone, now
@@ -30,7 +29,8 @@ class Inbox(View):
 		es_duenio_producto = False
 		confirmacion = None
 		mostrar_botones = False
-		mostrar_boton_entrega = False 
+		mostrar_boton_entrega = False
+		mostrar_boton_calificar = False
 		calificacion_cliente = False
 		cliente = None
 
@@ -47,6 +47,10 @@ class Inbox(View):
 						confirmacion = ConfirmacionEntrega.objects.filter(canal=canal, producto=producto_relacionado).first()
 						if not confirmacion: 
 							mostrar_boton_entrega = True
+						
+						calificacion_cliente = CalificacionCliente.objects.filter(producto=producto_relacionado, vendedor=request.user).exists()
+						if not calificacion_cliente:
+							mostrar_boton_calificar = True
 
 					cliente = canal.canalusuario_set.exclude(usuario=producto_relacionado.usuario).first()
 					if cliente:
@@ -85,6 +89,7 @@ class Inbox(View):
             "es_duenio_producto": es_duenio_producto,
 			"confirmacion": confirmacion,
 			"mostrar_botones": mostrar_botones,
+			"mostrar_boton_calificar": mostrar_boton_calificar,
 			"cliente":cliente,
 			"calificacion_cliente": calificacion_cliente
 		}

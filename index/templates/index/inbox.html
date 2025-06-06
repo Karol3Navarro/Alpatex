@@ -167,9 +167,11 @@
 					</div>
 					{% if calificacion_cliente|default:False %}
 						<!-- Botón para abrir modal de calificar al cliente -->
-						<button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#calificarClienteModal">
-							Calificar al Cliente
-						</button>
+						{% if mostrar_boton_calificar %}
+							<button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#calificarClienteModal">
+								Calificar al Cliente
+							</button>
+						{% endif %}
 
 						<!-- Modal -->
 						<div class="modal fade" id="calificarClienteModal" tabindex="-1" aria-labelledby="calificarClienteModalLabel" aria-hidden="true">
@@ -422,6 +424,7 @@
 					alert("Cliente calificado correctamente.");
 					const modal = bootstrap.Modal.getInstance(document.getElementById('calificarClienteModal'));
 					modal.hide();
+					location.reload();
 				} else {
 					alert("Error al enviar la calificación del cliente: " + JSON.stringify(data.errors || data.message));
 				}
