@@ -95,12 +95,12 @@ class Inbox(View):
 			"inbox": inbox,
 			"canal": canal,
 			"form": FormMensajes(),
-			"mostrar_boton_entrega": mostrar_boton_entrega, # NUEVO_V3
+			"mostrar_boton_entrega": mostrar_boton_entrega,
 			"producto_relacionado": producto_relacionado,
 			"es_duenio_producto": es_duenio_producto,
 			"confirmacion": confirmacion,
 			"mostrar_botones": mostrar_botones,
-			"mostrar_boton_calificar": mostrar_boton_calificar, # NUEVO_V4
+			"mostrar_boton_calificar": mostrar_boton_calificar,
 			"cliente":cliente,
 			"calificacion_cliente": calificacion_cliente,
 			"accion_realizada": accion_realizada,
