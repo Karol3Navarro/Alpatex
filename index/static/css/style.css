@@ -243,12 +243,6 @@ body {
     overflow-x: hidden;
 }
 
-.cent-body{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .reg-btn{
     display: flex;
     position: relative;
@@ -270,38 +264,142 @@ body {
     transform: scale(1.05);
     cursor: pointer;
 }
+/* INDEX */
+main{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #F0F4F3;
+}
 
-.container {
-    padding: 20px;
+.container{
+    width: 900px;
+    height: 600px;
+    display: flex;
+    position: relative;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgb(0, 0, 0, 0.3);
+}
+.container-form{
     width: 100%;
-    max-width: 500px;
-    max-height: 600px;
-    border: 4px solid #AD5CA1;
-    border-radius: 10px;
-    box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.5);
-    overflow-y: auto;
+    overflow: hidden;
+}
+.container-form form{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.5s ease-in;
+}
+.container-form span{
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+.social-networks{
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+.social-networks ion-icon{
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+}
+.container-input{
+    width: 300px;
+    height: 40px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 0 15px;
+    background-color: #eeeeee;
+}
+.container-input input.inp{
+    border: none;
+    outline: none;
+    width: 100%;
+    height: 100%;
+    background-color: inherit;
+    margin: 1px;
+}
+.container-form a{
+    color: #AD5CA1;
+    font-size: 14px;
+    text-decoration: none;
+    margin-bottom: 10px;
+    margin-top: 5px;
+}
+.container-form a:hover{
+    color: #DD1155;
+    text-decoration: underline;
 }
 
-/*Diseño dle scrollbar*/
-.container::-webkit-scrollbar {
-    width: 7px;
+/* ANIMACION INDEX */
+.sign-up{
+    transform: translateX(-100%);
 }
-.container::-webkit-scrollbar-track {
-    background: #AD5CA1;
+.container.toggle .login{
+    transform: translateX(100%);
+}
+.container.toggle .sign-up{
+    transform: translateX(0);
+}
+
+.container-welcome{
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    transform: translateX(100%); 
+    background-color: #DD1155;
+    transition: transform 0.5s ease-in-out, border-radius 0.5s ease-in-out;
+    overflow: hidden;
+    border-radius: 50% 0 0 50%;
+}
+.container.toggle .container-welcome{
+    transform: translateX(0);
+    border-radius: 0 50% 50% 0;
+    background-color: #AD5CA1;
+}
+.container-welcome .welcome{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 0 50px;
+    transition: transform 0.5s ease-in-out;   
+}
+.container-welcome .welcome button{
+    border: 2px solid white;
     border-radius: 5px;
+    background-color: transparent;
+    font-size: 18px;
+    padding: 10px;
+    color: white;
 }
-.container::-webkit-scrollbar-thumb:hover {
-    background: #DD1155;
+.welcome-sign-in{
+    transform: translateX(100%); 
 }
-.container::-webkit-scrollbar-thumb {
-    background: #42213D;
-    border-radius: 10px;
+.container-welcome h3, p{
+    color: white;
 }
-
-.titulo{
+.container-welcome p{
     text-align: center;
-    color: #000000;
-    margin-bottom: 20px;
+    font-size: 14px;
+}
+.container.toggle .welcome-sign-in{
+    transform: translateX(0);
+}
+.container.toggle .welcome-sign-up{
+    transform: translateX(-100%); 
 }
 
 input[type="text"], 
@@ -323,12 +421,12 @@ input[type="password"]:focus, input[type="submit"]:focus, input[type="text"]:foc
     outline: none;
     border-color: #AD5CA1;
 }
-
+/*
 input[type="submit"] {
     width: 100%;
     padding: 10px;
     background-color: #AD5CA1;
-    color: #000000;
+    color: #ffffff;
     font-size: 16px;
     border: none;
     border-radius: 5px;
@@ -337,7 +435,7 @@ input[type="submit"] {
     margin-bottom: 5px;
     font-weight: 500;
 }
-
+*/
 .recuperar{
     text-decoration: none;
     color: #AD5CA1;
@@ -357,23 +455,6 @@ input[type="submit"]:hover{
     color: #DD1155;
 }
 
-.introduccion{
-    text-align: center;
-    margin: 15px;
-    max-width: 400px;
-    padding: 30px;
-    margin-left: 80px;
-}
-
-.introduccion h1{
-    margin-bottom: 15px;
-    cursor: pointer;
-}
-
-.introduccion p{
-    padding: 5px;
-    cursor: pointer;
-}
 
 .btn{
     background-color: #AD5CA1;
@@ -384,6 +465,7 @@ input[type="submit"]:hover{
     margin: 15px;
     font-weight: 500;
     align-items: center;
+    color: #ffffff;
 }
 
 .btn:hover{
@@ -416,35 +498,14 @@ input:focus + .help-text {
     display: block;
 }
 
-.mod-password{
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    background-color: #F7F0F0;
-    border: #AD5CA1 2px solid;
+.container-reset{
+    background-color: white;
+    border: 2px solid red;
+    padding: 20px;
     border-radius: 15px;
-    box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.5);
+    color: black;
 }
 
-.mod-cont{
-    padding: 30px;
-    max-width: 500px;
-    margin: 5% auto;
-}
-
-.cerrar{
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 1001;
-}
-
-.cerrar:hover{
-    color: #DD1155;
-}
 /*
 PROFILE
 */
@@ -524,9 +585,9 @@ PROFILE
     gap: 2rem;
     margin-top: 2rem;
     flex-wrap: wrap;
-  }
+}
   
-  .membresia-card {
+.membresia-card {
     background: #fff;
     border: 3px solid #AD5CA1;
     border-radius: 18px;
@@ -538,35 +599,35 @@ PROFILE
     align-items: center;
     position: relative;
     transition: box-shadow 0.2s;
-  }
+}
   
-  .membresia-card.actual {
+.membresia-card.actual {
     border: 3px solid #AD5CA1;
     box-shadow: 0 0 0 4px #e6d6fa;
-  }
-  
-  .membresia-header h2 {
+}
+
+.membresia-header h2 {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
     color: #AD5CA1;
     letter-spacing: 1px;
     text-align: center;
     width: 100%;
-  }
-  
-  .membresia-header .precio {
+}
+
+.membresia-header .precio {
     font-size: 2.2rem;
     font-weight: bold;
     color: #AD5CA1;
     margin-bottom: 0.5rem;
-  }
+}
   
   .membresia-header .moneda {
     font-size: 1rem;
     font-weight: normal;
   }
   
-  .plan-actual {
+.plan-actual {
     background: #AD5CA1;
     color: #fff;
     font-size: 0.95rem;
@@ -583,43 +644,43 @@ PROFILE
     letter-spacing: 1px;
     white-space: nowrap;
     line-height: 1.2;
-  }
+}
   
-  .beneficios {
+.beneficios {
     list-style: none;
     padding: 0;
     margin: 1.2rem 0 1.5rem 0;
     width: 100%;
-  }
-  
-  .beneficios li {
+}
+
+.beneficios li {
     font-size: 1rem;
     margin-bottom: 0.7rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-  }
-  
-  .check {
+}
+
+.check {
     color: #AD5CA1;
     font-weight: bold;
     font-size: 1.2rem;
-  }
-  
-  .cross {
+}
+
+.cross {
     color: #e74c3c;
     font-weight: bold;
     font-size: 1.2rem;
-  }
-  
-  .acciones {
+}
+
+.acciones {
     width: 100%;
     display: flex;
     justify-content: center;
-  }
-  
-  .btn.cancelar,
-  .btn.contratar {
+}
+
+.btn.cancelar,
+.btn.contratar {
     background: #AD5CA1;
     color: #fff;
     border: none;
@@ -630,23 +691,23 @@ PROFILE
     cursor: pointer;
     margin-top: 0.5rem;
     transition: background 0.2s;
-  }
+}
   
-  .btn.cancelar:hover,
-  .btn.contratar:hover {
+.btn.cancelar:hover,
+.btn.contratar:hover {
     background: #DD1155;
-  }
-  
-  @media (max-width: 900px) {
+}
+
+@media (max-width: 900px) {
     .membresias-cards {
-      flex-direction: column;
-      align-items: center;
+    flex-direction: column;
+    align-items: center;
     }
     .membresia-card {
-      width: 90%;
-      margin-bottom: 2rem;
+    width: 90%;
+    margin-bottom: 2rem;
     }
-  }
+}
 /*
 PRODUCTOS PERFIL
 */

@@ -301,3 +301,12 @@ document.getElementById('confirmar-cancelacion').addEventListener('click', funct
     modal.hide();
 });
   
+//INDEX ANIMACION
+document.addEventListener("DOMContentLoaded", function () {
+  const btn = document.getElementById("trans-click");
+  const container = document.querySelector(".container");
+
+  btn.addEventListener("click", () => {
+      container.classList.toggle("toggle");
+      console.log("Animación de transición activada");
+  });

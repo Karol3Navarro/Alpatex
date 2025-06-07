@@ -7,19 +7,28 @@
     {% load static %}
     <link type='text/css' href="{% static 'css/style.css' %}" rel='stylesheet'>
 </head>
-<body class="cent-body bg-gray-100">
-    <div class="container">
-        <h2>Recuperar Clave</h2>
-        <form method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                {{ form.as_p }}
+<body>
+    <main>
+        <div class="container-reset">
+              <div class="reg-btn">
+                <a onclick="window.history.back();" class="regresar">
+                    <span class="material-symbols-outlined">chevron_left</span> Regresar
+                </a>
             </div>
-            <div class="btns text-center">
-                <button type="submit" class="btn">Enviar Correo</button>
-            </div>
-        </form>
-    </div>
+
+            <h2 class="prod-dest">Recuperar Contraseña</h2>
+            <p>Te enviaremos un enlace para restablecer tu contraseña.</p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form.as_p }}
+                </div>
+                <div class="btns text-center">
+                    <button type="submit" class="btn">Enviar Correo</button>
+                </div>
+            </form>
+        </div>
+    </main>
     
 </body>
 </html>

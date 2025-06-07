@@ -15,34 +15,116 @@
     
     <title>Iniciar Sesión</title>
 </head>
-<body class="cent-body">
-    <div class="container">
-        <h1 class="titulo">Iniciar Sesión</h1>
-        <!-- Sistema de alerta -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-success">
-                {{ message }}
+<body>
+    <!-- Sistema de alerta -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success">
+            {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <main>
+        <div class="container">
+            <div class="container-form">
+                
+                <form method="POST" class="login">
+                    <!-- Formulario de login -->
+                    <h2 class="prod-dest">Iniciar Sesión</h2>
+
+                    <div class="social-networks">
+                        <ion-icon name="logo-twitter"></ion-icon>
+                        <ion-icon name="logo-facebook"></ion-icon>
+                        <ion-icon name="logo-instagram"></ion-icon>
+                    </div>
+
+                    {% csrf_token %}  <!-- Protege el formulario de CSRF -->
+                    <span>Ingrese su usuario y contraseña</span>
+
+                    <div class="container-input">
+                        <ion-icon name="person"></ion-icon>
+                        <input type="text" name="username" placeholder="Usuario" class="inp" required>
+                    </div>
+                    <div class="container-input">
+                        <ion-icon name="lock"></ion-icon>
+                        <input type="password" name="password" placeholder="Contraseña" class="inp" required>
+                    </div>
+                    
+                    <a href="{% url 'autenticacion:cambiar_clave' %}">¿Olvidaste tu clave?</a>
+                    
+                    <input type="submit" value="Iniciar Sesión" class="btn">
+
+                </form>
+            </div>
+
+            <div class="container-form">
+
+                <!-- Formulario de registro -->
+                <form method="post" class="sign-up">
+                    <h2 class="prod-dest">Registrarse</h2>
+
+                    <div class="social-networks">
+                        <ion-icon name="logo-twitter"></ion-icon>
+                        <ion-icon name="logo-facebook"></ion-icon>
+                        <ion-icon name="logo-instagram"></ion-icon>
+                    </div>
+
+                    <span>Completa el formulario</span>
+
+                    {% csrf_token %}
+
+                    <div class="container-input">
+                        <input type="text" class="inp" id="nombre_usuario" name="nombre_usuario" placeholder="Usuario" required>
+                    </div>
+
+                    <div class="container-input">
+                        <input type="text" class="inp" id="nombre_completo" name="nombre_completo" placeholder="Nombre Completo" required>
+                    </div>
+
+                    <div class="container-input">
+                        <input type="text" class="inp" id="rut" name="rut" required placeholder="Run: Ej: 12.345.678-9" maxlength="12">
+                    </div>
+
+                    <div class="container-input" style="position: relative;">
+                        <input type="text" class="inp" id="direccion" name="direccion" required autocomplete="off" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" aria-controls="sugerencias-direccion" placeholder="Dirección">
+                        <ul id="sugerencias-direccion" role="listbox"></ul>
+                    </div>
+
+                    <div class="container-input">
+                        <input type="email" class="inp" id="email" name="email" placeholder="Correo electrónico" required>
+                    </div>
+
+                    <div class="container-input">
+                        <input type="password" class="inp" id="password1" name="password1" placeholder="Contraseña" required>
+                    </div>
+
+                    <div class="container-input">
+                        <input type="password" class="inp" id="password2" name="password2" placeholder="Confirmar contraseña" required>
+                    </div>
+
+                    <button type="submit" class="btn">Registrar</button>
+
+                </form>
+            </div>
+            
+            <div class="container-welcome">
+                <div class="welcome-sign-up welcome">
+                    <h3 class="prod-dest">Bienvenido a ALPATEX</h3>
+                    <p>Si no tienes una cuenta, creala! Solo te tomará unos minutos.</p>
+                    <button class="btns" id="btn-sign-up">Registrarse</button>
                 </div>
-            {% endfor %}
-        {% endif %}
-        <!-- Formulario de login -->
-        <form method="POST">
-            {% csrf_token %}  <!-- Protege el formulario de CSRF -->
-            <input type="text" name="username" placeholder="Usuario" required>
-            <input type="password" name="password" placeholder="Contraseña" required>
-            <input type="submit" value="Iniciar Sesión">
-        </form>
-        <a href="{% url 'autenticacion:cambiar_clave' %}">¿Olvidaste tu clave?</a>
-    </div>
-    <div class="introduccion">
-        <h1 class="welcome">Bienvenido a Alpatex</h1>
-        <p>Si ya tienes una cuenta, inicia sesión para ver los nuevos productos agregados.</p>
-        <p>Si no tienes una cuenta, creala! Solo te tomará unos minutos.</p>
-        <form action="{% url 'registro' %}" method="get">
-            <button type="submit" class="btn">Crear Cuenta</button>
-        </form>
-    </div>
+
+                <div class="welcome-sign-in welcome">
+                    <h3 class="prod-dest">ALPATEX</h3>
+                    <p>Si ya tienes una cuenta, inicia sesión para ver los nuevos productos agregados.</p>
+                    <button id="btn-sign-in">Iniciar Sesión</button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
 
     <div id="modRecContra" class="mod-password">
         <div class="mod-cont">
@@ -56,6 +138,31 @@
             </form>
         </div>
     </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const container = document.querySelector(".container");
+            const btnSignIn = document.getElementById("btn-sign-in");
+            const btnSignUp = document.getElementById("btn-sign-up");
+
+            btnSignIn.addEventListener("click", ()=> {
+                container.classList.remove("toggle");
+            });
+            btnSignUp.addEventListener("click", ()=> {
+                container.classList.add("toggle");
+            });
+        });
+
+        function abrirModal() {
+            document.getElementById("modRecContra").style.display = "block";
+        }
+
+        function cerrarModal() {
+            document.getElementById("modRecContra").style.display = "none";
+        }
+    </script>
+
+    <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
 
 </body>
 </html>
