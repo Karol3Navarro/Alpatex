@@ -7,7 +7,7 @@ from django.core.exceptions import PermissionDenied
 from .forms import FormMensajes
 from django.views.generic.edit import FormMixin
 from django.views.generic import View
-from index.models import Producto, CalificacionCliente
+from index.models import Producto, CalificacionCliente, CalificacionVendedor, ReporteVendedor
 from django.urls import reverse
 from django.utils import timezone
 from datetime import datetime, time
@@ -35,7 +35,6 @@ class Inbox(View):
 		cliente = None
 
 		mostrar_boton_entrega = False 
-		mostrar_boton_calificar = False
 		if canal_id:
 			try:
 				canal = Canal.objects.get(id=canal_id)
@@ -50,10 +49,6 @@ class Inbox(View):
 						confirmacion = ConfirmacionEntrega.objects.filter(canal=canal, producto=producto_relacionado).first()
 						if not confirmacion:  # Si no hay confirmación, mostramos el botón
 							mostrar_boton_entrega = True
-
-						calificacion_cliente = CalificacionCliente.objects.filter(producto=producto_relacionado, vendedor=request.user).exists()
-						if not calificacion_cliente:
-							mostrar_boton_calificar = True
 
 					cliente = canal.canalusuario_set.exclude(usuario=producto_relacionado.usuario).first()
 					if cliente:
@@ -77,8 +72,23 @@ class Inbox(View):
 					else:
 						mostrar_botones = False
 
-					if confirmacion.confirmado == True:
-						calificacion_cliente = True
+					calificacion_vendedor = CalificacionVendedor.objects.filter(producto=producto_relacionado, comprador=request.user).exists()
+					reporte_cliente = ReporteVendedor.objects.filter(producto=producto_relacionado, comprador=request.user).exists()
+					
+					if calificacion_vendedor or reporte_cliente:
+						mostrar_botones = False
+
+					if producto_relacionado and es_duenio_producto:
+						confirmacion = ConfirmacionEntrega.objects.filter(
+							canal=canal, producto=producto_relacionado, confirmado=True
+						).order_by('-creado_en').first()
+
+						if confirmacion:
+							ya_calificado = CalificacionCliente.objects.filter(
+								producto=producto_relacionado,
+								vendedor=request.user
+							).exists()
+							calificacion_cliente = not ya_calificado
 
 			except Canal.DoesNotExist:
 				canal = None  # O podrías manejar con Http404
@@ -87,12 +97,11 @@ class Inbox(View):
 			"inbox": inbox,
 			"canal": canal,
 			"form": FormMensajes(),
-			"mostrar_boton_entrega": mostrar_boton_entrega, # NUEVO_V3
+			"mostrar_boton_entrega": mostrar_boton_entrega,
 			"producto_relacionado": producto_relacionado,
 			"es_duenio_producto": es_duenio_producto,
 			"confirmacion": confirmacion,
 			"mostrar_botones": mostrar_botones,
-			"mostrar_boton_calificar": mostrar_boton_calificar, # NUEVO_V4
 			"cliente":cliente,
 			"calificacion_cliente": calificacion_cliente
 		}

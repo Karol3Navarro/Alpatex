@@ -167,12 +167,10 @@
 					</div>
 					{% if calificacion_cliente|default:False %}
 						<!-- Botón para abrir modal de calificar al cliente -->
-						{% if mostrar_boton_calificar %}
-							<button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#calificarClienteModal">
-								Calificar al Cliente
-							</button>
-						{% endif %}
-
+						<button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#calificarClienteModal">
+							Calificar al Cliente
+						</button>
+						
 						<!-- Modal -->
 						<div class="modal fade" id="calificarClienteModal" tabindex="-1" aria-labelledby="calificarClienteModalLabel" aria-hidden="true">
 							<div class="modal-dialog">
@@ -366,6 +364,7 @@
                 .then(data => {
                     if (data.status === "ok") {
                         alert("Gracias por calificar al vendedor.");
+                        location.reload();
                     } else {
                         alert("Error al calificar al vendedor: " + data.mensaje);
                     }
@@ -394,6 +393,7 @@
                         alert("Reporte enviado correctamente.");
                         const modal = bootstrap.Modal.getInstance(document.getElementById('reporteModal'));
                         modal.hide();
+                        location.reload();
                     } else {
                         alert("Error al enviar el reporte: " + JSON.stringify(data.errors || data.message));
                     }
@@ -425,7 +425,11 @@
 						alert("Cliente calificado correctamente.");
 						const modal = bootstrap.Modal.getInstance(document.getElementById('calificarClienteModal'));
 						modal.hide();
-						location.reload();
+                        
+						const boton = document.querySelector('button[data-bs-target="#calificarClienteModal"]');
+                        if (boton) {
+                            boton.style.display = 'none';
+                        }
 					} else {
 						alert("Error al enviar la calificación del cliente: " + JSON.stringify(data.errors || data.message));
 					}
