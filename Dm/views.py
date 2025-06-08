@@ -7,7 +7,7 @@ from django.core.exceptions import PermissionDenied
 from .forms import FormMensajes
 from django.views.generic.edit import FormMixin
 from django.views.generic import View
-from index.models import Producto, CalificacionCliente, CalificacionVendedor, ReporteVendedor
+from index.models import Producto, CalificacionCliente
 from django.urls import reverse
 from django.utils import timezone
 from datetime import datetime, time
@@ -36,7 +36,6 @@ class Inbox(View):
 
 		mostrar_boton_entrega = False 
 		mostrar_boton_calificar = False
-		accion_realizada = False 
 		if canal_id:
 			try:
 				canal = Canal.objects.get(id=canal_id)
@@ -55,8 +54,7 @@ class Inbox(View):
 						calificacion_cliente = CalificacionCliente.objects.filter(producto=producto_relacionado, vendedor=request.user).exists()
 						if not calificacion_cliente:
 							mostrar_boton_calificar = True
-						else:
-							mostrar_boton_entrega = False
+
 					cliente = canal.canalusuario_set.exclude(usuario=producto_relacionado.usuario).first()
 					if cliente:
 						cliente = cliente.usuario
@@ -79,14 +77,8 @@ class Inbox(View):
 					else:
 						mostrar_botones = False
 
-					calificacion_vendedor = CalificacionVendedor.objects.filter(producto=producto_relacionado, comprador=request.user).exists()
-					reporte_cliente = ReporteVendedor.objects.filter(producto=producto_relacionado, comprador=request.user).exists()
-					accion_realizada = calificacion_vendedor or reporte_cliente
-
 					if confirmacion.confirmado == True:
 						calificacion_cliente = True
-					else:
-						calificacion_cliente = False
 
 			except Canal.DoesNotExist:
 				canal = None  # O podrías manejar con Http404
@@ -102,8 +94,7 @@ class Inbox(View):
 			"mostrar_botones": mostrar_botones,
 			"mostrar_boton_calificar": mostrar_boton_calificar,
 			"cliente":cliente,
-			"calificacion_cliente": calificacion_cliente,
-			"accion_realizada": accion_realizada,
+			"calificacion_cliente": calificacion_cliente
 		}
 
 		return render(request, 'index/inbox.html', context)
