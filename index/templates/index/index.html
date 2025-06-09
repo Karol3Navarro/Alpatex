@@ -20,7 +20,6 @@
 <body>
     <!-- Sistema de alerta -->
 
-    
     <main>
         <div class="container">
             <div class="container-form">
@@ -57,7 +56,7 @@
             <div class="container-form">
 
                 <!-- Formulario de registro -->
-                <form method="POST" class="sign-up" id="form-registro">
+                <form method="POST" class="sign-up" id="form-registro" action="{% url 'registro' %}">
 
                     {% if error %}
                         <div class="text-danger">{{ error }}</div>
@@ -295,6 +294,20 @@
         SWEETALERT2
     -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    {% if messages %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            {% for message in messages %}
+                Swal.fire({
+                    icon: "{{ message.tags|default:'info' }}",
+                    title: "{{ message|escapejs }}",
+                    confirmButtonText: "Ok"
+                });
+            {% endfor %}
+        });
+    </script>
+    {% endif %}
 
 </body>
 </html>

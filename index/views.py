@@ -67,9 +67,6 @@ def menu(request):
 
 
 def index(request):
-    storage = get_messages(request)
-    for _ in storage:
-        pass
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -84,9 +81,8 @@ def index(request):
 
             if perfil and perfil.fecha_eliminacion is not None:
                 # Usuario eliminado, no puede ingresar
-                error_message = "Tu cuenta ha sido eliminada y no puedes ingresar."
-                messages.error(request, error_message)
-                return render(request, 'index/index.html', {'error_message': error_message})
+                messages.error(request, "Tu cuenta ha sido eliminada y no puedes ingresar.")
+                return redirect('index')
 
             # Usuario activo, permite login
             login(request, user)
@@ -96,9 +92,8 @@ def index(request):
                 return redirect('home')
 
         else:
-            error_message = "Credenciales incorrectas, por favor intenta nuevamente."
-            messages.error(request, error_message)
-            return render(request, 'index/index.html', {'error_message': error_message})
+            messages.error(request, "Credenciales incorrectas, por favor intenta nuevamente.")
+            return redirect('index')
 
     return render(request, 'index/index.html')
 
@@ -141,11 +136,12 @@ def registrar_usuario(request):
         password2 = request.POST['password2']
 
         if User.objects.filter(username=username).exists():
-            return render(request, 'index/registro.html', {'error': 'El nombre de usuario ya está en uso.'})
+            messages.error(request, 'El nombre de usuario ya está en uso. Por favor, elige otro.')
+            return redirect('index')
         if User.objects.filter(email=email).exists():
-            return render(request, 'index/registro.html', {'error': 'El correo ya está registrado.'})
+            return render(request, 'index/index.html', {'error': 'El correo ya está registrado.'})
         if Perfil.objects.filter(rut=rut).exists():
-            return render(request, 'index/registro.html', {'error': 'El RUT ya está registrado.'})
+            return render(request, 'index/index.html', {'error': 'El RUT ya está registrado.'})
         if password1 != password2:
             return render(request, 'index/index.html', {'error': 'Las claves no coinciden.'})
 
@@ -187,7 +183,7 @@ def registrar_usuario(request):
         messages.success(request, 'Usuario registrado correctamente.')
         return redirect('index')
 
-    return render(request, 'index/registro.html')
+    return render(request, 'index/index.html')
 
 
 @login_required
