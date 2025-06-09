@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from index.models import Producto, Perfil, ReporteVendedor
+from index.models import Producto, Perfil,  CalificacionVendedor, CalificacionCliente, ReporteVendedor
 from django.contrib.auth.decorators import login_required,user_passes_test
 from django.contrib.auth.models import User
 import openpyxl
@@ -204,14 +204,66 @@ def usuarios_eliminados(request):
 
 
 
-
 @login_required
 def perfil_usuario(request, username):
-    # Obtener el usuario y su perfil
     usuario = get_object_or_404(User, username=username)
     perfil = get_object_or_404(Perfil, user=usuario)
+    
+    opiniones = []
 
-    return render(request, 'admin_alpatex/perfil.html', {'perfil': perfil})
+    # Calificaciones vendedor
+    calificaciones_vendedor = CalificacionVendedor.objects.filter(vendedor=usuario).select_related('comprador', 'producto')
+    for calificacion in calificaciones_vendedor:
+        perfil_comprador = getattr(calificacion.comprador, 'perfil', None)
+        foto = perfil_comprador.get_foto_perfil_url() if perfil_comprador else None
+        opiniones.append({
+            'tipo': 'calificacion',
+            'usuario': calificacion.comprador.username,
+            'foto': foto,
+            'puntaje': calificacion.puntaje,
+            'comentario': calificacion.comentario,
+            'producto': calificacion.producto.nombre,
+            'fecha': calificacion.fecha_creacion,
+        })
+
+    # Calificaciones cliente (si quieres incluirlas también)
+    calificaciones_cliente = CalificacionCliente.objects.filter(cliente=usuario).select_related('vendedor', 'producto')
+    for calificacion in calificaciones_cliente:
+        perfil_vendedor = getattr(calificacion.vendedor, 'perfil', None)
+        foto = perfil_vendedor.get_foto_perfil_url() if perfil_vendedor else None
+        opiniones.append({
+            'tipo': 'calificacion_cliente',
+            'usuario': calificacion.vendedor.username,
+            'foto': foto,
+            'puntaje': calificacion.puntaje,
+            'comentario': calificacion.comentario,
+            'producto': calificacion.producto.nombre,
+            'fecha': calificacion.fecha,
+        })
+
+    # Reportes recibidos
+    reportes_recibidos = ReporteVendedor.objects.filter(vendedor=usuario).select_related('comprador')
+    for reporte in reportes_recibidos:
+        perfil_comprador = getattr(reporte.comprador, 'perfil', None)
+        foto = perfil_comprador.get_foto_perfil_url() if perfil_comprador else None
+        opiniones.append({
+            'tipo': 'reporte',
+            'usuario': reporte.comprador.username,
+            'foto': foto,
+            'motivo': reporte.motivo,
+            'fecha': reporte.fecha_reporte,
+        })
+
+    # Ordenar opiniones por fecha descendente
+    opiniones.sort(key=lambda x: x['fecha'], reverse=True)
+    
+    context = {
+        'perfil': perfil,
+        'usuario': usuario,
+        'opiniones': opiniones,
+    }
+    
+    return render(request, 'admin_alpatex/perfil.html', context)
 
 
 #Membresias
