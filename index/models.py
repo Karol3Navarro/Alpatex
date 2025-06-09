@@ -120,12 +120,21 @@ class CalificacionVendedor(models.Model):
         return f'Calificación de {self.comprador.username} para {self.vendedor.username} en {self.producto.nombre}'
 
 class ReporteVendedor(models.Model):
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, null=True, blank=True)
     comprador = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reportes_realizados')
     vendedor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reportes_recibidos')
     motivo = models.TextField()
     puntaje = models.PositiveIntegerField(null=True, blank=True)
     fecha_reporte = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Reporte de {self.comprador} a {self.vendedor} - {self.fecha_reporte}"
+    
+class ReporteUsuario(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reportes_usuario', null=True, blank=True)
+    motivo = models.TextField()
+    fecha_reporte = models.DateTimeField(auto_now_add=True)
+   
 
     def __str__(self):
         return f"Reporte de {self.comprador} a {self.vendedor} - {self.fecha_reporte}"
