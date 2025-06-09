@@ -131,6 +131,10 @@ header .icons li a.user i {
 header .icons li a.search i {
     background-image: url('../img/ico-search.png'); 
 }
+header .icons li a.inbox i {
+    background-image: url('../img/ico-inbox.png'); 
+    width: 30px;
+}
 
 header .icons .search-form form {
     width: 100%; 

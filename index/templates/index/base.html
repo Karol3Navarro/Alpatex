@@ -102,6 +102,11 @@
                 <ul>
                     {% if user.is_authenticated %}
                             <li>
+                                <a class="inbox" href="{% url 'inbox' %}">
+                                    <i></i>
+                                </a>
+                            </li>
+                            <li>
                                 <a class="user" href="{% url 'perfil_usuario' %}">
                                     <i></i>
                                 </a>
