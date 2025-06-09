@@ -2,7 +2,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from .models import Perfil, Producto, ReporteVendedor
+from .models import Perfil, Producto, ReporteVendedor, ReporteUsuario
 
 
 class PerfilForm(forms.ModelForm):
@@ -57,4 +57,8 @@ class ProductoForm(forms.ModelForm):
 class ReporteVendedorForm(forms.ModelForm):
     class Meta:
         model = ReporteVendedor
+        fields = ['motivo']
+class ReporteusuarioForm(forms.ModelForm):
+    class Meta:
+        model = ReporteUsuario
         fields = ['motivo']

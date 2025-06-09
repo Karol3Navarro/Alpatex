@@ -77,7 +77,7 @@
 			<div class="modal fade" id="reporteModal{{ usuario.id }}" tabindex="-1" aria-labelledby="reporteModalLabel{{ usuario.id }}" aria-hidden="true">
 				<div class="modal-dialog">
 					<div class="modal-content">
-						<form id="reporteForm{{ usuario.id }}" method="POST" action="{% url 'reportar_vendedor' %}">
+						<form id="reporteForm{{ usuario.id }}" method="POST" action="{% url 'reportar_usuario' %}">
 							{% csrf_token %}
 							<div class="modal-header">
 								<h5 class="modal-title" id="reporteModalLabel{{ usuario.id }}">Reportar al Usuario</h5>

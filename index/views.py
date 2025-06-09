@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from .models import Producto, Perfil, CalificacionVendedor, ReporteVendedor, CalificacionCliente
-from .Forms import PerfilForm, ProductoForm, ReporteVendedorForm
+from .Forms import PerfilForm, ProductoForm, ReporteVendedorForm, ReporteusuarioForm
 import json
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -652,6 +652,33 @@ def reportar_vendedor(request):
         return redirect(request.META.get('HTTP_REFERER', 'home')) 
     else:
         return JsonResponse({'status': 'error', 'errors': form.errors})
+@login_required
+@require_POST
+def reportar_usuario(request):
+    form = ReporteusuarioForm(request.POST)
+    usuario_reportado_id = request.POST.get('usuario_reportado_id')
+
+    if not usuario_reportado_id:
+        messages.error(request, "ID de usuario no proporcionado.")
+        return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+    try:
+        usuario_reportado = get_object_or_404(User, pk=int(usuario_reportado_id))
+    except (ValueError, TypeError):
+        messages.error(request, "ID de usuario inválido.")
+        return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+    if form.is_valid():
+        reporte = form.save(commit=False)
+        reporte.comprador = request.user
+        reporte.vendedor = usuario_reportado
+        reporte.save()
+        messages.success(request, "Gracias por reportar a este usuario.")
+    else:
+        for error in form.errors.values():
+            messages.error(request, error)
+
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
     
 @login_required
 def perfil_publico(request, username):
