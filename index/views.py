@@ -147,7 +147,8 @@ def registrar_usuario(request):
         if Perfil.objects.filter(rut=rut).exists():
             return render(request, 'index/registro.html', {'error': 'El RUT ya está registrado.'})
         if password1 != password2:
-            return render(request, 'index/registro.html', {'error': 'Las claves no coinciden.'})
+            return render(request, 'index/index.html', {'error': 'Las claves no coinciden.'})
+
 
         # Crear usuario y perfil
         user = User.objects.create_user(username=username, email=email, password=password1)

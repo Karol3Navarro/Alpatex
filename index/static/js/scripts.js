@@ -307,6 +307,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const container = document.querySelector(".container");
 
   btn.addEventListener("click", () => {
-      container.classList.toggle("toggle");
-      console.log("Animación de transición activada");
+    container.classList.toggle("toggle");
+    console.log("Animación de transición activada");
   });
+});

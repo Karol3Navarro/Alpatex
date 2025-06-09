@@ -6,14 +6,30 @@
     <title>Cambiar Clave</title>
     {% load static %}
     <link type='text/css' href="{% static 'css/style.css' %}" rel='stylesheet'>
+
+    <link rel="icon" href="{% static 'img/ico-alpatex-v4.ico' %}" type="image/x-icon">
+    <!--
+        -google font
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=chevron_left" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+
 </head>
 <body>
     <main>
         <div class="container-reset">
-              <div class="reg-btn">
+            <div class="reg-btn">
                 <a onclick="window.history.back();" class="regresar">
                     <span class="material-symbols-outlined">chevron_left</span> Regresar
                 </a>
+            </div>
+
+            <div class="foto-rec-pass">
+                <img src="{% static 'img/rec-pass-alptx.png' %}" alt="Recuperar Contraseña">
             </div>
 
             <h2 class="prod-dest">Recuperar Contraseña</h2>

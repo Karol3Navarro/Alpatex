@@ -12,18 +12,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="icon" href="{% static 'img/ico-alpatex-v4.ico' %}" type="image/x-icon">
     
     <title>Iniciar Sesión</title>
 </head>
 <body>
     <!-- Sistema de alerta -->
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-success">
-            {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
+
     
     <main>
         <div class="container">
@@ -61,7 +57,12 @@
             <div class="container-form">
 
                 <!-- Formulario de registro -->
-                <form method="post" class="sign-up">
+                <form method="POST" class="sign-up" id="form-registro">
+
+                    {% if error %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endif %}
+
                     <h2 class="prod-dest">Registrarse</h2>
 
                     <div class="social-networks">
@@ -125,19 +126,6 @@
         </div>
 
     </main>
-
-    <div id="modRecContra" class="mod-password">
-        <div class="mod-cont">
-            <span class="cerrar" onclick="cerrarModal()">&times;</span>
-            <h2>Recuperar Contraseña</h2>
-            <p>Te enviaremos un enlace para restablecer tu contraseña.</p>
-            <form method="POST">
-                {% csrf_token %}
-                <input type="email" name="email" placeholder="Correo electrónico" required>
-                <button type="submit" class="btn">Enviar enlace</button>
-            </form>
-        </div>
-    </div>
     
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -162,7 +150,151 @@
         }
     </script>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const direccionInput = document.getElementById("direccion");
+            const rutInput = document.getElementById("rut");
+            const lista = document.getElementById("sugerencias-direccion");
+            let timeout;
+
+            // Autocompletado dirección mejorado
+            direccionInput.addEventListener("input", function () {
+                clearTimeout(timeout);
+                const query = direccionInput.value.trim();
+
+                if (query.length < 3) {
+                    lista.innerHTML = "";
+                    return;
+                }
+
+                timeout = setTimeout(() => {
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&countrycodes=cl&limit=5&q=${encodeURIComponent(query)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            lista.innerHTML = "";
+                            const resultadosChile = data.filter(item => item.display_name.toLowerCase().includes("chile"));
+
+                            if (resultadosChile.length === 0) {
+                                lista.innerHTML = "<li>No se encontraron direcciones en Chile</li>";
+                                return;
+                            }
+
+                            resultadosChile.forEach(item => {
+                                const address = item.address;
+
+                                // Extraemos los campos relevantes, usando fallback por si no existen
+                                const calle = address.road || address.pedestrian || address.cycleway || address.footway || address.neighbourhood || "";
+                                const comuna = address.suburb || address.village || address.town || address.city || "";
+                                const region = address.state || address.region || "";
+
+                                const textoSugerencia = [calle, comuna, region].filter(Boolean).join(", ");
+
+                                const li = document.createElement("li");
+                                li.textContent = textoSugerencia;
+                                li.setAttribute("role", "option");
+                                li.addEventListener("click", () => {
+                                    direccionInput.value = textoSugerencia;
+                                    lista.innerHTML = "";
+                                });
+                                lista.appendChild(li);
+                            });
+                        })
+                        .catch(() => {
+                            lista.innerHTML = "<li>Error al cargar sugerencias</li>";
+                        });
+                }, 400);
+            });
+
+            // Cerrar lista al hacer click fuera del input o la lista
+            document.addEventListener("click", function (e) {
+                if (e.target !== direccionInput && !lista.contains(e.target)) {
+                    lista.innerHTML = "";
+                }
+            });
+
+            // Formato RUT con puntos y guion
+            rutInput.addEventListener("input", function () {
+                let valor = rutInput.value.replace(/\./g, "").replace(/-/g, "").replace(/\s/g, "").toUpperCase();
+                if (valor.length === 0) {
+                    rutInput.value = "";
+                    return;
+                }
+
+                let cuerpo = valor.slice(0, -1);
+                let dv = valor.slice(-1);
+
+                let rutFormateado = "";
+                while (cuerpo.length > 3) {
+                    rutFormateado = "." + cuerpo.slice(-3) + rutFormateado;
+                    cuerpo = cuerpo.slice(0, -3);
+                }
+                rutFormateado = cuerpo + rutFormateado;
+                rutInput.value = rutFormateado + "-" + dv;
+            });
+
+            // Validación de RUT
+            function validarRut(rut) {
+                rut = rut.replace(/\./g, "").replace("-", "").toUpperCase();
+                if (!/^[0-9]+[0-9K]$/.test(rut)) return false;
+
+                const cuerpo = rut.slice(0, -1);
+                const dv = rut.slice(-1);
+                let suma = 0, multiplo = 2;
+
+                for (let i = cuerpo.length - 1; i >= 0; i--) {
+                    suma += parseInt(cuerpo.charAt(i)) * multiplo;
+                    multiplo = multiplo < 7 ? multiplo + 1 : 2;
+                }
+
+                const dvEsperado = 11 - (suma % 11);
+                const dvCalc = dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
+                return dv === dvCalc;
+            }
+
+            // Validar RUT al enviar formulario
+            document.querySelector(".sign-up").addEventListener("submit", function (e) {
+                const rut = rutInput.value;
+                if (!validarRut(rut)) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'RUT inválido.',
+                        text: 'Verifica el formato y dígito verificador.',
+                        confirmButtonText: 'Comprendo!'
+                    })
+
+                    rutInput.focus();
+                }
+            });
+    
+            const formRegistro = document.querySelector(".sign-up");
+            const pass1 = document.getElementById("password1");
+            const pass2 = document.getElementById("password2");
+
+            formRegistro.addEventListener("submit", function (e){
+                if(pass1.value !== pass2.value) {
+                    e.preventDefault();
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Las contraseñas no coinciden.',
+                        text: 'Por favor, verifica ambas contraseñas antes de continuar.',
+                        confirmButtonText: 'Comprendo!'
+                    })
+
+                    pass2.focus();
+                }
+            });
+
+        });
+    </script>
+
     <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
+    <!--
+        SWEETALERT2
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </body>
 </html>
