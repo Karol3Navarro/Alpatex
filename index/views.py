@@ -109,7 +109,7 @@ def registrar_usuario(request):
         if User.objects.filter(username=username).exists():
             return render(request, 'index/index.html', {'error': 'El nombre de usuario ya está en uso.'})
         if User.objects.filter(email=email).exists():
-            return render(request, 'index/index.htmll', {'error': 'El correo ya está registrado.'})
+            return render(request, 'index/index.html', {'error': 'El correo ya está registrado.'})
         if Perfil.objects.filter(rut=rut).exists():
             return render(request, 'index/index.html', {'error': 'El RUT ya está registrado.'})
         if password1 != password2:
