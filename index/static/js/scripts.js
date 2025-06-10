@@ -4,7 +4,7 @@ let precioSeleccionado = null;
 let cardForm = null;
 
 // Función global para mostrar el formulario de pago
-window.mostrarFormularioPago = function(membresiaId, precio) {
+window.mostrarFormularioPago = function (membresiaId, precio) {
   if (!cardForm) {
     console.error("El formulario de pago no está inicializado");
     return;
@@ -48,14 +48,14 @@ window.mostrarFormularioPago = function(membresiaId, precio) {
   modal.style.display = "flex";
 
   // Al hacer clic en la X, cerramos y limpiamos
-  cerrarBtn.onclick = function() {
+  cerrarBtn.onclick = function () {
     modal.style.display = "none";
     limpiarModal();
     window.onclick = null;
   };
 
   // Al hacer clic fuera del contenido, también cerramos
-  window.onclick = function(event) {
+  window.onclick = function (event) {
     if (event.target == modal) {
       modal.style.display = "none";
       limpiarModal();
@@ -83,7 +83,7 @@ function inicializarMercadoPago() {
 
   // 3) Crea el cardForm de Mercado Pago
   cardForm = mp.cardForm({
-    amount: "0", 
+    amount: "0",
     autoMount: true,
     form: {
       id: "form-pago",
@@ -161,7 +161,7 @@ function inicializarMercadoPago() {
 }
 
 // esperar a que el dom este elisto
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   // Verifica que MercadoPago  está cargado
   if (typeof MercadoPago !== 'undefined') {
     inicializarMercadoPago();
@@ -252,62 +252,240 @@ function getCookie(name) {
   return cookieValue;
 }
 
-document.getElementById('confirmar-cancelacion').addEventListener('click', function() {
-    fetch('/index/membresia/cancelar/', {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken'),
-            'Content-Type': 'application/json'
-        }
-    })
+document.getElementById('confirmar-cancelacion').addEventListener('click', function () {
+  fetch('/index/membresia/cancelar/', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'Content-Type': 'application/json'
+    }
+  })
     .then(response => response.json())
     .then(data => {
-        if(data.success){
-            // Muestra el modal Bootstrap con el mensaje
-            document.getElementById('modalMensajeBody').innerText = '¡Tu plan ha sido cancelado! Seguirá activo hasta la fecha de vencimiento.';
-            var modalMensaje = new bootstrap.Modal(document.getElementById('modalMensaje'));
-            modalMensaje.show();
+      if (data.success) {
+        // Muestra el modal Bootstrap con el mensaje
+        document.getElementById('modalMensajeBody').innerText = '¡Tu plan ha sido cancelado! Seguirá activo hasta la fecha de vencimiento.';
+        var modalMensaje = new bootstrap.Modal(document.getElementById('modalMensaje'));
+        modalMensaje.show();
 
-            // Al cerrar el modal, oculta el botón y muestra el mensaje destacado
-            document.getElementById('modalMensaje').addEventListener('hidden.bs.modal', function handler() {
-                // Oculta el botón y el formulario
-                var formCancelar = document.getElementById('form-cancelar-plan');
-                if (formCancelar) {
-                    formCancelar.style.display = 'none';
-                }
-                // Muestra el mensaje destacado
-                var mensajeDiv = document.getElementById('mensaje-cancelacion');
-                if (mensajeDiv) {
-                    mensajeDiv.style.display = 'block';
-                    mensajeDiv.innerHTML = `
+        // Al cerrar el modal, oculta el botón y muestra el mensaje destacado
+        document.getElementById('modalMensaje').addEventListener('hidden.bs.modal', function handler() {
+          // Oculta el botón y el formulario
+          var formCancelar = document.getElementById('form-cancelar-plan');
+          if (formCancelar) {
+            formCancelar.style.display = 'none';
+          }
+          // Muestra el mensaje destacado
+          var mensajeDiv = document.getElementById('mensaje-cancelacion');
+          if (mensajeDiv) {
+            mensajeDiv.style.display = 'block';
+            mensajeDiv.innerHTML = `
                       <div class="alert alert-warning" style="font-weight:bold;">
                         Tu plan fue cancelado y estará activo hasta que se cumpla un mes desde el último pago válido.
                       </div>
                     `;
-                }
-                // Elimina el listener para evitar duplicados
-                document.getElementById('modalMensaje').removeEventListener('hidden.bs.modal', handler);
-            });
-        } else {
-            // Muestra el error en el modal también
-            document.getElementById('modalMensajeBody').innerText = 'Error: ' + data.error;
-            var modalMensaje = new bootstrap.Modal(document.getElementById('modalMensaje'));
-            modalMensaje.show();
-        }
+          }
+          // Elimina el listener para evitar duplicados
+          document.getElementById('modalMensaje').removeEventListener('hidden.bs.modal', handler);
+        });
+      } else {
+        // Muestra el error en el modal también
+        document.getElementById('modalMensajeBody').innerText = 'Error: ' + data.error;
+        var modalMensaje = new bootstrap.Modal(document.getElementById('modalMensaje'));
+        modalMensaje.show();
+      }
     });
 
-    // Cierra el modal de Bootstrap
-    var modal = bootstrap.Modal.getInstance(document.getElementById('modalCancelar'));
-    modal.hide();
+  // Cierra el modal de Bootstrap
+  var modal = bootstrap.Modal.getInstance(document.getElementById('modalCancelar'));
+  modal.hide();
 });
-  
-//INDEX ANIMACION
-document.addEventListener("DOMContentLoaded", function () {
-  const btn = document.getElementById("trans-click");
-  const container = document.querySelector(".container");
 
-  btn.addEventListener("click", () => {
-    container.classList.toggle("toggle");
-    console.log("Animación de transición activada");
+//FUNCION PARA EDITAR PRODUCTOS
+const editables = [
+  "username_input",
+  "email_input",
+  "genero_input",
+  "foto_perfil_input",
+  "direccion_input"
+];
+
+function toggleEdit(modo) {
+  console.log("Modo edición:", modo);
+  editables.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = !modo;
+  });
+
+  document.getElementById("label_foto_perfil").style.display = modo ? "block" : "none";
+  document.getElementById("foto_perfil_input").style.display = modo ? "inline-block" : "none";
+  document.getElementById("guardar_editar").style.display = modo ? "inline-block" : "none";
+
+  const btn = document.getElementById("btn_editar");
+  if (modo) {
+    btn.textContent = "Cancelar edición";
+    btn.setAttribute("onclick", "toggleEdit(false)");
+  } else {
+    btn.textContent = "Editar perfil";
+    btn.setAttribute("onclick", "toggleEdit(true)");
+  }
+}
+
+// FUNCIÓN PARA EDITAR LA INFORMACIÓN DE UN PRODUCTO
+function toggleEditProducto(modo, productoId) {
+  console.log("Modo edición del producto:", modo);
+
+  const editables = document.querySelectorAll(`#producto-${productoId} .editable`);
+  const btn = document.getElementById(`btn-editar-producto-${productoId}`);
+
+  editables.forEach(el => {
+    el.disabled = !modo;
+  });
+
+  if (modo) {
+    btn.textContent = "Cancelar edición";
+    btn.setAttribute("onclick", `toggleEditProducto(false, ${productoId})`);
+  } else {
+    btn.textContent = "Editar producto";
+    btn.setAttribute("onclick", `toggleEditProducto(true, ${productoId})`);
+  }
+}
+
+//FUNCION PARA EL FILTRO DE PRODUCTOS.HTLM 
+document.addEventListener("DOMContentLoaded", function () {
+  const filtros = document.querySelectorAll('input[type="radio"]');
+  filtros.forEach(filtro => {
+    filtro.addEventListener('change', aplicarFiltros);
   });
 });
+
+function aplicarFiltros() {
+  const categoria = document.querySelector('input[name="categoria"]:checked')?.value;
+  const estado = document.querySelector('input[name="estado"]:checked')?.value;
+  const tipo = document.querySelector('input[name="tipo"]:checked')?.value;
+
+  const productos = document.querySelectorAll('.producto-card-link');
+
+  productos.forEach(producto => {
+    const matchCategoria = !categoria || producto.dataset.categoria === categoria;
+    const matchEstado = !estado || producto.dataset.estado === estado;
+    const matchTipo = !tipo || producto.dataset.tipo === tipo;
+
+    if (matchCategoria && matchEstado && matchTipo) {
+      producto.style.display = "block";
+    } else {
+      producto.style.display = "none";
+    }
+  });
+}
+
+//FUNCION PARA DESPLEGAR MAS OPCIONES
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".toggle-btn").forEach(button => {
+    button.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const menu = this.closest(".producto-card").querySelector(".drop-opc");
+      document.querySelectorAll(".drop-opc").forEach(m => {
+        if (m !== menu) m.style.display = "none";
+        menu.style.display = (menu.style.display === "block") ? "none" : "block";
+      });
+    });
+
+    document.addEventListener("click", () => {
+      document.querySelectorAll(".drop-opc").forEach(menu => {
+        menu.style.display = "none";
+      });
+    });
+  });
+});
+
+//FUNCION PARA LAS ALERTAS
+document.addEventListener("DOMContentLoaded", function () {
+  const alerts = document.querySelectorAll(".alert");
+  setTimeout(() => {
+    alerts.forEach(alert => {
+      alert.classList.add("alert-hidden");
+    });
+  }, 3000);
+});
+
+
+//PREVISUALIZACION DE IMAGENES PARA SUBIR PRODUCTO
+document.addEventListener("DOMContentLoaded", () => {
+  const imgInput = document.getElementById('id_imagen');
+  const prevImg = document.getElementById('img-previa');
+
+  if (imgInput) {
+    imgInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          prevImg.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+});
+
+//CONFIRMACION DE ELIMINAR PRODUCTO PERFIL USUARIO (SWEETALERT2)
+document.addEventListener("DOMContentLoaded", () => {
+  const eliminarLinks = document.querySelectorAll(".btn-eliminar");
+
+  eliminarLinks.forEach(link => {
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+      const url = this.getAttribute("data-url");
+
+      Swal.fire({
+        title: "¿Estás seguro?",
+        text: "Esta acción no se puede deshacer.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = url;
+        }
+      });
+    });
+  });
+});
+
+//ALERTA PARA CONFIRMAR ELIMINAR MEMBRESIA
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll('.btn-mem-del').forEach(function (button) {
+    button.addEventListener('click', function (e) {
+      e.preventDefault();
+
+      const url = this.getAttribute('href');
+
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Esta acción no se puede deshacer.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = url;
+        }
+      });
+    });
+  });
+});
+
+function abrirModal() {
+  document.getElementById("modRecContra").style.display = "block";
+}
+
+function cerrarModal() {
+  document.getElementById("modRecContra").style.display = "none";
+}
