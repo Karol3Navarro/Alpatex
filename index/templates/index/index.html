@@ -1,31 +1,31 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link type='text/css' href='{% static "css/style.css"%}' rel='stylesheet'>
+    <title>Iniciar Sesión</title>
 
-    <!--
-        -google font
-    -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" href="{% static 'img/ico-alpatex-v4.ico' %}" type="image/x-icon">
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;500&display=swap" rel="stylesheet">
 
-    <link rel="icon" href="{% static 'img/ico-alpatex-v4.ico' %}" type="image/x-icon">
-    
-    <title>Iniciar Sesión</title>
+    <!-- Ionicons y SweetAlert2 -->
+    <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body>
-    <!-- Sistema de alerta -->
 
+<body>
     <main>
         <div class="container">
+            <!-- Formulario de Login -->
             <div class="container-form">
-                
                 <form method="POST" class="login">
-                    <!-- Formulario de login -->
+                    {% csrf_token %}
                     <h2 class="prod-dest">Iniciar Sesión</h2>
 
                     <div class="social-networks">
@@ -34,7 +34,6 @@
                         <ion-icon name="logo-instagram"></ion-icon>
                     </div>
 
-                    {% csrf_token %}  <!-- Protege el formulario de CSRF -->
                     <span>Ingrese su usuario y contraseña</span>
 
                     <div class="container-input">
@@ -45,22 +44,16 @@
                         <ion-icon name="lock"></ion-icon>
                         <input type="password" name="password" placeholder="Contraseña" class="inp" required>
                     </div>
-                    
-                    <a href="{% url 'autenticacion:cambiar_clave' %}">¿Olvidaste tu clave?</a>
-                    
-                    <input type="submit" value="Iniciar Sesión" class="btn">
 
+                    <a href="{% url 'autenticacion:cambiar_clave' %}">¿Olvidaste tu clave?</a>
+                    <input type="submit" value="Iniciar Sesión" class="btn">
                 </form>
             </div>
 
+            <!-- Formulario de Registro -->
             <div class="container-form">
-
-                <!-- Formulario de registro -->
-                <form method="POST" class="sign-up" id="form-registro" action="{% url 'registro' %}">
-
-                    {% if error %}
-                        <div class="text-danger">{{ error }}</div>
-                    {% endif %}
+                <form method="POST" action="{% url 'registro' %}">
+                    {% csrf_token %}
 
                     <h2 class="prod-dest">Registrarse</h2>
 
@@ -72,95 +65,106 @@
 
                     <span>Completa el formulario</span>
 
-                    {% csrf_token %}
-
                     <div class="container-input">
                         <input type="text" class="inp" id="nombre_usuario" name="nombre_usuario" placeholder="Usuario" required>
                     </div>
-
                     <div class="container-input">
                         <input type="text" class="inp" id="nombre_completo" name="nombre_completo" placeholder="Nombre Completo" required>
                     </div>
-
                     <div class="container-input">
                         <input type="text" class="inp" id="rut" name="rut" required placeholder="Run: Ej: 12.345.678-9" maxlength="12">
                     </div>
-
                     <div class="container-input" style="position: relative;">
-                        <input type="text" class="inp" id="direccion" name="direccion" required autocomplete="off" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" aria-controls="sugerencias-direccion" placeholder="Dirección">
+                        <input type="text" class="inp" id="direccion" name="direccion" required autocomplete="off" placeholder="Dirección">
                         <ul id="sugerencias-direccion" role="listbox"></ul>
                     </div>
-
                     <div class="container-input">
                         <input type="email" class="inp" id="email" name="email" placeholder="Correo electrónico" required>
                     </div>
-
                     <div class="container-input">
                         <input type="password" class="inp" id="password1" name="password1" placeholder="Contraseña" required>
                     </div>
-
                     <div class="container-input">
                         <input type="password" class="inp" id="password2" name="password2" placeholder="Confirmar contraseña" required>
                     </div>
 
                     <button type="submit" class="btn">Registrar</button>
-
                 </form>
             </div>
-            
+
+            <!-- Panel Bienvenida -->
             <div class="container-welcome">
                 <div class="welcome-sign-up welcome">
                     <h3 class="prod-dest">Bienvenido a ALPATEX</h3>
-                    <p>Si no tienes una cuenta, creala! Solo te tomará unos minutos.</p>
+                    <p>Si no tienes una cuenta, créala. Solo tomará unos minutos.</p>
                     <button class="btns" id="btn-sign-up">Registrarse</button>
                 </div>
-
                 <div class="welcome-sign-in welcome">
                     <h3 class="prod-dest">ALPATEX</h3>
-                    <p>Si ya tienes una cuenta, inicia sesión para ver los nuevos productos agregados.</p>
+                    <p>Si ya tienes una cuenta, inicia sesión para ver los nuevos productos.</p>
                     <button id="btn-sign-in">Iniciar Sesión</button>
                 </div>
             </div>
-
         </div>
-
     </main>
-    
+
+    <!-- JS Funcionalidad -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const container = document.querySelector(".container");
             const btnSignIn = document.getElementById("btn-sign-in");
             const btnSignUp = document.getElementById("btn-sign-up");
 
-            btnSignIn.addEventListener("click", ()=> {
+            btnSignIn.addEventListener("click", () => {
                 container.classList.remove("toggle");
             });
-            btnSignUp.addEventListener("click", ()=> {
+
+            btnSignUp.addEventListener("click", () => {
                 container.classList.add("toggle");
             });
-        });
 
-        function abrirModal() {
-            document.getElementById("modRecContra").style.display = "block";
-        }
-
-        function cerrarModal() {
-            document.getElementById("modRecContra").style.display = "none";
-        }
-    </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const direccionInput = document.getElementById("direccion");
+            // RUT format
             const rutInput = document.getElementById("rut");
+            rutInput.addEventListener("input", function () {
+                let val = rutInput.value.replace(/\./g, "").replace(/-/g, "").replace(/\s/g, "").toUpperCase();
+                if (val.length === 0) return;
+
+                let cuerpo = val.slice(0, -1);
+                let dv = val.slice(-1);
+
+                let rutFormateado = "";
+                while (cuerpo.length > 3) {
+                    rutFormateado = "." + cuerpo.slice(-3) + rutFormateado;
+                    cuerpo = cuerpo.slice(0, -3);
+                }
+                rutFormateado = cuerpo + rutFormateado;
+                rutInput.value = rutFormateado + "-" + dv;
+            });
+
+            // Validación RUT
+            function validarRut(rut) {
+                rut = rut.replace(/\./g, "").replace("-", "").toUpperCase();
+                if (!/^[0-9]+[0-9K]$/.test(rut)) return false;
+                const cuerpo = rut.slice(0, -1);
+                const dv = rut.slice(-1);
+                let suma = 0, multiplo = 2;
+                for (let i = cuerpo.length - 1; i >= 0; i--) {
+                    suma += parseInt(cuerpo.charAt(i)) * multiplo;
+                    multiplo = multiplo < 7 ? multiplo + 1 : 2;
+                }
+                const dvEsperado = 11 - (suma % 11);
+                const dvCalc = dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
+                return dv === dvCalc;
+            }
+
+            // Autocompletado de dirección
+            const direccionInput = document.getElementById("direccion");
             const lista = document.getElementById("sugerencias-direccion");
             let timeout;
 
-            // Autocompletado dirección mejorado
             direccionInput.addEventListener("input", function () {
                 clearTimeout(timeout);
                 const query = direccionInput.value.trim();
-
                 if (query.length < 3) {
                     lista.innerHTML = "";
                     return;
@@ -171,26 +175,21 @@
                         .then(res => res.json())
                         .then(data => {
                             lista.innerHTML = "";
-                            const resultadosChile = data.filter(item => item.display_name.toLowerCase().includes("chile"));
-
-                            if (resultadosChile.length === 0) {
+                            const chileResults = data.filter(item => item.display_name.toLowerCase().includes("chile"));
+                            if (chileResults.length === 0) {
                                 lista.innerHTML = "<li>No se encontraron direcciones en Chile</li>";
                                 return;
                             }
 
-                            resultadosChile.forEach(item => {
+                            chileResults.forEach(item => {
                                 const address = item.address;
-
-                                // Extraemos los campos relevantes, usando fallback por si no existen
-                                const calle = address.road || address.pedestrian || address.cycleway || address.footway || address.neighbourhood || "";
-                                const comuna = address.suburb || address.village || address.town || address.city || "";
-                                const region = address.state || address.region || "";
-
+                                const calle = address.road || address.neighbourhood || "";
+                                const comuna = address.suburb || address.city || "";
+                                const region = address.state || "";
                                 const textoSugerencia = [calle, comuna, region].filter(Boolean).join(", ");
 
                                 const li = document.createElement("li");
                                 li.textContent = textoSugerencia;
-                                li.setAttribute("role", "option");
                                 li.addEventListener("click", () => {
                                     direccionInput.value = textoSugerencia;
                                     lista.innerHTML = "";
@@ -204,110 +203,44 @@
                 }, 400);
             });
 
-            // Cerrar lista al hacer click fuera del input o la lista
             document.addEventListener("click", function (e) {
                 if (e.target !== direccionInput && !lista.contains(e.target)) {
                     lista.innerHTML = "";
                 }
             });
 
-            // Formato RUT con puntos y guion
-            rutInput.addEventListener("input", function () {
-                let valor = rutInput.value.replace(/\./g, "").replace(/-/g, "").replace(/\s/g, "").toUpperCase();
-                if (valor.length === 0) {
-                    rutInput.value = "";
-                    return;
-                }
+            // Validaciones al enviar el formulario de registro
+            const formRegistro = document.getElementById("form-registro");
+            const pass1 = document.getElementById("password1");
+            const pass2 = document.getElementById("password2");
 
-                let cuerpo = valor.slice(0, -1);
-                let dv = valor.slice(-1);
-
-                let rutFormateado = "";
-                while (cuerpo.length > 3) {
-                    rutFormateado = "." + cuerpo.slice(-3) + rutFormateado;
-                    cuerpo = cuerpo.slice(0, -3);
-                }
-                rutFormateado = cuerpo + rutFormateado;
-                rutInput.value = rutFormateado + "-" + dv;
-            });
-
-            // Validación de RUT
-            function validarRut(rut) {
-                rut = rut.replace(/\./g, "").replace("-", "").toUpperCase();
-                if (!/^[0-9]+[0-9K]$/.test(rut)) return false;
-
-                const cuerpo = rut.slice(0, -1);
-                const dv = rut.slice(-1);
-                let suma = 0, multiplo = 2;
-
-                for (let i = cuerpo.length - 1; i >= 0; i--) {
-                    suma += parseInt(cuerpo.charAt(i)) * multiplo;
-                    multiplo = multiplo < 7 ? multiplo + 1 : 2;
-                }
-
-                const dvEsperado = 11 - (suma % 11);
-                const dvCalc = dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
-                return dv === dvCalc;
-            }
-
-            // Validar RUT al enviar formulario
-            document.querySelector(".sign-up").addEventListener("submit", function (e) {
+            formRegistro.addEventListener("submit", function (e) {
                 const rut = rutInput.value;
+
                 if (!validarRut(rut)) {
                     e.preventDefault();
-
                     Swal.fire({
                         icon: 'error',
                         title: 'RUT inválido.',
                         text: 'Verifica el formato y dígito verificador.',
                         confirmButtonText: 'Comprendo!'
-                    })
-
+                    });
                     rutInput.focus();
+                    return;
                 }
-            });
-    
-            const formRegistro = document.querySelector(".sign-up");
-            const pass1 = document.getElementById("password1");
-            const pass2 = document.getElementById("password2");
 
-            formRegistro.addEventListener("submit", function (e){
-                if(pass1.value !== pass2.value) {
+                if (pass1.value !== pass2.value) {
                     e.preventDefault();
-                    
                     Swal.fire({
                         icon: 'error',
                         title: 'Las contraseñas no coinciden.',
-                        text: 'Por favor, verifica ambas contraseñas antes de continuar.',
-                        confirmButtonText: 'Comprendo!'
-                    })
-
+                        text: 'Por favor, verifica ambas contraseñas.',
+                        confirmButtonText: 'Entendido'
+                    });
                     pass2.focus();
                 }
             });
-
         });
     </script>
-
-    <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
-    <!--
-        SWEETALERT2
-    -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    {% if messages %}
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            {% for message in messages %}
-                Swal.fire({
-                    icon: "{{ message.tags|default:'info' }}",
-                    title: "{{ message|escapejs }}",
-                    confirmButtonText: "Ok"
-                });
-            {% endfor %}
-        });
-    </script>
-    {% endif %}
-
 </body>
 </html>

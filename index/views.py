@@ -66,37 +66,6 @@ def menu(request):
     return render(request, 'index/home.html', context)
 
 
-def index(request):
-    if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            try:
-                perfil = user.perfil
-            except Perfil.DoesNotExist:
-                perfil = None
-
-            if perfil and perfil.fecha_eliminacion is not None:
-                # Usuario eliminado, no puede ingresar
-                messages.error(request, "Tu cuenta ha sido eliminada y no puedes ingresar.")
-                return redirect('index')
-
-            # Usuario activo, permite login
-            login(request, user)
-            if user.is_staff:
-                return redirect('admin_dashboard')
-            else:
-                return redirect('home')
-
-        else:
-            messages.error(request, "Credenciales incorrectas, por favor intenta nuevamente.")
-            return redirect('index')
-
-    return render(request, 'index/index.html')
-
 def home(request):
     usuarios = User.objects.all()
 
@@ -134,12 +103,13 @@ def registrar_usuario(request):
         email = request.POST['email']
         password1 = request.POST['password1']
         password2 = request.POST['password2']
+        if not all([username, nombre_completo, rut, direccion, email, password1, password2]):
+            return render(request, 'index/index.html', {'error': 'Todos los campos son obligatorios.'})
 
         if User.objects.filter(username=username).exists():
-            messages.error(request, 'El nombre de usuario ya está en uso. Por favor, elige otro.')
-            return redirect('index')
+            return render(request, 'index/index.html', {'error': 'El nombre de usuario ya está en uso.'})
         if User.objects.filter(email=email).exists():
-            return render(request, 'index/index.html', {'error': 'El correo ya está registrado.'})
+            return render(request, 'index/index.htmll', {'error': 'El correo ya está registrado.'})
         if Perfil.objects.filter(rut=rut).exists():
             return render(request, 'index/index.html', {'error': 'El RUT ya está registrado.'})
         if password1 != password2:
@@ -184,24 +154,42 @@ def registrar_usuario(request):
         return redirect('index')
 
     return render(request, 'index/index.html')
+def index(request):
+    storage = get_messages(request)
+    for _ in storage:
+        pass
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
+        user = authenticate(request, username=username, password=password)
 
-@login_required
-def perfil_usuario(request):
-    perfil, created = Perfil.objects.get_or_create(user=request.user)
-    
-    if request.method == 'POST':
-        form = PerfilForm(request.POST, request.FILES, instance=perfil, user=request.user)
-        if form.is_valid():
-            form.save(user=request.user)
-            messages.success(request, "Perfil actualizado con éxito.")
-            return redirect('perfil_usuario')
+        if user is not None:
+            try:
+                perfil = user.perfil
+            except Perfil.DoesNotExist:
+                perfil = None
+
+            if perfil and perfil.fecha_eliminacion is not None:
+                # Usuario eliminado, no puede ingresar
+                error_message = "Tu cuenta ha sido eliminada y no puedes ingresar."
+                messages.error(request, error_message)
+                return render(request, 'index/index.html', {'error_message': error_message})
+
+            # Usuario activo, permite login
+            login(request, user)
+            if user.is_staff:
+                return redirect('admin_dashboard')
+            else:
+                return redirect('home')
+
         else:
-            messages.error(request, "Hubo un error al actualizar el perfil.")
-    else:
-        form = PerfilForm(instance=perfil, user=request.user)
+            error_message = "Credenciales incorrectas, por favor intenta nuevamente."
+            messages.error(request, error_message)
+            return render(request, 'index/index.html', {'error_message': error_message})
 
-    return render(request, 'index/perfil.html', {'perfil': perfil, 'form': form})
+    return render(request, 'index/index.html')
+
 
  
 
