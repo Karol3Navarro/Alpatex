@@ -63,9 +63,12 @@
   </div>
 
   <!-- Opiniones -->
-  <h3 class="prod-dest">Opiniones de otros usuarios:</h3>
-  <div class="calificaciones">
-    {% for op in opiniones %}
+<!-- Sección de opiniones -->
+<div id="seccion-opiniones">
+  <h3 class="prod-dest" style="text-align:center; margin-top: 40px;">Opiniones de otros usuarios:</h3>
+  <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+   {% for op in opiniones %}
+     {% if op.tipo == 'calificacion' or op.tipo == 'calificacion_cliente' %}
       <div class="cal-card">
         {% if op.foto %}
           <img src="{{ op.foto }}" alt="Foto de perfil" class="cal-avatar">
@@ -75,8 +78,8 @@
         <div class="cal-user-info">
           <h4 class="cal-card-titulo">{{ op.usuario }}</h4>
           <div class="cal-rating">
-            {% for i in "12345" %}
-              {% if forloop.counter <= op.calificacion %}
+            {% for i in "12345"|make_list %}
+              {% if forloop.counter <= op.puntaje %}
                 <span class="star full">★</span>
               {% else %}
                 <span class="star">☆</span>
@@ -87,10 +90,12 @@
           <p class="cal-card-texto">{{ op.comentario }}</p>
         </div>
       </div>
-    {% empty %}
-      <p style="text-align:center; color:#666;">No hay opiniones disponibles.</p>
-    {% endfor %}
+     {% endif %}
+   {% empty %}
+     <p style="text-align:center; color:#666;">No hay opiniones disponibles.</p>
+   {% endfor %}
   </div>
+</div>
 </div>
 
 <script>
