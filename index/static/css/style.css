@@ -420,12 +420,13 @@ main{
 .welcome-sign-in{
     transform: translateX(100%); 
 }
-.container-welcome h3, p{
-    color: black;
+.container-welcome h3{
+    color:white
 }
 .container-welcome p{
     text-align: center;
     font-size: 14px;
+    color:white
 }
 .container.toggle .welcome-sign-in{
     transform: translateX(0);
@@ -1191,6 +1192,9 @@ footer{
 .footer-container p,
 .footer-container ul {
     margin: 10px 0;
+    color: white;
+
+
 }
 .footer-nosotros ul {
     list-style: none;
