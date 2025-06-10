@@ -421,7 +421,7 @@ main{
     transform: translateX(100%); 
 }
 .container-welcome h3, p{
-    color: white;
+    color: black;
 }
 .container-welcome p{
     text-align: center;
@@ -864,6 +864,7 @@ PRODUCTOS DESTACADOS
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     overflow: hidden;
+    
 }
 .card-body {
     display: flex;
@@ -871,6 +872,7 @@ PRODUCTOS DESTACADOS
     height: 100%;
     padding: 8px;
     text-align: center;
+    
 }
 .card-body img {
     border-radius: 10px;
@@ -924,7 +926,6 @@ VER PRODUCTO
 .prod-detalle .der .precio {
     font-size: 1.4em;
     color: #AD5CA1;
-    font-weight: bold;
 }
 .prod-detalle .der h2{
     text-transform: uppercase;
@@ -936,6 +937,7 @@ VER PRODUCTO
 }
 .prod-detalle .der p{
     font-size: 1.1em;
+    color: black;
 }
 
 /* AGREGAR PRODUCTO */

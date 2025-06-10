@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from index.models import Producto, Perfil,  CalificacionVendedor, CalificacionCliente, ReporteVendedor
+from index.models import Producto, Perfil,  CalificacionVendedor, CalificacionCliente, ReporteVendedor , ReporteUsuario
 from django.contrib.auth.decorators import login_required,user_passes_test
 from django.contrib.auth.models import User
 import openpyxl
@@ -242,13 +242,13 @@ def perfil_usuario(request, username):
         })
 
     # Reportes recibidos
-    reportes_recibidos = ReporteVendedor.objects.filter(vendedor=usuario).select_related('comprador')
+    reportes_recibidos = ReporteUsuario.objects.filter(vendedor=usuario).select_related('comprador')
     for reporte in reportes_recibidos:
         perfil_comprador = getattr(reporte.comprador, 'perfil', None)
         foto = perfil_comprador.get_foto_perfil_url() if perfil_comprador else None
         opiniones.append({
             'tipo': 'reporte',
-            'usuario': reporte.comprador.username,
+            'usuario': reporte.usuario.username,
             'foto': foto,
             'motivo': reporte.motivo,
             'fecha': reporte.fecha_reporte,
