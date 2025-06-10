@@ -8,8 +8,148 @@
     <title>Cambiar Clave</title>
 
     <link rel="icon" href="{% static 'img/ico-alpatex-v4.ico' %}" type="image/x-icon">
+    <link type="text/css" href="{% static 'css/style.css' %}" rel="stylesheet">
 
-    <link type='text/css' href="{% static 'css/style.css' %}" rel='stylesheet'>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9f5fb;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container-reset {
+            max-width: 450px;
+            margin: 4rem auto;
+            background: white;
+            padding: 2.5rem 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .prod-dest {
+            text-align: center;
+            color: #AD5CA1;
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .reset-input {
+            margin-bottom: 1.5rem;
+        }
+
+        .reset-input label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #AD5CA1;
+        }
+
+        .reset-input input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #AD5CA1;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .helptext {
+            background-color: #f9f1f9;
+            border: 1px solid #AD5CA1;
+            padding: 10px 15px;
+            border-radius: 10px;
+            color: #5a3c56;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #AD5CA1;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #8e4c87;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            z-index: 9999;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 2rem 3rem;
+            border-radius: 20px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: popUp 0.4s ease;
+        }
+
+        @keyframes popUp {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #AD5CA1;
+            cursor: pointer;
+        }
+
+        .modal h2 {
+            margin-bottom: 0.5rem;
+            color: #AD5CA1;
+        }
+
+        .modal p {
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .modal-btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            background: #AD5CA1;
+            color: #fff;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .modal-btn:hover {
+            background: #8e4c87;
+        }
+    </style>
 </head>
 <body>
     <main>
@@ -20,7 +160,7 @@
                 {% csrf_token %}
                 
                 <div class="reset-input">
-                    <label for="id_new_password1">Nueva Contraseña</label>
+                    <label for="id_new_password1">Nueva Clave</label>
                     {{ form.new_password1 }}
                     {% for error in form.new_password1.errors %}
                         <p class="error">{{ error }}</p>
@@ -28,7 +168,7 @@
                 </div>
 
                 <div class="reset-input">
-                    <label for="id_new_password2">Confirmar Nueva Contraseña</label>
+                    <label for="id_new_password2">Confirmar Nueva Clave</label>
                     {{ form.new_password2 }}
                     {% for error in form.new_password2.errors %}
                         <p class="error">{{ error }}</p>
@@ -37,16 +177,66 @@
         
                 <button type="submit" class="btn">Guardar Cambios</button>
             </form>
-
-            <!-- Centrado de instrucciones -->
-            <div class="helptext text-center">
-                <ul class="list-disc pl-5 inline-block text-left">
-                    <li>Debe contener al menos 8 caracteres.</li>
-                    <li>No debe ser demasiado similar a tu información personal.</li>
-                    <li>No debe ser una clave común ni totalmente numérica.</li>
-                </ul>
-            </div>
         </div>
     </main>
+
+    {% if clave_cambiada_exito %}
+    <!-- Modal de éxito -->
+    <div id="modalExito" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal()">&times;</span>
+            <img src="{% static 'img/check-success.png' %}" alt="Éxito" style="width: 60px; margin-bottom: 1rem;">
+            <h2>¡Clave actualizada correctamente!</h2>
+            <p>Tu nueva clave se ha guardado con éxito. Ahora puedes iniciar sesión.</p>
+            <a href="{% url 'index' %}" class="modal-btn">Ir a Iniciar Sesión</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <script>
+        function cerrarModal() {
+            document.getElementById('modalExito').style.display = 'none';
+        }
+
+        // Validaciones en tiempo real
+           const passwordInput1 = document.getElementById('id_new_password1');
+    if (passwordInput1) {
+        passwordInput1.addEventListener("input", function () {
+            const clave = passwordInput1.value;
+            let errores = [];
+
+            if (clave.length < 8) {
+                errores.push("Debe contener al menos 8 caracteres.");
+            }
+            if (!/[A-Z]/.test(clave)) {
+                errores.push("Debe contener al menos una letra mayúscula.");
+            }
+            if (!/\d/.test(clave)) {
+                errores.push("Debe contener al menos un número.");
+            }
+            if (!/[!@#$%^&*(),.?":{}|<>]/.test(clave)) {
+                errores.push("Debe contener al menos un carácter especial.");
+            }
+            if (/^\d+$/.test(clave)) {
+                errores.push("No debe ser totalmente numérica.");
+            }
+            if (clave.toLowerCase().includes("password") || clave.toLowerCase().includes("clave")) {
+                errores.push("No debe ser demasiado común o fácil.");
+            }
+
+            mostrarRequisitos(errores.length ? errores : ["✅ Clave válida"]);
+        });
+    }
+
+    function mostrarRequisitos(mensajes) {
+        let helpText = document.querySelector(".helptext");
+        if (!helpText) {
+            helpText = document.createElement("div");
+            helpText.className = "helptext";
+            passwordInput1.parentElement.appendChild(helpText);
+        }
+        helpText.innerHTML = "<ul>" + mensajes.map(m => `<li>${m}</li>`).join('') + "</ul>";
+    }
+    </script>
 </body>
 </html>

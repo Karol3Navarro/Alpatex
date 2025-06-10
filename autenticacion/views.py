@@ -11,6 +11,8 @@ from django.core.mail import EmailMessage
 from email.mime.image import MIMEImage
 import os
 def cambiar_clave(request):
+    error_email = False
+
     if request.method == 'POST':
         form = PasswordResetForm(request.POST)
         if form.is_valid():
@@ -36,7 +38,6 @@ def cambiar_clave(request):
                     )
                     email.content_subtype = "html"
 
-                    # Adjuntar imagen del logo
                     logo_path = os.path.join(settings.BASE_DIR, 'index', 'static', 'img', 'alpatex-v2-tipografía.png')
                     with open(logo_path, 'rb') as img:
                         mime_image = MIMEImage(img.read())
@@ -46,11 +47,14 @@ def cambiar_clave(request):
 
                     email.send()
 
-            return redirect('autenticacion:correo_modal')  # Vista que muestra mensaje de correo enviado
+                return redirect('autenticacion:correo_modal')
+            else:
+                error_email = True  # Activa el flag
+
     else:
         form = PasswordResetForm()
 
-    return render(request, 'autenticacion/cambiar_clave.html', {'form': form})
+    return render(request, 'autenticacion/cambiar_clave.html', {'form': form, 'error_email': error_email})
 
 
 def reset_clave(request, uidb64, token):
@@ -58,18 +62,32 @@ def reset_clave(request, uidb64, token):
         uid = urlsafe_base64_decode(uidb64)
         user = User.objects.get(pk=uid)
         if default_token_generator.check_token(user, token):
+            clave_cambiada_exito = False
             if request.method == 'POST':
                 form = SetPasswordForm(user, request.POST)
                 if form.is_valid():
                     form.save()
-                    return redirect('autenticacion:clave_cambiada')  # Redirect to confirmation page
+                    clave_cambiada_exito = True
+                else:
+                    # Aquí puedes reemplazar o limpiar errores de validación
+                    # Por ejemplo, sobreescribir errores de new_password1:
+                    errores_personalizados = []
+                    for error in form.errors.get('new_password1', []):
+                        # Por ejemplo, ignorar mensajes de "too short" y "too common"
+                        if "too short" in error or "too common" in error:
+                            continue
+                        else:
+                            errores_personalizados.append(error)
+                    form.errors['new_password1'] = errores_personalizados
             else:
                 form = SetPasswordForm(user)
-            return render(request, 'autenticacion/reset_clave.html', {'form': form})
+            return render(request, 'autenticacion/reset_clave.html', {'form': form, 'clave_cambiada_exito': clave_cambiada_exito})
         else:
-            return redirect('autenticacion:error_token')  # Token error handling
+            return redirect('autenticacion:error_token')
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        return redirect('autenticacion:error_token')  # Token error handling
+        return redirect('autenticacion:error_token')
+
+
 
 def clave_cambiada(request):
     return render(request, 'autenticacion/clave_cambiada.html')

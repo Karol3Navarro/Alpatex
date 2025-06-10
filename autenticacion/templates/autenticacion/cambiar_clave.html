@@ -1,23 +1,20 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cambiar Clave</title>
-    {% load static %}
-    <link type='text/css' href="{% static 'css/style.css' %}" rel='stylesheet'>
 
     <link rel="icon" href="{% static 'img/ico-alpatex-v4.ico' %}" type="image/x-icon">
-    <!--
-        -google font
-    -->
+    <link type='text/css' href="{% static 'css/style.css' %}" rel='stylesheet'>
+
+    <!-- Google Fonts y Material Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;500&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=chevron_left" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
-
 </head>
 <body>
     <main>
@@ -34,6 +31,7 @@
 
             <h2 class="prod-dest">Recuperar Contraseña</h2>
             <p>Te enviaremos un enlace para restablecer tu contraseña.</p>
+
             <form method="post">
                 {% csrf_token %}
                 <div class="form-group">
@@ -45,6 +43,48 @@
             </form>
         </div>
     </main>
-    
+
+    {% if error_email %}
+    <!-- Modal de Error -->
+    <div id="modalError" class="modal">
+        <div class="modal-content">
+            <h2>Correo no registrado</h2>
+            <p>El correo ingresado no se encuentra en nuestra base de datos.</p>
+            <button onclick="cerrarModal()" class="btn">Cerrar</button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Estilos y Script del Modal -->
+    <style>
+        .modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            max-width: 400px;
+        }
+        .modal-content h2 {
+            color: #d9534f;
+            margin-bottom: 1rem;
+        }
+    </style>
+
+    <script>
+        function cerrarModal() {
+            document.getElementById("modalError").style.display = "none";
+        }
+    </script>
 </body>
 </html>
