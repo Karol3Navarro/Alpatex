@@ -15,7 +15,7 @@
                     <h5 class="card-title">{{ usuario.username }}</h5>
                     <p class="card-text"><strong>Dirección:</strong> {{ usuario.perfil.direccion }}</p>
                     <p class="card-text"><strong>Reportes:</strong> {{ usuario.num_reportes }}</p>
-                    <a href="{% url 'perfil_publico' username=usuario.username %}">Ver Perfil</a>
+                    <a href="{% url 'perfil_usuario' username=usuario.username %}">Ver Perfil</a>
                 </div>
 
             </div>

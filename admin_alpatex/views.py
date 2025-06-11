@@ -250,6 +250,7 @@ def perfil_usuario(request, username):
             'tipo': 'reporte',
             'usuario': reporte.comprador.username,
             'foto': foto,
+            'puntaje': reporte.puntaje,
             'motivo': reporte.motivo,
             'fecha': reporte.fecha_reporte,
         })

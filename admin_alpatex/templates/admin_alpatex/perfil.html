@@ -183,6 +183,7 @@
               {% endif %}
             {% endfor %}
           </div>
+          <p><strong>Fecha:</strong> {{ op.fecha|date:"d/m/Y" }}</p>
           <p class="cal-producto">{{ op.producto }}</p>
           <p class="cal-card-texto">{{ op.comentario }}</p>
         </div>
@@ -208,7 +209,18 @@
         {% endif %}
         <div class="cal-user-info">
           <h4 class="cal-card-titulo">{{ op.usuario }}</h4>
+          <div class="cal-rating">
+            {% for i in "12345"|make_list %}
+              {% if forloop.counter <= op.puntaje %}
+                <span class="star full">★</span>
+              {% else %}
+                <span class="star">☆</span>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <p><strong>Fecha:</strong> {{ op.fecha|date:"d/m/Y" }}</p>
           <p><strong>Motivo del reporte:</strong> {{ op.motivo }}</p>
+          
         </div>
       </div>
      {% endif %}
