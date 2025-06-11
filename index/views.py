@@ -416,23 +416,23 @@ def redirigir_producto(request, producto_id):
         
 @login_required
 def libros(request):
-    libros = Producto.objects.filter(categoria='Libro', estado_revision='Aceptado')  
+    libros = Producto.objects.filter(categoria='Libro', disponible=True)  
     return render(request, 'index/libros.html', {'libros': libros})
 
 @login_required
 def videojuegos(request):
-    videojuegos = Producto.objects.filter(categoria='Videojuego', estado_revision='Aceptado')  
+    videojuegos = Producto.objects.filter(categoria='Videojuego', disponible=True)  
     return render(request, 'index/videojuegos.html', {'videojuegos': videojuegos})
 
 
 @login_required
 def productos(request):
-    # Filtrar productos aprobados con estado_revision='Aceptado'
-    productos = Producto.objects.filter(estado_revision='Aceptado')
+    # Filtrar productos aprobados con disponible
+    productos = Producto.objects.filter(disponible=True)
     return render(request, 'index/productos.html', {'productos': productos})
 
 def ver_todo(request):
-    productos = Producto.objects.filter(estado_revision='Aceptado')
+    productos = Producto.objects.filter(disponible=True)
 
     categoria = request.GET.get('categoria')
     estado = request.GET.get('estado')
@@ -753,7 +753,7 @@ def toggle_favorito(request, producto_id):
 
 def buscar_productos(request):
     query = request.GET.get('q', '')
-    resultados = Producto.objects.filter(nombre__icontains=query, estado_revision='Aceptado')
+    resultados = Producto.objects.filter(nombre__icontains=query, disponible=True)
     return render(request, 'index/resultados_busqueda.html', {'resultados': resultados, 'query': query})
 def detalle_producto(request, id):
     producto = get_object_or_404(Producto, id=id)
