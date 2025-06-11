@@ -240,7 +240,7 @@ def editar_perfil(request):
 
 @login_required
 def productos_perfil(request):
-    productos = Producto.objects.filter(usuario=request.user)  # Filtramos por el usuario actual
+    productos = Producto.objects.filter(usuario=request.user, disponible=True)
     if not productos:
         mensaje = "No tienes productos agregados."
     else:
