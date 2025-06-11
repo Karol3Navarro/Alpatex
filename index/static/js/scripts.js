@@ -1,5 +1,28 @@
 console.log("scripts.js cargado");
 
+//FUNCION PARA QUE SE DESPLIEGUE PRECIO
+document.addEventListener("DOMContentLoaded", function () {
+  const tipoSelect = document.getElementById("id_tipo");
+  const precioWrapper = document.getElementById("precio-wrapper");
+  const precioInput = document.getElementById("id_precio");
+
+  function togglePrecio() {
+    if (tipoSelect.value === "Venta") {
+      precioWrapper.style.display = "block";
+    } else {
+      precioWrapper.style.display = "none";
+      if (precioInput) {
+        precioInput.value = "";  // Limpia si no es venta
+      }
+    }
+  }
+
+  if (tipoSelect && precioWrapper) {
+    tipoSelect.addEventListener("change", togglePrecio);
+    togglePrecio();  // Asegura que esté correcto en el primer renderizado
+  }
+});
+
 //FUNCION PARA LAS ALERTAS
 document.addEventListener("DOMContentLoaded", function () {
   const alerts = document.querySelectorAll(".alert");

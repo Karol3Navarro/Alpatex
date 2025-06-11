@@ -44,12 +44,13 @@ class PerfilForm(forms.ModelForm):
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        fields =  ['nombre', 'estado',  'tipo', 'direccion', 'categoria', 'imagen']  
+        fields =  ['nombre', 'estado',  'tipo', 'precio', 'direccion', 'categoria', 'imagen']  
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.fields['imagen'].widget.attrs.update({'id': 'id_imagen'})
+        self.fields['precio'].widget.attrs.update({'id': 'id_precio'})
         
         if 'direccion' in self.initial:
             self.fields['direccion'].initial = self.initial['direccion']

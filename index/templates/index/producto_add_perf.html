@@ -13,7 +13,19 @@
   <div class="add-prod-wrapper">
     <form method="POST" enctype="multipart/form-data" class="add-prod-form">
       {% csrf_token %}
-      {{ form.as_p }}
+        <p>{{ form.nombre.label_tag }} {{ form.nombre }}</p>
+        <p>{{ form.estado.label_tag }} {{ form.estado }}</p>
+        <p>{{ form.tipo.label_tag }} {{ form.tipo }}</p>
+        <!-- Campo precio envuelto para ocultar -->
+        <p id="precio-wrapper" style="display: none;">
+          {{ form.precio.label_tag }} {{ form.precio }}
+          {{ field.errors }}
+        </p>
+        <p>{{ form.direccion.label_tag }} {{ form.direccion }}</p>
+        <p>{{ form.categoria.label_tag }} {{ form.categoria }}</p>
+        <p>{{ form.imagen.label_tag }} {{ form.imagen }}</p>
+
+
       <button type="submit" class="btn btn-primary">Agregar Producto</button>
     </form>
 

@@ -5,6 +5,7 @@ from admin_alpatex.models import Membresia
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
+from django.core.exceptions import ValidationError
 import os
 
 ##Productos
@@ -41,6 +42,7 @@ class Producto(models.Model):
     fecha_creacion = models.DateTimeField(default=timezone.now)
     contador_visitas = models.IntegerField(default=0)
     disponible = models.BooleanField(default=True)
+    precio = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.nombre
@@ -57,6 +59,20 @@ class Producto(models.Model):
         except:
             pass
         return 2  # Básico o sin membresía
+
+    def clean(self):
+        # Asegurarse de que el precio sea positivo
+        if self.precio is not None and self.precio < 0:
+            raise ValidationError("El precio no puede ser negativo.")
+        
+        #Validar que el precio corresponda
+        if self.tipo == 'Venta':
+                if self.precio is None or self.precio < 500:
+                    raise ValidationError("El precio debe ser al menos 500 CLP para productos en venta.")
+                else:
+                    self.precio = None
+
+        super().clean()
 
 #Modelo calificacion producto
 class CalificacionProducto(models.Model):

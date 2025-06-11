@@ -43,7 +43,7 @@
                     <div class="card-body">
                         <img src="{{ x.imagen.url }}" class="card-img-top">
                         <h5 class="card-title">{{ x.nombre }}</h5>
-                        <p class="price card-text">Precio: {{ x.usuario }}</p>
+                        <p class="price card-text">Precio: {{ x.precio }}</p>
                         <p class="estado card-text">Estado: {{ x.estado }}</p>
                         <a href="{% url 'ver_producto' id_producto=x.id_producto %}" class="btn btn-primary">Ver Producto</a>
                     </div>
