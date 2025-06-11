@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from .models import Producto, Perfil, CalificacionVendedor, ReporteVendedor, CalificacionCliente
 from .Forms import PerfilForm, ProductoForm, ReporteVendedorForm, ReporteusuarioForm
 import json
+from django.db.models import Avg
+
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from email.mime.image import MIMEImage
@@ -681,6 +683,8 @@ def perfil_publico(request, username):
 
     # Calificaciones
     calificaciones = CalificacionVendedor.objects.filter(vendedor=usuario).select_related('comprador', 'producto')
+    promedio_calificaciones = calificaciones.aggregate(promedio=Avg('puntaje'))['promedio']
+
     for calificacion in calificaciones:
         perfil_comprador = getattr(calificacion.comprador, 'perfil', None)
         foto = perfil_comprador.get_foto_perfil_url() if perfil_comprador else None
@@ -713,6 +717,8 @@ def perfil_publico(request, username):
     return render(request, 'index/perfil_publico.html', {
         'perfil': perfil,
         'opiniones': opiniones,
+        'promedio_calificaciones': promedio_calificaciones,
+
     })
 
 @login_required
