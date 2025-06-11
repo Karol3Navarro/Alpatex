@@ -16,7 +16,13 @@
         </div>
         <div class="der">
             <h2 class="der-titulo">{{ producto.nombre }}</h2>
-            <p class="precio">$ <!--${{ producto.precio }}--></p>
+
+            {% if producto.tipo == 'Venta' and producto.precio %}
+                <p class="precio">Precio: ${{ producto.precio}}</p>
+            {% elif producto.tipo == 'Intercambio' %}
+                <p class="precio">Producto para intercambio</p>
+            {% endif %}
+
             <p><strong>Detalles del Producto:</strong> (Aquí puedes agregar más detalles)</p>
             <p><strong>Publicado por: <a href="{% url 'perfil_publico' producto.usuario.username %}">
                 {{ producto.usuario.username }}</a></p>

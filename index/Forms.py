@@ -59,6 +59,7 @@ class ReporteVendedorForm(forms.ModelForm):
     class Meta:
         model = ReporteVendedor
         fields = ['motivo']
+        
 class ReporteusuarioForm(forms.ModelForm):
     class Meta:
         model = ReporteUsuario

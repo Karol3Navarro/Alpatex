@@ -61,16 +61,11 @@ class Producto(models.Model):
         return 2  # Básico o sin membresía
 
     def clean(self):
-        # Asegurarse de que el precio sea positivo
-        if self.precio is not None and self.precio < 0:
-            raise ValidationError("El precio no puede ser negativo.")
-        
-        #Validar que el precio corresponda
         if self.tipo == 'Venta':
-                if self.precio is None or self.precio < 500:
-                    raise ValidationError("El precio debe ser al menos 500 CLP para productos en venta.")
-                else:
-                    self.precio = None
+            if self.precio is None or self.precio < 500:
+                raise ValidationError("El precio debe ser al menos 500 CLP para productos en venta.")
+        else:
+            self.precio = None
 
         super().clean()
 
