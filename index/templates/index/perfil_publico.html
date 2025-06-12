@@ -18,13 +18,14 @@
   {% if promedio_general %}
   <p><strong>Promedio:</strong> {{ promedio_general|floatformat:1 }} / 5</p>
   <div class="cal-rating" style="font-size: 1.5rem; color: #4CAF50;">
-    {% for i in "12345" %}
-      {% if forloop.counter <= promedio_general|floatformat:0 %}
-        <span class="star full">★</span>
-      {% else %}
-        <span class="star empty">☆</span>
-      {% endif %}
-    {% endfor %}
+{% for i in "12345"|make_list %}
+  {% if forloop.counter <= promedio_general %}
+    <span class="star full">★</span>
+  {% else %}
+    <span class="star">☆</span>
+  {% endif %}
+{% endfor %}
+
   </div>
 {% else %}
   <p><strong>Promedio:</strong> Sin calificaciones</p>
