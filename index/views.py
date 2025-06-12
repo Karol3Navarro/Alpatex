@@ -677,7 +677,7 @@ def perfil_publico(request, username):
 
     usuario = get_object_or_404(User, username=username)
     perfil = get_object_or_404(Perfil, user=usuario)
-    productos = Producto.objects.filter(usuario=usuario)
+    productos = Producto.objects.filter(usuario=usuario, disponible=True)
     promedio_v, promedio_c = obtener_promedios_usuario(usuario.id)
     promedio_general = round(((promedio_v + promedio_c) / 2), 1) if (promedio_v and promedio_c) else (promedio_v or promedio_c or 0)
 
