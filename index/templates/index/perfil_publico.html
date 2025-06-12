@@ -6,22 +6,6 @@
 
 <div class="profile-container">
   <h2>Perfil de {{ perfil.user.username }}</h2>
-{% if promedio_calificaciones %}
-  <p><strong>Calificación promedio:</strong> {{ promedio_calificaciones|floatformat:1 }} / 5</p>
-
-  <!-- Mostrar estrellas del promedio -->
-  <div class="cal-rating">
-    {% for i in "12345" %}
-      {% if forloop.counter <= promedio_calificaciones|default:0 %}
-        <span class="star full">★</span>
-      {% else %}
-        <span class="star">☆</span>
-      {% endif %}
-    {% endfor %}
-  </div>
-{% else %}
-  <p><strong>Calificación promedio:</strong> Sin calificaciones</p>
-{% endif %}
 
   <div class="profile-card">
     <!-- Sección izquierda: Foto y datos -->
@@ -31,6 +15,20 @@
       {% else %}
         <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada">
       {% endif %}
+  {% if promedio_general %}
+  <p><strong>Promedio:</strong> {{ promedio_general|floatformat:1 }} / 5</p>
+  <div class="cal-rating" style="font-size: 1.5rem; color: #4CAF50;">
+    {% for i in "12345" %}
+      {% if forloop.counter <= promedio_general|floatformat:0 %}
+        <span class="star full">★</span>
+      {% else %}
+        <span class="star empty">☆</span>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% else %}
+  <p><strong>Promedio:</strong> Sin calificaciones</p>
+{% endif %}
 
       {% if request.user.is_authenticated and request.user != perfil.user %}
         <a href="{% url 'detailms' perfil.user.username %}" class="btn btn-chat" title="Chatear con {{ perfil.user.username }}">

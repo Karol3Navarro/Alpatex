@@ -665,6 +665,10 @@ def reportar_usuario(request):
             messages.error(request, error)
 
     return redirect(request.META.get('HTTP_REFERER', 'home'))
+def obtener_promedios_usuario(user_id):
+    promedio_vendedor = CalificacionVendedor.objects.filter(vendedor_id=user_id).aggregate(Avg('puntaje'))['puntaje__avg'] or 0
+    promedio_cliente = CalificacionCliente.objects.filter(cliente_id=user_id).aggregate(Avg('puntaje'))['puntaje__avg'] or 0
+    return promedio_vendedor, promedio_cliente
     
 @login_required
 def perfil_publico(request, username):
@@ -674,6 +678,11 @@ def perfil_publico(request, username):
     usuario = get_object_or_404(User, username=username)
     perfil = get_object_or_404(Perfil, user=usuario)
     productos = Producto.objects.filter(usuario=usuario)
+    promedio_v, promedio_c = obtener_promedios_usuario(usuario.id)
+    promedio_general = round(((promedio_v + promedio_c) / 2), 1) if (promedio_v and promedio_c) else (promedio_v or promedio_c or 0)
+
+
+
 
     opiniones = []
 
@@ -724,8 +733,11 @@ def perfil_publico(request, username):
 
     return render(request, 'index/perfil_publico.html', {
         'perfil': perfil,
-        'productos': productos,
         'opiniones': opiniones,
+        'promedio_vendedor': promedio_v,
+        'promedio_cliente': promedio_c,
+        'promedio_general': promedio_general,
+
     })
 
 @login_required

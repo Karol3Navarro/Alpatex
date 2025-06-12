@@ -41,74 +41,64 @@
         return null;
     }
 
-    async function initMap() {
-        const defaultLocation = [-33.45, -70.66]; // Santiago, Chile
-        const radiusMeters = 5000; // 5 km
+    async function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
-        const map = L.map('map');
+    async function showAllProducts(userCoords, map) {
+        const productos = window.perfiles;
+        let bounds = [userCoords];
+
+        for (const prod of productos) {
+            await delay(400);
+
+            const coords = await geocode(prod.direccion);
+            if (coords) {
+                const marker = L.marker([coords.lat, coords.lng]).addTo(map);
+                marker.bindPopup(
+                    `<b>${prod.nombre}</b><br>Vendedor: ${prod.vendedor}<br><i>Ubicación protegida</i><br>
+                    <a href="/index/producto/${prod.id}/" class="btn btn-primary mt-2">Ver Producto</a>`
+                );
+
+                marker.on('click', () => {
+                    map.setView([coords.lat, coords.lng], 17);
+                    marker.openPopup();
+                });
+
+                bounds.push([coords.lat, coords.lng]);
+            }
+        }
+
+        if (bounds.length > 0) {
+            map.fitBounds(bounds, { maxZoom: 15 });
+        } else {
+            map.setView(userCoords, 13);
+        }
+    }
+
+    async function initMap() {
+        let userCoords = [-33.45, -70.66]; // Santiago por defecto
+        const map = L.map('map').setView(userCoords, 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // Mostrar productos cercanos dentro del radio
-        async function showProductsNearby(userCoords) {
-            const productos = window.perfiles;
-            let bounds = [];
-
-            for (const prod of productos) {
-                const coords = await geocode(prod.direccion);
-                if (coords) {
-                    const distance = map.distance(
-                        L.latLng(userCoords[0], userCoords[1]),
-                        L.latLng(coords.lat, coords.lng)
-                    );
-
-                    if (distance <= radiusMeters) {
-                        const marker = L.marker([coords.lat, coords.lng]).addTo(map);
-                        marker.bindPopup(
-                            `<b>${prod.nombre}</b><br>Vendedor: ${prod.vendedor}<br><i>Ubicación protegida</i><br>
-                            <a href="/index/producto/${prod.id}/" class="btn btn-primary mt-2">Ver Producto</a>`
-                        );
-
-                        marker.on('click', () => {
-                            map.setView([coords.lat, coords.lng], 17);
-                            marker.openPopup();
-                        });
-
-                        bounds.push([coords.lat, coords.lng]);
-                    }
-                }
-            }
-
-            if (bounds.length > 0) {
-                map.fitBounds(bounds, { maxZoom: 15 });
-            } else {
-                // Si no hay productos cercanos, centramos en la ubicación usuario con zoom prudente
-                map.setView(userCoords, 13);
-            }
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async function(position) {
+                userCoords = [position.coords.latitude, position.coords.longitude];
+                L.marker(userCoords).addTo(map).bindPopup("Tu ubicación").openPopup();
+                map.setView(userCoords, 15);
+                await showAllProducts(userCoords, map);
+            }, async function() {
+                alert("No se pudo obtener tu ubicación. Mostrando productos desde Santiago.");
+                await showAllProducts(userCoords, map);
+            });
+        } else {
+            alert("Tu navegador no soporta geolocalización.");
+            await showAllProducts(userCoords, map);
         }
-
-        // Evento si se obtiene la ubicación del usuario
-        function onLocationFound(e) {
-            const userCoords = [e.latlng.lat, e.latlng.lng];
-            map.setView(userCoords, 11);
-            L.marker(userCoords).addTo(map).bindPopup("Tu ubicación").openPopup();
-            showProductsNearby(userCoords);
-        }
-
-        // Evento si no se obtiene ubicación
-        function onLocationError() {
-            map.setView(defaultLocation, 6);
-            alert("No se pudo obtener tu ubicación, mostrando productos cercanos a Santiago.");
-            showProductsNearby(defaultLocation);
-        }
-
-        // Intentar obtener la ubicación al cargar el mapa
-        map.locate({ setView: false, maxZoom: 16 });
-        map.on('locationfound', onLocationFound);
-        map.on('locationerror', onLocationError);
     }
 
     window.onload = initMap;
