@@ -36,6 +36,7 @@ urlpatterns = [
     path('calificar_vendedor/', views.calificar_vendedor, name='calificar_vendedor'),
     path('reportar_vendedor/', views.reportar_vendedor, name='reportar_vendedor'),
     path('reportar_usuario/', views.reportar_usuario, name='reportar_usuario'),
+    path('terminos/', views.terminos, name='terminos'),
 
     path('confirmacion/<int:pk>/editar/', views.editar_confirmacion, name='editar_confirmacion'),
     path('confirmacion/<int:pk>/eliminar/', views.eliminar_confirmacion, name='eliminar_confirmacion'),

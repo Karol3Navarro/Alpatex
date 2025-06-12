@@ -1,0 +1,13 @@
+{% extends "index/base.html" %}
+{% load static %}
+
+{% block body %}
+  <div style="min-height: 100vh; background: linear-gradient(180deg, #fff 0%, #ffe4f1 100%); display: flex; justify-content: center; align-items: center; padding: 40px;">
+    <div style="max-width: 950px; width: 100%; background-color: #fff; border-radius: 20px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); padding: 40px; position: relative; overflow: hidden;">
+      <!-- Contenido de la imagen -->
+      <div style="position: relative; z-index: 2;">        
+        <img src="{% static 'img/terminos2.svg' %}" alt="Términos y Condiciones de Alpatex" style="width: 100%; max-width: 850px; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);">
+      </div>
+    </div>
+  </div>
+{% endblock %}
