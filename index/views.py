@@ -668,23 +668,17 @@ def reportar_usuario(request):
     
 @login_required
 def perfil_publico(request, username):
-    # Verificar si el usuario está viendo su propio perfil
     if request.user.username == username:
-        return redirect('perfil_usuario')  # Redirigir a su propio perfil (privado)
+        return redirect('perfil_usuario')
 
-    # Obtener el perfil del usuario público
     usuario = get_object_or_404(User, username=username)
     perfil = get_object_or_404(Perfil, user=usuario)
-
-    # Obtener los productos del usuario público
     productos = Producto.objects.filter(usuario=usuario)
 
     opiniones = []
 
-    # Calificaciones
+    # Calificaciones recibidas como vendedor
     calificaciones = CalificacionVendedor.objects.filter(vendedor=usuario).select_related('comprador', 'producto')
-    promedio_calificaciones = calificaciones.aggregate(promedio=Avg('puntaje'))['promedio']
-
     for calificacion in calificaciones:
         perfil_comprador = getattr(calificacion.comprador, 'perfil', None)
         foto = perfil_comprador.get_foto_perfil_url() if perfil_comprador else None
@@ -698,7 +692,7 @@ def perfil_publico(request, username):
             'fecha': calificacion.fecha_creacion,
         })
 
-    # Reportes
+    # Reportes recibidos
     reportes = ReporteVendedor.objects.filter(vendedor=usuario).select_related('comprador')
     for reporte in reportes:
         perfil_comprador = getattr(reporte.comprador, 'perfil', None)
@@ -711,14 +705,27 @@ def perfil_publico(request, username):
             'fecha': reporte.fecha_reporte,
         })
 
-    # Ordenar por fecha descendente
+    # Calificaciones recibidas como cliente
+    calificaciones_cliente = CalificacionCliente.objects.filter(cliente=usuario).select_related('vendedor', 'producto')
+    for cal in calificaciones_cliente:
+        perfil_vendedor = getattr(cal.vendedor, 'perfil', None)
+        foto = perfil_vendedor.get_foto_perfil_url() if perfil_vendedor else None
+        opiniones.append({
+            'tipo': 'calificacion_cliente',
+            'usuario': cal.vendedor.username,
+            'foto': foto,
+            'puntaje': cal.puntaje,
+            'comentario': cal.comentario,
+            'producto': cal.producto.nombre,
+            'fecha': cal.fecha,
+        })
+
     opiniones.sort(key=lambda x: x['fecha'], reverse=True)
 
     return render(request, 'index/perfil_publico.html', {
         'perfil': perfil,
+        'productos': productos,
         'opiniones': opiniones,
-        'promedio_calificaciones': promedio_calificaciones,
-
     })
 
 @login_required
