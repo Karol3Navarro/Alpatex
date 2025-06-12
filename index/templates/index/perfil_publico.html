@@ -5,122 +5,122 @@
 <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
 
 <div class="profile-container">
-  <h2>Perfil de {{ perfil.user.username }}</h2>
+	<h2>Perfil de {{ perfil.user.username }}</h2>
 
-  <div class="profile-card">
-    <!-- Sección izquierda: Foto y datos -->
-    <div class="profile-left">
-      {% if perfil.foto_perfil %}
-        <img src="{{ perfil.foto_perfil.url }}" alt="Foto de perfil">
-      {% else %}
-        <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada">
-      {% endif %}
-  {% if promedio_general %}
-  <p><strong>Promedio:</strong> {{ promedio_general|floatformat:1 }} / 5</p>
-  <div class="cal-rating" style="font-size: 1.5rem; color: #4CAF50;">
+	<div class="profile-card">
+		<!-- Sección izquierda: Foto y datos -->
+		<div class="profile-left">
+			{% if perfil.foto_perfil %}
+				<img src="{{ perfil.foto_perfil.url }}" alt="Foto de perfil">
+			{% else %}
+				<img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada">
+			{% endif %}
+	{% if promedio_general %}
+	<p><strong>Promedio:</strong> {{ promedio_general|floatformat:1 }} / 5</p>
+	<div class="cal-rating" style="font-size: 1.5rem; color: #4CAF50;">
 {% for i in "12345"|make_list %}
-  {% if forloop.counter <= promedio_general %}
-    <span class="star full">★</span>
-  {% else %}
-    <span class="star">☆</span>
-  {% endif %}
+	{% if forloop.counter <= promedio_general %}
+		<span class="star full">★</span>
+	{% else %}
+		<span class="star">☆</span>
+	{% endif %}
 {% endfor %}
 
-  </div>
+	</div>
 {% else %}
-  <p><strong>Promedio:</strong> Sin calificaciones</p>
+	<p><strong>Promedio:</strong> Sin calificaciones</p>
 {% endif %}
 
-      {% if request.user.is_authenticated and request.user != perfil.user %}
-        <a href="{% url 'detailms' perfil.user.username %}" class="btn btn-chat" title="Chatear con {{ perfil.user.username }}">
-          💬 Chatear con {{ perfil.user.username }}
-        </a>
-      {% endif %}
+			{% if request.user.is_authenticated and request.user != perfil.user %}
+				<a href="{% url 'detailms' perfil.user.username %}" class="btn btn-chat" title="Chatear con {{ perfil.user.username }}">
+					💬 Chatear con {{ perfil.user.username }}
+				</a>
+			{% endif %}
 
-      <div class="profile-info">
-        <p><strong>Correo:</strong> {{ perfil.user.email }}</p>
-        <p><strong>Género:</strong> {{ perfil.get_genero_display }}</p>
-        <p><strong>Dirección:</strong> {{ perfil.direccion }}</p>
-        <p><strong>RUT:</strong> {{ perfil.rut }}</p>
-        <p><strong>Fecha de creación:</strong> {{ perfil.user.date_joined|date:"d M Y" }}</p>
-      </div>
-    </div>
+			<div class="profile-info">
+				<p><strong>Correo:</strong> {{ perfil.user.email }}</p>
+				<p><strong>Género:</strong> {{ perfil.get_genero_display }}</p>
+				<p><strong>Dirección:</strong> {{ perfil.direccion }}</p>
+				<p><strong>RUT:</strong> {{ perfil.rut }}</p>
+				<p><strong>Fecha de creación:</strong> {{ perfil.user.date_joined|date:"d M Y" }}</p>
+			</div>
+		</div>
 
-    <!-- Sección derecha: Botones y lista productos -->
-    <div class="profile-right">
-      <button class="btn btn-toggle" onclick="toggleProductos()">
-        Productos <span id="signo">+</span>
-      </button>
+		<!-- Sección derecha: Botones y lista productos -->
+		<div class="profile-right">
+			<button class="btn btn-toggle" onclick="toggleProductos()">
+				Productos <span id="signo">+</span>
+			</button>
 
-      <div id="productos" class="productos-lista" style="display: none;">
-        {% if productos %}
-          <ul>
-            {% for producto in productos %}
-              <li>
-                <div class="card-product">
-                  <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
-                  <div class="card-body">
-                    <h5 class="card-title">{{ producto.nombre }}</h5>
-                    <p class="card-text">Usuario: {{ producto.usuario }}</p>
-                    <p class="card-text">Estado: {{ producto.estado }}</p>
-                    <p class="card-text">Calificación: {{ producto.calificacion_promedio }}</p>
-                    <a href="{% url 'ver_producto' id_producto=producto.id_producto %}" class="btn">Ver</a>
-                  </div>
-                </div>
-              </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p>Este usuario no tiene productos.</p>
-        {% endif %}
-      </div>
-    </div>
-  </div>
+			<div id="productos" class="productos-lista" style="display: none;">
+				{% if productos %}
+					<ul>
+						{% for producto in productos %}
+							<li>
+								<div class="card-product">
+									<img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+									<div class="card-body">
+										<h5 class="card-title">{{ producto.nombre }}</h5>
+										<p class="card-text">Usuario: {{ producto.usuario }}</p>
+										<p class="card-text">Estado: {{ producto.estado }}</p>
+										<p class="card-text">Calificación: {{ producto.calificacion_promedio }}</p>
+										<a href="{% url 'ver_producto' id_producto=producto.id_producto %}" class="btn">Ver</a>
+									</div>
+								</div>
+							</li>
+						{% endfor %}
+					</ul>
+				{% else %}
+					<p>Este usuario no tiene productos.</p>
+				{% endif %}
+			</div>
+		</div>
+	</div>
 
-  <!-- Opiniones -->
+	<!-- Opiniones -->
 <!-- Sección de opiniones -->
 <div id="seccion-opiniones">
-  <h3 class="prod-dest" style="text-align:center; margin-top: 40px;">Opiniones de otros usuarios:</h3>
-  <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
-   {% for op in opiniones %}
-     {% if op.tipo == 'calificacion' or op.tipo == 'calificacion_cliente' %}
-      <div class="cal-card">
-        {% if op.foto %}
-          <img src="{{ op.foto }}" alt="Foto de perfil" class="cal-avatar">
-        {% else %}
-          <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada" class="cal-avatar">
-        {% endif %}
-        <div class="cal-user-info">
-          <h4 class="cal-card-titulo">{{ op.usuario }}</h4>
-          <div class="cal-rating">
-            {% for i in "12345"|make_list %}
-              {% if forloop.counter <= op.puntaje %}
-                <span class="star full">★</span>
-              {% else %}
-                <span class="star">☆</span>
-              {% endif %}
-            {% endfor %}
-          </div>
-          <p class="cal-producto">{{ op.producto }}</p>
-          <p class="cal-card-texto">{{ op.comentario }}</p>
-        </div>
-      </div>
-     {% endif %}
-   {% empty %}
-     <p style="text-align:center; color:#666;">No hay opiniones disponibles.</p>
-   {% endfor %}
-  </div>
+	<h3 class="prod-dest" style="text-align:center; margin-top: 40px;">Opiniones de otros usuarios:</h3>
+	<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+	 {% for op in opiniones %}
+		 {% if op.tipo == 'calificacion' or op.tipo == 'calificacion_cliente' %}
+			<div class="cal-card">
+				{% if op.foto %}
+					<img src="{{ op.foto }}" alt="Foto de perfil" class="cal-avatar">
+				{% else %}
+					<img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada" class="cal-avatar">
+				{% endif %}
+				<div class="cal-user-info">
+					<h4 class="cal-card-titulo">{{ op.usuario }}</h4>
+					<div class="cal-rating">
+						{% for i in "12345"|make_list %}
+							{% if forloop.counter <= op.puntaje %}
+								<span class="star full">★</span>
+							{% else %}
+								<span class="star">☆</span>
+							{% endif %}
+						{% endfor %}
+					</div>
+					<p class="cal-producto">{{ op.producto }}</p>
+					<p class="cal-card-texto">{{ op.comentario }}</p>
+				</div>
+			</div>
+		 {% endif %}
+	 {% empty %}
+		 <p style="text-align:center; color:#666;">No hay opiniones disponibles.</p>
+	 {% endfor %}
+	</div>
 </div>
 </div>
 
 <script>
-  function toggleProductos() {
-    const productosDiv = document.getElementById("productos");
-    const signo = document.getElementById("signo");
-    const isHidden = productosDiv.style.display === "none" || productosDiv.style.display === "";
-    productosDiv.style.display = isHidden ? "block" : "none";
-    signo.textContent = isHidden ? "-" : "+";
-  }
+	function toggleProductos() {
+		const productosDiv = document.getElementById("productos");
+		const signo = document.getElementById("signo");
+		const isHidden = productosDiv.style.display === "none" || productosDiv.style.display === "";
+		productosDiv.style.display = isHidden ? "block" : "none";
+		signo.textContent = isHidden ? "-" : "+";
+	}
 </script>
 
 {% endblock %}
