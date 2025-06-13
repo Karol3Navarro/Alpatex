@@ -45,7 +45,8 @@ urlpatterns = [
     path('membresia/', views.ver_membresia_usuario, name='ver_membresia_usuario'),
     path('membresia/api/', views.crear_suscripcion_api, name='crear_suscripcion_api'),
     path('membresia/cancelar/', views.cancelar_suscripcion_view, name='cancelar_suscripcion'),
-
+    path('pago_exito/', views.pago_exito, name='pago_exito'),
+    path('pago_rechazado/', views.pago_rechazado, name='pago_rechazado'),
     path('webhook/mercadopago/', views.mercadopago_webhook, name='mercadopago_webhook'),
     path('calificar_cliente/', views.calificar_cliente, name='calificar_cliente'),
 ]

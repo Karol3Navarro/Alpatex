@@ -1,0 +1,13 @@
+{% extends "index/base.html" %}
+{% load static %}
+{% block title %}Pago Exitoso{% endblock %}
+
+{% block body %}
+<div style="min-height: 80vh; display: flex; justify-content: center; align-items: center; background: linear-gradient(180deg, #fff 0%, #e0ffe4 100%); padding: 40px;">
+  <div style="max-width: 500px; width: 100%; background-color: #fff; border-radius: 20px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); padding: 40px; text-align: center;">
+    <h2 class="fw-bold" style="color: #4BB543;">¡Pago realizado con éxito!</h2>
+    <p style="font-size: 18px; margin: 20px 0;">Tu pago ha sido procesado correctamente.<br>Gracias por tu compra en Alpatex.</p>
+    <a href="{% url 'home' %}" class="btn btn-primary" style="background-color: #AD5CA1; border: none;">Volver al inicio</a>
+  </div>
+</div>
+{% endblock %} 

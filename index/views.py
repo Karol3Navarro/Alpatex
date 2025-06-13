@@ -937,7 +937,14 @@ def cancelar_suscripcion_view(request):
         except Exception as e:
             return JsonResponse({"success": False, "error": str(e)}, status=500)
     return JsonResponse({"success": False, "error": "Método no permitido."}, status=405)
+
 def terminos(request):
     return render(request, 'index/terminos.html')
+
+def pago_exito(request):
+    return render(request, 'index/pago_exito.html')
+
+def pago_rechazado(request):
+    return render(request, 'index/pago_rechazado.html')
    
    
