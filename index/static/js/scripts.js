@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 //FUNCION PARA LAS ALERTAS
 document.addEventListener("DOMContentLoaded", function () {
-  const alerts = document.querySelectorAll(".alert:not(.alert-warning)");
+  const alerts = document.querySelectorAll(".alert:not([id='mensaje-cancelacion'])");
   setTimeout(() => {
     alerts.forEach(alert => {
       alert.classList.add("alert-hidden");
