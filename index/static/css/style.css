@@ -1168,7 +1168,24 @@ VER TODO
 .producto-card-link {
     text-decoration: none;
     color: inherit;
-  }
+}
+
+.swiper-button-next:after, .swiper-button-prev:after {
+    color: #AD5CA1;
+}
+
+.list-promos{
+    list-style: none;
+    margin: 50px;
+}
+.list-item{
+    display: flex;
+
+}
+.list-item .promo1{
+    width: 540px;
+    border-radius: 10px;
+}
 /*
 FOOTER
 */

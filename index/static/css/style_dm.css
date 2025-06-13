@@ -1,3 +1,6 @@
+.chat-username1 a{
+    color: #DC3545;
+}
 .chat-wrapper {
     display: flex;
     height: 90vh;
@@ -52,7 +55,7 @@
     text-decoration: none;
     display: inline-block;
     font-weight: 700;
-    color: #333;
+    cursor: pointer;
 }
 .chat-header a:hover{
     color: #AD5CA1; 
