@@ -21,6 +21,7 @@ header .banner{
     flex-wrap: wrap;
     padding: 10px 2vw;
     position: relative;
+    background-color: white;
 }
 header .sociales{
     display: flex;
@@ -245,6 +246,7 @@ body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    background: #fff4f9;
 }
 
 .reg-btn{
@@ -348,7 +350,6 @@ main{
     position: absolute;
     top: 100%;
     left: 0;
-    z-index: 10;
     width: 100%;
     max-height: 200px;
     overflow-y: auto;
@@ -1264,6 +1265,8 @@ footer{
 .mem-container{
     max-width: 1000px;
     border: 2px solid #ccc;
+    background-color: #f5f0f8;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     border-radius: 20px;
     margin: auto;
     padding: 2rem;
@@ -1317,6 +1320,8 @@ footer{
 
 .mem-form-container{
     border: 2px solid #ccc;
+    background-color: #f5f0f8;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     border-radius: 20px;
     width: 1000px;
     margin: auto;
