@@ -78,9 +78,26 @@ def home(request):
         prioridad_visibilidad=F('usuario__perfil__membresia__prioridad_visibilidad')
     ).order_by('-prioridad_visibilidad', '-fecha_creacion')
 
+    mostrar_pendientes = False
+    pendientes = ConfirmacionEntrega.objects.none()  # por defecto vacío
+    usuario = request.user
+    # Mostrar pendientes solo si no se ha mostrado aún en esta sesión
+    if not request.session.get('pendientes_mostrados', False):
+        pendientes = ConfirmacionEntrega.objects.filter(
+            canal__usuarios=usuario,
+            concretado=True,
+            confirmado=False
+        ).distinct()
+
+        if pendientes.exists():
+            mostrar_pendientes = True
+            request.session['pendientes_mostrados'] = True  # marcar como mostrado
+
     context = {
         "usuarios": usuarios,
         "productos": productos,
+        "pendientes": pendientes,
+        "mostrar_pendientes": mostrar_pendientes,
     }
     return render(request, 'index/home.html', context)
 

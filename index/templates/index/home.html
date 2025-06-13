@@ -3,7 +3,24 @@
 {% load static %}
 
 {% block body %}
-
+{% if mostrar_pendientes %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'info',
+            title: 'Tienes {{ pendientes.count }} confirmaciones pendientes',
+            text: '¡Recuerda revisar y confirmar tus entregas pendientes!',
+            confirmButtonText: 'Ver mis pendientes',
+            showCancelButton: true,
+            cancelButtonText: 'Cerrar',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{% url 'mis_compras' %}";
+            }
+        });
+    });
+</script>
+{% endif %}
 <!-- Carrusel estilizado -->
 <div id="carouselExampleFade" class="carousel slide carousel-fade mb-10 rounded-4 overflow-hidden shadow-lg" data-bs-ride="carousel" data-bs-interval="4000">
   <div class="carousel-inner">
