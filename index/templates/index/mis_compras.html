@@ -3,6 +3,71 @@
 {% block title %}Mis Compras{% endblock %}
 
 {% block body %}
+<style>
+/* Cambiamos color principal a #AD5CA1 */
+
+/* Títulos */
+.prod-dest {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 1.8rem;
+  margin: 25px 0 15px 0;
+  color: #AD5CA1; /* color púrpura */
+  border-bottom: 2px solid #AD5CA1; /* borde con el mismo color */
+  padding-bottom: 5px;
+}
+
+/* Botones de acción */
+.actions .btn-warning {
+  background-color: #AD5CA1;
+  color: white;
+}
+
+.actions .btn-warning:hover {
+  background-color: #8a477f; /* un púrpura más oscuro para hover */
+}
+
+.actions .btn-danger {
+  background-color: #d9534f; /* lo dejamos rojo para alerta */
+}
+
+.actions .btn-danger:hover {
+  background-color: #c9302c;
+}
+
+/* Botón regresar */
+.reg-btn a.regresar {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  font-weight: 600;
+  color: #AD5CA1;
+  margin-bottom: 20px;
+  transition: color 0.3s ease;
+}
+
+.reg-btn a.regresar:hover {
+  color: #8a477f;
+}
+
+/* Estados con colores y peso */
+.info span {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-top: 6px;
+  display: inline-block;
+}
+
+/* Cambiamos color de estado pendiente para que combine */
+.info span[style*="orange"] {
+  color: #AD5CA1;
+}
+
+/* Puedes personalizar más elementos si quieres */
+
+
+</style>
     <div class="reg-btn">
         <a href="{% url 'perfil_usuario' %}" class="regresar">
             <span class="material-symbols-outlined">chevron_left</span> Regresar
@@ -196,4 +261,4 @@
     {% else %}
         <p>No has realizado reportes aún.</p>
     {% endif %}
-{% endblock %}
+{% endblock %} 

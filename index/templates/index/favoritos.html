@@ -1,29 +1,32 @@
 {% extends "index/base.html" %}
 {% block body %}
-<h1>Mis Favoritos</h1>
 
-<div id="productos" class="producto-lista">
+<div class="title-prod mt-5 text-center">
+    <h1 class="prod-dest fw-bold">Mis Favoritos</h1>
+</div>
+
+<div class="container-items">
     {% if favoritos %}
-        <ul>
+        <div class="grid-prod" id="product-container">
             {% for producto in favoritos %}
-                <li>
-                    <div class="product card-product">
+                <div class="product">
+                    <div class="card-product">
+                         <div class="card-body">
                         {% if producto.imagen %}
                             <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}">
                         {% endif %}
-                        <div class="card-body">
+                       
                             <h5 class="card-title">{{ producto.nombre }}</h5>
-                            <p class="card-text">Usuario: {{ producto.usuario.username }}</p>
-                            <p class="card-text">Estado: {{ producto.estado }}</p>
-                            <p class="card-text">Calificación: {{ producto.calificacion_promedio|default:"Sin calificaciones" }}</p>
+                            <p class="card-text"><strong>Usuario:</strong> {{ producto.usuario.username }}</p>
+                            <p class="card-text"><strong>Estado:</strong> {{ producto.estado }}</p>
                             <a href="{% url 'ver_producto' id_producto=producto.id_producto %}" class="btn btn-primary">Ver</a>
-                        </div>
-                    </div>
-                </li>
+                        </div> 
+                    </div> 
+                </div> 
             {% endfor %}
-        </ul>
+        </div> 
     {% else %}
-        <p>No tienes productos favoritos aún.</p>
+        <p class="text-center text-muted">No tienes productos favoritos aún.</p>
     {% endif %}
 </div>
 
