@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 //FUNCION PARA LAS ALERTAS
 document.addEventListener("DOMContentLoaded", function () {
-  const alerts = document.querySelectorAll(".alert");
+  const alerts = document.querySelectorAll(".alert:not(.alert-warning)");
   setTimeout(() => {
     alerts.forEach(alert => {
       alert.classList.add("alert-hidden");
