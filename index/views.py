@@ -6,7 +6,7 @@ from .models import Producto, Perfil, CalificacionVendedor, ReporteVendedor, Cal
 from .Forms import PerfilForm, ProductoForm, ReporteVendedorForm, ReporteusuarioForm
 import json
 from django.db.models import Avg
-
+from Dm.utils import contar_mensajes_no_leidos
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from email.mime.image import MIMEImage
@@ -81,6 +81,7 @@ def home(request):
     mostrar_pendientes = False
     pendientes = ConfirmacionEntrega.objects.none()  # por defecto vacío
     usuario = request.user
+    mensajes_no_leidos = contar_mensajes_no_leidos(request.user)
     # Mostrar pendientes solo si no se ha mostrado aún en esta sesión
     if not request.session.get('pendientes_mostrados', False):
         pendientes = ConfirmacionEntrega.objects.filter(
@@ -98,6 +99,7 @@ def home(request):
         "productos": productos,
         "pendientes": pendientes,
         "mostrar_pendientes": mostrar_pendientes,
+        'mensajes_no_leidos': mensajes_no_leidos,
     }
     return render(request, 'index/home.html', context)
 

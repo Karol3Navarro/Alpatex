@@ -84,7 +84,18 @@
         </div>
     </nav>
 -->
-
+<style>
+    .badge {
+        background-color: red;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 50%;
+        font-size: 0.75rem;
+        position: absolute;
+        top: -6px;   /* sube el badge */
+        right: -6px; /* mueve a la derecha */
+    }
+</style>
     <header>
         <div class="banner">
             <div class="sociales">
@@ -103,7 +114,10 @@
                     {% if user.is_authenticated %}
                             <li>
                                 <a class="inbox" href="{% url 'inbox' %}">
-                                    <i></i>
+                                    <i class="icono-mensaje"></i>
+                                    {% if mensajes_no_leidos > 0 %}
+                                        <span class="badge">{{ mensajes_no_leidos }}</span>
+                                    {% endif %}
                                 </a>
                             </li>
                             <li>

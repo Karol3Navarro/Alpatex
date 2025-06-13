@@ -24,6 +24,7 @@ class CanalMensaje(ModelBase):
     usuario= models.ForeignKey(User, on_delete=models.CASCADE)
     texto = models.TextField()
     producto = models.ForeignKey(Producto, null=True, blank=True, on_delete=models.SET_NULL)
+    leido_por = models.ManyToManyField(User, related_name="mensajes_leidos", blank=True) 
 
 class CanalUsuario(ModelBase):
     canal = models.ForeignKey("Canal", null=True, on_delete=models.SET_NULL) #SET_NULL, pueda conservar los antiguos mensajes
