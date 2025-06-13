@@ -1,5 +1,22 @@
 console.log("scripts.js cargado");
 
+document.addEventListener("DOMContentLoaded", function(){
+  new Swiper(".mySwiper", {
+    slidesPerView: 4,
+    spaceBetween: 30,
+    loop: true,
+    navigation: {
+      nextEl: ".swiper-button-next",
+      prevEl: ".swiper-button-prev",
+    },
+    breakpoints: {
+      1024: {slidesPerView: 4},
+      768: {slidesPerView: 2},
+      680: {slidesPerView: 1},
+    }
+  });
+});
+
 //FUNCION PARA QUE SE DESPLIEGUE PRECIO
 document.addEventListener("DOMContentLoaded", function () {
   const tipoSelect = document.getElementById("id_tipo");
