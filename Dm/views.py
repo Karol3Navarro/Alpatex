@@ -15,6 +15,8 @@ from .models import ConfirmacionEntrega
 from django.utils.timezone import localtime
 from datetime import timedelta
 from django.utils.timezone import localtime, make_aware, get_current_timezone, now
+from .utils import contar_mensajes_no_leidos
+
 # Create your views here.
 def home_index(request):
 	# Aquí puedes pasar el contexto que necesites para tu página de inicio
@@ -23,7 +25,7 @@ def home_index(request):
 class Inbox(View):
 	def get(self, request):
 		inbox = Canal.objects.filter(canalusuario__usuario=request.user)
-
+		
 		canal_id = request.GET.get('canal_id')
 		canal = None
 		producto_relacionado = None
@@ -38,6 +40,20 @@ class Inbox(View):
 		if canal_id:
 			try:
 				canal = Canal.objects.get(id=canal_id)
+
+				# ✅ Marcar como leídos
+				mensajes_sin_leer = canal.canalmensaje_set.exclude(leido_por=request.user).exclude(usuario=request.user)
+				if mensajes_sin_leer.exists():
+					for mensaje in mensajes_sin_leer:
+						mensaje.leido_por.add(request.user)
+					# 🔄 Redirigir para actualizar el contador de base.html
+					return redirect(f"{request.path}?canal_id={canal.id}")
+
+				# 🔔 Marcar como leídos los mensajes de este canal que aún no lo están
+				mensajes_sin_leer = canal.canalmensaje_set.exclude(leido_por=request.user).exclude(usuario=request.user)
+				for mensaje in mensajes_sin_leer:
+					mensaje.leido_por.add(request.user)
+
 				# 🔍 Buscamos el último mensaje con producto
 				mensaje_con_producto = canal.canalmensaje_set.filter(producto__isnull=False).order_by('-tiempo').first()
 				if mensaje_con_producto:
@@ -93,6 +109,9 @@ class Inbox(View):
 			except Canal.DoesNotExist:
 				canal = None  # O podrías manejar con Http404
 
+		# ✅ Ahora sí contar los mensajes no leídos después de marcar
+		mensajes_no_leidos = contar_mensajes_no_leidos(request.user)
+
 		context = {
 			"inbox": inbox,
 			"canal": canal,
@@ -103,7 +122,8 @@ class Inbox(View):
 			"confirmacion": confirmacion,
 			"mostrar_botones": mostrar_botones,
 			"cliente":cliente,
-			"calificacion_cliente": calificacion_cliente
+			"calificacion_cliente": calificacion_cliente,
+			"mensajes_no_leidos": mensajes_no_leidos,
 		}
 
 		return render(request, 'index/inbox.html', context)
