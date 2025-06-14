@@ -19,7 +19,7 @@ from reportlab.pdfgen import canvas  # type: ignore
 from reportlab.lib.utils import ImageReader # type: ignore
 from django.template.loader import render_to_string
 from email.mime.image import MIMEImage
-
+from Dm.utils import contar_mensajes_no_leidos
 
 
 
@@ -29,7 +29,13 @@ def dashboard(request):
 def home_admin(request):
     usuarios = User.objects.all()
     productos = Producto.objects.all()  # Obtener todos los productos
-    context = {"usuarios": usuarios, "productos": productos}  # Pasar la variable 'productos'
+    mensajes_no_leidos = contar_mensajes_no_leidos(request.user)
+
+    context = {
+        "usuarios": usuarios, 
+        "productos": productos,
+        'mensajes_no_leidos': mensajes_no_leidos
+        }  # Pasar la variable 'productos'
     return render(request, 'admin_alpatex/home_admin.html', context)
 
 @login_required

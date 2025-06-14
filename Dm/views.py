@@ -26,6 +26,11 @@ class Inbox(View):
 	def get(self, request):
 		inbox = Canal.objects.filter(canalusuario__usuario=request.user)
 		
+		if request.user.is_staff:
+			base_template = 'admin_alpatex/base.html'
+		else:
+			base_template = 'index/base.html'
+
 		canal_id = request.GET.get('canal_id')
 		canal = None
 		producto_relacionado = None
@@ -124,6 +129,7 @@ class Inbox(View):
 			"cliente":cliente,
 			"calificacion_cliente": calificacion_cliente,
 			"mensajes_no_leidos": mensajes_no_leidos,
+			"base_template": base_template,
 		}
 
 		return render(request, 'index/inbox.html', context)
