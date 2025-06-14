@@ -119,8 +119,8 @@
               </span>
             </small><br>
             <!--membresia-->
-            {% if request.user.perfil.membresia.nombre == 'Oro' %}
-            <small>Visitas: {{ producto.contador_visitas }}</small><br>
+            {% if suscripcion_activa and suscripcion_activa.membresia.estadisticas %}
+                <small>Visitas: {{ producto.contador_visitas }}</small><br>
             {% endif %}
 
             {% if producto.estado_revision == "Rechazado" %}

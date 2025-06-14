@@ -25,6 +25,7 @@ from admin_alpatex.services import MercadoPagoService
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from admin_alpatex.models import SuscripcionMercadoPago
 from admin_alpatex.mercadopago_config import (
     MERCADOPAGO_PUBLIC_KEY,
     MERCADOPAGO_PUBLIC_KEY_PROD
@@ -71,12 +72,15 @@ def menu(request):
 def home(request):
     usuarios = User.objects.all()
 
-    productos = Producto.objects.select_related('usuario__perfil__membresia').filter(
+    productos = Producto.objects.filter(
         estado_revision='Aceptado',
         disponible=True,
-    ).annotate(
-        prioridad_visibilidad=F('usuario__perfil__membresia__prioridad_visibilidad')
-    ).order_by('-prioridad_visibilidad', '-fecha_creacion')
+    ).select_related('usuario__perfil')
+
+    productos = sorted(
+        productos,
+        key=lambda p: (p.prioridad_visibilidad, -p.fecha_creacion.timestamp())
+    )
 
     mostrar_pendientes = False
     pendientes = ConfirmacionEntrega.objects.none()  # por defecto vacío
@@ -229,6 +233,13 @@ def editar_perfil(request):
 @login_required
 def perfil_usuario(request):
     perfil, _ = Perfil.objects.get_or_create(user=request.user)
+    
+    ahora = timezone.now()
+    suscripcion_activa = SuscripcionMercadoPago.objects.filter(
+        perfil=perfil,
+        fecha_fin__gte=ahora  # La suscripción sigue vigente
+    ).order_by('-fecha_inicio').first()
+
 
     if request.method == 'POST':
         form = PerfilForm(request.POST, request.FILES, instance=perfil, user=request.user)
@@ -241,7 +252,8 @@ def perfil_usuario(request):
     else:
         form = PerfilForm(instance=perfil, user=request.user)
 
-    return render(request, 'index/perfil.html', {'perfil': perfil, 'form': form})
+    return render(request, 'index/perfil.html', {'perfil': perfil, 'form': form,
+        'suscripcion_activa': suscripcion_activa})
 
  
 
@@ -264,10 +276,18 @@ def productos_perfil(request):
         mensaje = "No tienes productos agregados."
     else:
         mensaje = None
+
+    perfil = request.user.perfil
+    ahora = timezone.now()
+    suscripcion_activa = SuscripcionMercadoPago.objects.filter(
+        perfil=perfil,
+        fecha_fin__gte=ahora
+    ).order_by('-fecha_inicio').first()
+
     return render(request, 'index/productos_perf.html', {
         'productos': productos, 
         'mensaje': mensaje,
-        'membresia': request.user.perfil.membresia
+        'suscripcion_activa': suscripcion_activa
     })
 
 
@@ -792,6 +812,10 @@ def toggle_favorito(request, producto_id):
 def buscar_productos(request):
     query = request.GET.get('q', '')
     resultados = Producto.objects.filter(nombre__icontains=query, disponible=True)
+    resultados = sorted(
+        resultados,
+        key=lambda p: (p.prioridad_visibilidad, -p.fecha_creacion.timestamp())
+    )
     return render(request, 'index/resultados_busqueda.html', {'resultados': resultados, 'query': query})
 def detalle_producto(request, id):
     producto = get_object_or_404(Producto, id=id)

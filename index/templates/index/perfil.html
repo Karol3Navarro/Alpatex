@@ -16,10 +16,10 @@
             <div class="perfil-left">
                 <div class="perfil-foto">
                     <img src="{{ perfil.get_foto_perfil_url }}" alt="Foto de perfil" class="img-perfil">
-                    {% if perfil.membresia %}
-                        {% if perfil.membresia.nombre == 'Plata' %}
+                    {% if suscripcion_activa %}
+                        {% if suscripcion_activa.membresia.nombre == 'Plata' %}
                             <img src="{% static 'img/plata.png' %}" class="marco-membresia" alt="Marco Plata">
-                        {% elif perfil.membresia.nombre == 'Oro' %}
+                        {% elif suscripcion_activa.membresia.nombre == 'Oro' %}
                             <img src="{% static 'img/oro.png' %}" class="marco-membresia" alt="Marco Oro">
                         {% endif %}
                     {% endif %}

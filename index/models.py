@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from admin_alpatex.models import SuscripcionMercadoPago
 from admin_alpatex.models import Membresia
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -51,14 +52,34 @@ class Producto(models.Model):
     @property
     def prioridad_verificacion(self):
         try:
-            membresia = self.usuario.perfil.membresia
-            if membresia and membresia.nombre == 'Oro':
+            perfil = self.usuario.perfil
+            ahora = timezone.now()
+            suscripcion = SuscripcionMercadoPago.objects.filter(
+                perfil=perfil,
+                fecha_fin__gte=ahora
+            ).order_by('-fecha_inicio').first()
+            if suscripcion and suscripcion.membresia.nombre == 'Oro':
                 return 0
-            elif membresia and membresia.nombre == 'Plata':
+            elif suscripcion and suscripcion.membresia.nombre == 'Plata':
                 return 1
-        except:
+        except Exception:
             pass
         return 2  # Básico o sin membresía
+    
+    @property
+    def prioridad_visibilidad(self):
+        try:
+            perfil = self.usuario.perfil
+            ahora = timezone.now()
+            suscripcion = SuscripcionMercadoPago.objects.filter(
+                perfil=perfil,
+                fecha_fin__gte=ahora
+            ).order_by('-fecha_inicio').first()
+            if suscripcion:
+                return suscripcion.membresia.prioridad_visibilidad
+        except Exception:
+            pass
+        return 30  # Valor por defecto para usuarios sin membresía vigente
 
     def clean(self):
         if self.tipo == 'Venta':
