@@ -31,6 +31,9 @@ class Inbox(View):
 		else:
 			base_template = 'index/base.html'
 
+		for canal in inbox:
+			canal.no_leidos = canal.canalmensaje_set.exclude(leido_por=request.user).exclude(usuario=request.user).count()
+
 		canal_id = request.GET.get('canal_id')
 		canal = None
 		producto_relacionado = None

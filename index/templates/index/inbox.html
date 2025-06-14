@@ -2,7 +2,25 @@
 {% load static %}
 {% block title %}Mis Mensajes{% endblock title %}
 {% block body %}
-
+    <style>
+        .badge-unread {
+            top: -2px; 
+            right: 0;
+            transform: translate(50%, -50%);
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            pointer-events: none;
+        }
+    </style>
 	<div class="chat-wrapper">
 		<!-- Lista de conversaciones -->
 		<div class="chat-sidebar">
@@ -28,6 +46,11 @@
 									</div>
 								{% endif %}
 							</div>
+                            {% if inbox.no_leidos > 0 %}
+                                <div class="unread-count">
+                                    <span class="badge-unread">{{ inbox.no_leidos }}</span>
+                                </div>
+                            {% endif %}
 						</a>
 					{% endif %}
 				{% endfor %}
