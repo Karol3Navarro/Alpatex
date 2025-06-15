@@ -455,19 +455,19 @@ def redirigir_producto(request, producto_id):
         
 @login_required
 def libros(request):
-    libros = Producto.objects.filter(categoria='Libro', disponible=True)  
+    libros = Producto.objects.filter(categoria='Libro', disponible=True, estado_revision='Aceptado')  
     return render(request, 'index/libros.html', {'libros': libros})
 
 @login_required
 def videojuegos(request):
-    videojuegos = Producto.objects.filter(categoria='Videojuego', disponible=True)  
+    videojuegos = Producto.objects.filter(categoria='Videojuego', disponible=True, estado_revision='Aceptado')  
     return render(request, 'index/videojuegos.html', {'videojuegos': videojuegos})
 
 
 @login_required
 def productos(request):
     # Filtrar productos aprobados con disponible
-    productos = Producto.objects.filter(disponible=True)
+    productos = Producto.objects.filter(disponible=True, estado_revision='Aceptado')
     return render(request, 'index/productos.html', {'productos': productos})
 
 def ver_todo(request):
