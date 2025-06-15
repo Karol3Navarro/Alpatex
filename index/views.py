@@ -204,7 +204,7 @@ def index(request):
             # Usuario activo, permite login
             login(request, user)
             if user.is_staff:
-                return redirect('admin_dashboard')
+                return redirect('home_admin')
             else:
                 return redirect('home')
 
@@ -677,8 +677,8 @@ def reportar_vendedor(request):
         return redirect(request.META.get('HTTP_REFERER', 'home')) 
     else:
         return JsonResponse({'status': 'error', 'errors': form.errors})
-@login_required
 @require_POST
+@login_required
 def reportar_usuario(request):
     form = ReporteusuarioForm(request.POST)
     usuario_reportado_id = request.POST.get('usuario_reportado_id')
@@ -695,8 +695,7 @@ def reportar_usuario(request):
 
     if form.is_valid():
         reporte = form.save(commit=False)
-        reporte.comprador = request.user
-        reporte.vendedor = usuario_reportado
+        reporte.usuario = usuario_reportado  # 👈 Este es el único campo necesario
         reporte.save()
         messages.success(request, "Gracias por reportar a este usuario.")
     else:

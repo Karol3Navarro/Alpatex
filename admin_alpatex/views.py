@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from index.models import Producto, Perfil,  CalificacionVendedor, CalificacionCliente, ReporteVendedor
+from index.models import Producto, Perfil,  CalificacionVendedor, CalificacionCliente, ReporteVendedor, ReporteUsuario
+from django.db.models import Avg
 from django.contrib.auth.decorators import login_required,user_passes_test
 from django.contrib.auth.models import User
 import openpyxl
@@ -25,18 +26,73 @@ from Dm.utils import contar_mensajes_no_leidos
 
 def dashboard(request):
     return render(request, 'admin_alpatex/home_admin.html')
-
 def home_admin(request):
-    usuarios = User.objects.all()
-    productos = Producto.objects.all()  # Obtener todos los productos
+    # Totales y otros datos
     mensajes_no_leidos = contar_mensajes_no_leidos(request.user)
 
+    total_usuarios = User.objects.count()
+    total_productos = Producto.objects.count()
+    productos_pendientes = Producto.objects.filter(estado_revision='Pendiente').count()
+    
+    total_reportes_vendedor = ReporteVendedor.objects.count()
+    total_reportes_usuario = ReporteUsuario.objects.count()
+
+    # Promedios individuales
+    promedio_puntaje_vendedor = CalificacionVendedor.objects.aggregate(avg=Avg('puntaje'))['avg'] or 0
+    promedio_puntaje_cliente = CalificacionCliente.objects.aggregate(avg=Avg('puntaje'))['avg'] or 0
+
+    # Promedio general ponderado
+    count_vendedor = CalificacionVendedor.objects.count()
+    count_cliente = CalificacionCliente.objects.count()
+    total_calificaciones = count_vendedor + count_cliente
+
+    if total_calificaciones > 0:
+        promedio_puntaje_usuarios = (
+            (promedio_puntaje_vendedor * count_vendedor) + 
+            (promedio_puntaje_cliente * count_cliente)
+        ) / total_calificaciones
+    else:
+        promedio_puntaje_usuarios = 0
+
+    # Mejor vendedor promedio (usuario con mayor promedio en CalificacionVendedor)
+    mejor_vendedor = CalificacionVendedor.objects.values('vendedor__id', 'vendedor__username') \
+        .annotate(promedio=Avg('puntaje')) \
+        .order_by('-promedio').first()
+
+    # Mejor cliente promedio (usuario con mayor promedio en CalificacionCliente)
+    mejor_cliente = CalificacionCliente.objects.values('cliente__id', 'cliente__username') \
+        .annotate(promedio=Avg('puntaje')) \
+        .order_by('-promedio').first()
+
+    # Aquí combinamos ambos para obtener el mejor usuario general (el que tenga mayor promedio entre ambos)
+    mejor_usuario = None
+    if mejor_vendedor and mejor_cliente:
+        if mejor_vendedor['promedio'] >= mejor_cliente['promedio']:
+            mejor_usuario = {'username': mejor_vendedor['vendedor__username'], 'promedio': mejor_vendedor['promedio']}
+        else:
+            mejor_usuario = {'username': mejor_cliente['cliente__username'], 'promedio': mejor_cliente['promedio']}
+    elif mejor_vendedor:
+        mejor_usuario = {'username': mejor_vendedor['vendedor__username'], 'promedio': mejor_vendedor['promedio']}
+    elif mejor_cliente:
+        mejor_usuario = {'username': mejor_cliente['cliente__username'], 'promedio': mejor_cliente['promedio']}
+
+    productos_pendientes_list = Producto.objects.filter(estado_revision='Pendiente').order_by('-fecha_creacion')[:5]
+
     context = {
-        "usuarios": usuarios, 
-        "productos": productos,
+        'total_usuarios': total_usuarios,
+        'total_productos': total_productos,
+        'productos_pendientes': productos_pendientes,
+        'total_reportes_vendedor': total_reportes_vendedor,
+        'total_reportes_usuario': total_reportes_usuario,
+        'promedio_puntaje_usuarios': round(promedio_puntaje_usuarios, 2),
+        'mejor_usuario': mejor_usuario,
+        'productos_pendientes_list': productos_pendientes_list,
         'mensajes_no_leidos': mensajes_no_leidos
-        }  # Pasar la variable 'productos'
+
+    }
     return render(request, 'admin_alpatex/home_admin.html', context)
+
+
 
 @login_required
 def menu(request):
@@ -359,10 +415,13 @@ def eliminar_usuario(request, user_id):
     return redirect('usuarios')
 @login_required
 def usuarios_reportados(request):
-    # Obtener usuarios que han sido reportados al menos una vez
-    usuarios = User.objects.filter(reportes_recibidos__isnull=False).annotate(
-        num_reportes=Count('reportes_recibidos')
-    ).distinct()
+    # Contar reportes recibidos como vendedor y como usuario
+    usuarios = User.objects.annotate(
+        num_reportes_vendedor=Count('reportes_recibidos', distinct=True),
+        num_reportes_usuario=Count('reportes_usuario', distinct=True)
+    ).filter(
+        Q(num_reportes_vendedor__gt=0) | Q(num_reportes_usuario__gt=0)
+    )
 
     return render(request, 'admin_alpatex/usuarios_reportados.html', {
         'usuarios': usuarios
