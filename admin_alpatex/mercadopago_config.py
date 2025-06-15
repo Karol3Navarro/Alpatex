@@ -9,12 +9,8 @@ MERCADOPAGO_PUBLIC_KEY = "APP_USR-92c6bcfe-4853-4768-a8e7-e4015fc9219e"
 MERCADOPAGO_ACCESS_TOKEN_PROD = "APP_USR-7429934597752386-052722-02335e93139d8f32b0e2544fb0a4d780-2464461320"
 MERCADOPAGO_PUBLIC_KEY_PROD = "APP_USR-bbbfdb4d-55c2-4d7b-8ae4-d1ec450749a5"
 
-# URL base para webhooks y callbacks
+# toma la url de ngrok y la usa para construir o actualizar las url de webhook, exito y rechzo
 def get_base_url():
-    """
-    Obtiene la URL base del proyecto.
-    En desarrollo, usa la URL de ngrok si está disponible.
-    """
     if hasattr(settings, 'NGROK_URL'):
         return settings.NGROK_URL
     return settings.BASE_URL

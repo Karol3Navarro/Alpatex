@@ -11,7 +11,7 @@ class Membresia(models.Model):
     verificacion_prioritaria = models.BooleanField(default=False)
     estadisticas = models.BooleanField(default=False)
     precio = models.PositiveIntegerField()
-    plan_id = models.CharField(max_length=100, null=True, blank=True)
+    plan_id = models.CharField(max_length=100, null=True, blank=True) #ids de los planes en mercado pago
 
     def __str__(self):
         return self.nombre
@@ -23,9 +23,9 @@ class SuscripcionMercadoPago(models.Model):
         ('expired', 'Expirada'),
     ]
 
-    perfil = models.ForeignKey('index.Perfil', on_delete=models.CASCADE)
-    membresia = models.ForeignKey(Membresia, on_delete=models.CASCADE)
-    subscription_id = models.CharField(max_length=100, unique=True)
+    perfil = models.ForeignKey('index.Perfil', on_delete=models.CASCADE) #relacion con el perfil del usuario
+    membresia = models.ForeignKey(Membresia, on_delete=models.CASCADE) #relacion con el tipo de membresia
+    subscription_id = models.CharField(max_length=100, unique=True) #id de la suscripcion en mercado pago
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='active')
     fecha_inicio = models.DateTimeField(default=timezone.now)
     fecha_fin = models.DateTimeField(null=True, blank=True)
@@ -39,17 +39,20 @@ class SuscripcionMercadoPago(models.Model):
     def __str__(self):
         return f"Suscripción {self.subscription_id} - {self.perfil.user.username}"
 
+
     def cancelar(self):
         self.estado = 'cancelled'
         self.fecha_cancelacion = timezone.now()
         # La membresía seguirá activa hasta la fecha_fin
         self.save()
 
+    #Calcula la fecha del próximo pago (30 días después del último)
     def actualizar_proximo_pago(self):
         if self.ultimo_pago:
             self.proximo_pago = self.ultimo_pago + timedelta(days=30)
             self.save()
 
+    #Verifica si la suscripción ha expirado
     def verificar_estado(self):
         if self.estado == 'active' and self.fecha_fin and timezone.now() > self.fecha_fin:
             self.estado = 'expired'

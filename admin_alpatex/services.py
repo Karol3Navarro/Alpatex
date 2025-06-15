@@ -15,10 +15,12 @@ from .mercadopago_config import (
 )
 
 class MercadoPagoService:
+    
+    #Inicializa el SDK de Mercado Pago con el Access Token de prueba
     def __init__(self):
-        # Inicializar el SDK con el Access Token de SANDBOX
         self.sdk = mercadopago.SDK(MERCADOPAGO_ACCESS_TOKEN)
 
+    #Crea una suscripción automática de pago recurrente
     def crear_suscripcion(self, perfil, membresia, token_tarjeta):
         """
         Crea una suscripción en Mercado Pago (Sandbox).
@@ -26,7 +28,7 @@ class MercadoPagoService:
         Además, crea un registro en el modelo SuscripcionMercadoPago.
         """
         try:
-            # Validaciones básicas
+            # Valida que el token de tarjeta sea válido
             if not token_tarjeta or not isinstance(token_tarjeta, str):
                 raise Exception("No se recibió un token de tarjeta válido")
 
@@ -35,21 +37,21 @@ class MercadoPagoService:
                 "preapproval_plan_id": membresia.plan_id,
                 "reason": membresia.nombre,
                 "payer_email": perfil.user.email,
-                "card_token_id": token_tarjeta,
+                "card_token_id": token_tarjeta, #generado por el frontend
                 "notification_url": MERCADOPAGO_WEBHOOK_URL,
                 "back_url": MERCADOPAGO_SUCCESS_URL,
                 "failure_url": MERCADOPAGO_FAILURE_URL,
                 "pending_url": MERCADOPAGO_PENDING_URL
             }
 
-            # Llamada a la API de Mercado Pago
+            # Llamada a la API de Mercado Pago para crear la suscripción
             response = self.sdk.subscription().create(subscription_data)
 
             # Si el estado es 201, la suscripción se creó correctamente
             if response["status"] == 201:
                 api_response = response["response"]
 
-                # Guardar en la bd
+                # Guardar en la bd en la tabla  SuscripcionMercadoPago
                 SuscripcionMercadoPago.objects.create(
                     perfil=perfil,
                     membresia=membresia,
@@ -59,7 +61,7 @@ class MercadoPagoService:
                     fecha_fin=timezone.now() + timedelta(days=SUBSCRIPTION_FREQUENCY)
                 )
 
-                # Devolvemos todo el dict que vino de Mercado Pago
+                # Devuelve la respuesta de la API de Mercado Pago
                 return api_response
 
             else:
