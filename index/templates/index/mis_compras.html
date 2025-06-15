@@ -64,7 +64,21 @@
   color: #AD5CA1;
 }
 
-/* Puedes personalizar más elementos si quieres */
+/* Estilo para las secciones de productos y mensajes */
+.list-prod {
+  padding: 15px; /* Espacio alrededor de la lista de productos */
+  margin: 0 15px; /* Espacio en los márgenes izquierdo y derecho */
+}
+
+/* Estilo para los mensajes sin productos */
+p {
+  padding: 10px 20px; /* Añadir padding en todos los lados */
+  margin: 0 15px; /* Márgenes para no pegarse a los bordes */
+  border-radius: 5px; /* Bordes redondeados */
+  font-size: 1rem; /* Tamaño de fuente ligeramente mayor */
+  color: #333; /* Color de texto oscuro */
+}
+
 
 
 </style>
@@ -73,192 +87,265 @@
             <span class="material-symbols-outlined">chevron_left</span> Regresar
         </a>
     </div>
-    <h1 class="prod-dest">Mis Pendientes</h1>
-    {% if pendientes %}
-        <div class="list-prod">
-            {% for confirmacion in pendientes %}
-                <div class="list-prod-item">
-                    <div class="img-prod">
-                        {% if confirmacion.producto.imagen %}
-                        <img src="{{ confirmacion.producto.imagen.url }}" alt="{{ confirmacion.producto.nombre }}"
-                            style="width: 100px; height: 100px; object-fit: cover;">
-                        {% else %}
-                        <img src="{% static 'images/default_product.png' %}" alt="Sin imagen"
-                            style="width: 100px; height: 100px; object-fit: cover;">
+    <div class="text-center my-4">
+  <div class="btn-group">
+    <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      Filtrar sección
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); toggleSeccion('pendientes')">Mis Pendientes</a></li>
+      <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); toggleSeccion('compras')">Mis Compras</a></li>
+      <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); toggleSeccion('intercambios')">Mis Intercambios</a></li>
+      <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); toggleSeccion('productos')">Mis Productos</a></li>
+      <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); toggleSeccion('realizado')">No Realizados</a></li>
+      <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); toggleSeccion('todos')">Mostrar todo</a></li>
+    </ul>
+  </div>
+</div>
+    <div id="seccion-pendientes">
+        <h1 class="prod-dest">Mis Pendientes</h1>
+        {% if pendientes %}
+            <div class="list-prod">
+                {% for confirmacion in pendientes %}
+                    <div class="list-prod-item">
+                        <div class="img-prod">
+                            {% if confirmacion.producto.imagen %}
+                            <img src="{{ confirmacion.producto.imagen.url }}" alt="{{ confirmacion.producto.nombre }}"
+                                style="width: 100px; height: 100px; object-fit: cover;">
+                            {% else %}
+                            <img src="{% static 'images/default_product.png' %}" alt="Sin imagen"
+                                style="width: 100px; height: 100px; object-fit: cover;">
+                            {% endif %}
+                        </div>
+
+                        <div class="info">
+                            <strong>Producto: {{ confirmacion.producto.nombre }}</strong><br>
+                            <small>Fecha: {{ confirmacion.fecha }}</small><br>
+                            <small>Hora: {{ confirmacion.hora }}</small><br>
+                            <small>Lugar: {{ confirmacion.lugar }}</small><br>
+                            <small>Creado por: {{ confirmacion.creador.username }}</small><br>
+                            <small>Creado en: {{ confirmacion.creado_en|date:"d M Y H:i" }}</small><br>
+                            {% if not confirmacion.concretado %}
+                                <span style="color:red; font-weight:bold;">❌ No se concretó</span>
+                            {% elif confirmacion.confirmado %}
+                                <span style="color:green; font-weight:bold;">✔ Entrega Confirmada</span>
+                            {% else %}
+                                <span style="color:orange; font-weight:bold;">⏳ Pendiente de Confirmación</span>
+                            {% endif %}
+                        </div>
+
+                        {% if confirmacion.creador == request.user %}
+                            <div class="actions">
+                                <a href="{% url 'editar_confirmacion' confirmacion.id %}" class="btn btn-warning">Editar</a>
+                                <form action="{% url 'eliminar_confirmacion' confirmacion.id %}" method="POST" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta confirmación?');">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
                         {% endif %}
                     </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No tienes confirmaciones pendientes.</p>
+        {% endif %}
+    </div>
+    <div id="seccion-compras">
+        <h1 class="prod-dest">Mis Compras</h1>
+        {% if compras %}
+            <div class="list-prod">
+                {% for confirmacion in compras %}
+                    <div class="list-prod-item">
+                        <div class="img-prod">
+                            {% if confirmacion.producto.imagen %}
+                            <img src="{{ confirmacion.producto.imagen.url }}" alt="{{ confirmacion.producto.nombre }}"
+                                style="width: 100px; height: 100px; object-fit: cover;">
+                            {% else %}
+                            <img src="{% static 'images/default_product.png' %}" alt="Sin imagen"
+                                style="width: 100px; height: 100px; object-fit: cover;">
+                            {% endif %}
+                        </div>
 
-                    <div class="info">
-                        <strong>Producto: {{ confirmacion.producto.nombre }}</strong><br>
-                        <small>Fecha: {{ confirmacion.fecha }}</small><br>
-                        <small>Hora: {{ confirmacion.hora }}</small><br>
-                        <small>Lugar: {{ confirmacion.lugar }}</small><br>
-                        <small>Creado por: {{ confirmacion.creador.username }}</small><br>
-                        <small>Creado en: {{ confirmacion.creado_en|date:"d M Y H:i" }}</small><br>
-                        {% if not confirmacion.concretado %}
+                        <div class="info">
+                            <strong>Producto: {{ confirmacion.producto.nombre }}</strong><br>
+                            <small>Fecha: {{ confirmacion.fecha }}</small><br>
+                            <small>Hora: {{ confirmacion.hora }}</small><br>
+                            <small>Lugar: {{ confirmacion.lugar }}</small><br>
+                            <small>Creado por: {{ confirmacion.creador.username }}</small><br>
+                            <small>Creado en: {{ confirmacion.creado_en|date:"d M Y H:i" }}</small><br>
+
+                            {% if confirmacion.confirmado %}
+                                <span style="color:green; font-weight:bold;">✔ Entrega Confirmada</span>
+                            {% else %}
+                                <span style="color:orange; font-weight:bold;">⏳ Pendiente de Confirmación</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No has comprado productos aún.</p>
+        {% endif %}
+    </div>
+    <div id="seccion-intercambios">
+        <h1 class="prod-dest">Mis Intercambios</h1>
+        {% if intercambios %}
+            <div class="list-prod">
+                {% for confirmacion in intercambios %}
+                    <div class="list-prod-item">
+                        <div class="img-prod">
+                            {% if confirmacion.producto.imagen %}
+                            <img src="{{ confirmacion.producto.imagen.url }}" alt="{{ confirmacion.producto.nombre }}"
+                                style="width: 100px; height: 100px; object-fit: cover;">
+                            {% else %}
+                            <img src="{% static 'images/default_product.png' %}" alt="Sin imagen"
+                                style="width: 100px; height: 100px; object-fit: cover;">
+                            {% endif %}
+                        </div>
+
+                        <div class="info">
+                            <strong>Producto: {{ confirmacion.producto.nombre }}</strong><br>
+                            <small>Fecha: {{ confirmacion.fecha }}</small><br>
+                            <small>Hora: {{ confirmacion.hora }}</small><br>
+                            <small>Lugar: {{ confirmacion.lugar }}</small><br>
+                            <small>Creado por: {{ confirmacion.creador.username }}</small><br>
+                            <small>Creado en: {{ confirmacion.creado_en|date:"d M Y H:i" }}</small><br>
+
+                            {% if confirmacion.confirmado %}
+                                <span style="color:green; font-weight:bold;">✔ Entrega Confirmada</span>
+                            {% else %}
+                                <span style="color:orange; font-weight:bold;">⏳ Pendiente de Confirmación</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No has realizado intercambios aún.</p>
+        {% endif %}
+    </div>
+    <div id="seccion-productos">
+        <h1 class="prod-dest">Mis Productos</h1>
+        {% if mis_productos %}
+            <div class="list-prod">
+                {% for confirmacion in mis_productos %}
+                    <div class="list-prod-item">
+                        <div class="img-prod">
+                            {% if confirmacion.producto.imagen %}
+                            <img src="{{ confirmacion.producto.imagen.url }}" alt="{{ confirmacion.producto.nombre }}"
+                                style="width: 100px; height: 100px; object-fit: cover;">
+                            {% else %}
+                            <img src="{% static 'images/default_product.png' %}" alt="Sin imagen"
+                                style="width: 100px; height: 100px; object-fit: cover;">
+                            {% endif %}
+                        </div>
+
+                        <div class="info">
+                            <strong>Producto: {{ confirmacion.producto.nombre }}</strong><br>
+                            <small>Fecha: {{ confirmacion.fecha }}</small><br>
+                            <small>Hora: {{ confirmacion.hora }}</small><br>
+                            <small>Lugar: {{ confirmacion.lugar }}</small><br>
+                            <small>Creado por: {{ confirmacion.creador.username }}</small><br>
+                            <small>Creado en: {{ confirmacion.creado_en|date:"d M Y H:i" }}</small><br>
+
+                            {% if confirmacion.confirmado %}
+                                <span style="color:green; font-weight:bold;">✔ Entrega Confirmada</span>
+                            {% else %}
+                                <span style="color:orange; font-weight:bold;">⏳ Pendiente de Confirmación</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No has vendido ni intercambiado productos aún.</p>
+        {% endif %}
+    </div>
+    <div id="seccion-realizados">
+        <h1 class="prod-dest">No Realizados</h1>
+        {% if reportados %}
+            <div class="list-prod">
+                {% for confirmacion in reportados %}
+                    <div class="list-prod-item">
+                        <div class="img-prod">
+                            {% if confirmacion.producto.imagen %}
+                            <img src="{{ confirmacion.producto.imagen.url }}" alt="{{ confirmacion.producto.nombre }}"
+                                style="width: 100px; height: 100px; object-fit: cover;">
+                            {% else %}
+                            <img src="{% static 'images/default_product.png' %}" alt="Sin imagen"
+                                style="width: 100px; height: 100px; object-fit: cover;">
+                            {% endif %}
+                        </div>
+
+                        <div class="info">
+                            <strong>Producto: {{ confirmacion.producto.nombre }}</strong><br>
+                            <small>Fecha: {{ confirmacion.fecha }}</small><br>
+                            <small>Hora: {{ confirmacion.hora }}</small><br>
+                            <small>Lugar: {{ confirmacion.lugar }}</small><br>
+                            <small>Creado por: {{ confirmacion.creador.username }}</small><br>
+                            <small>Creado en: {{ confirmacion.creado_en|date:"d M Y H:i" }}</small><br>
+
                             <span style="color:red; font-weight:bold;">❌ No se concretó</span>
-                        {% elif confirmacion.confirmado %}
-                            <span style="color:green; font-weight:bold;">✔ Entrega Confirmada</span>
-                        {% else %}
-                            <span style="color:orange; font-weight:bold;">⏳ Pendiente de Confirmación</span>
-                        {% endif %}
+                        </div>
                     </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No has realizado reportes aún.</p>
+        {% endif %}
+    </div>
 
-                    {% if confirmacion.creador == request.user %}
-						<div class="actions">
-							<a href="{% url 'editar_confirmacion' confirmacion.id %}" class="btn btn-warning">Editar</a>
-							<form action="{% url 'eliminar_confirmacion' confirmacion.id %}" method="POST" style="display:inline;">
-								{% csrf_token %}
-								<button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta confirmación?');">
-									Eliminar
-								</button>
-							</form>
-						</div>
-					{% endif %}
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p>No tienes confirmaciones pendientes.</p>
-    {% endif %}
+    <script>
+        function toggleSeccion(opcion) {
+            const pendientes = document.getElementById("seccion-pendientes");
+            const compras = document.getElementById("seccion-compras");
+            const intercambios = document.getElementById("seccion-intercambios");
+            const productos = document.getElementById("seccion-productos");
+            const realizados = document.getElementById("seccion-realizados");
 
-    <h1 class="prod-dest">Mis Compras</h1>
-    {% if compras %}
-        <div class="list-prod">
-            {% for confirmacion in compras %}
-                <div class="list-prod-item">
-                    <div class="img-prod">
-                        {% if confirmacion.producto.imagen %}
-                        <img src="{{ confirmacion.producto.imagen.url }}" alt="{{ confirmacion.producto.nombre }}"
-                            style="width: 100px; height: 100px; object-fit: cover;">
-                        {% else %}
-                        <img src="{% static 'images/default_product.png' %}" alt="Sin imagen"
-                            style="width: 100px; height: 100px; object-fit: cover;">
-                        {% endif %}
-                    </div>
+            if (opcion === "pendientes") {
+                pendientes.style.display = "block";
+                compras.style.display = "none";
+                intercambios.style.display = "none";
+                productos.style.display = "none";
+                realizados.style.display = "none";
+            } else if (opcion === "compras") {
+                pendientes.style.display = "none";
+                compras.style.display = "block";
+                intercambios.style.display = "none";
+                productos.style.display = "none";
+                realizados.style.display = "none";
+            } else if (opcion === "intercambios") {
+                pendientes.style.display = "none";
+                compras.style.display = "none";
+                intercambios.style.display = "block";
+                productos.style.display = "none";
+                realizados.style.display = "none";
+            } else if (opcion === "productos") {
+                pendientes.style.display = "none";
+                compras.style.display = "none";
+                intercambios.style.display = "none";
+                productos.style.display = "block";
+                realizados.style.display = "none";
+            } else if (opcion === "realizado") {
+                pendientes.style.display = "none";
+                compras.style.display = "none";
+                intercambios.style.display = "none";
+                productos.style.display = "none";
+                realizados.style.display = "block";
+            } else {
+                pendientes.style.display = "block";
+                compras.style.display = "block";
+                intercambios.style.display = "block";
+                productos.style.display = "block";
+                realizados.style.display = "block";
+            }
+        }
 
-                    <div class="info">
-                        <strong>Producto: {{ confirmacion.producto.nombre }}</strong><br>
-                        <small>Fecha: {{ confirmacion.fecha }}</small><br>
-                        <small>Hora: {{ confirmacion.hora }}</small><br>
-                        <small>Lugar: {{ confirmacion.lugar }}</small><br>
-                        <small>Creado por: {{ confirmacion.creador.username }}</small><br>
-                        <small>Creado en: {{ confirmacion.creado_en|date:"d M Y H:i" }}</small><br>
-
-                        {% if confirmacion.confirmado %}
-                            <span style="color:green; font-weight:bold;">✔ Entrega Confirmada</span>
-                        {% else %}
-                            <span style="color:orange; font-weight:bold;">⏳ Pendiente de Confirmación</span>
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p>No has comprado productos aún.</p>
-    {% endif %}
-
-    <h1 class="prod-dest">Mis Intercambios</h1>
-    {% if intercambios %}
-        <div class="list-prod">
-            {% for confirmacion in intercambios %}
-                <div class="list-prod-item">
-                    <div class="img-prod">
-                        {% if confirmacion.producto.imagen %}
-                        <img src="{{ confirmacion.producto.imagen.url }}" alt="{{ confirmacion.producto.nombre }}"
-                            style="width: 100px; height: 100px; object-fit: cover;">
-                        {% else %}
-                        <img src="{% static 'images/default_product.png' %}" alt="Sin imagen"
-                            style="width: 100px; height: 100px; object-fit: cover;">
-                        {% endif %}
-                    </div>
-
-                    <div class="info">
-                        <strong>Producto: {{ confirmacion.producto.nombre }}</strong><br>
-                        <small>Fecha: {{ confirmacion.fecha }}</small><br>
-                        <small>Hora: {{ confirmacion.hora }}</small><br>
-                        <small>Lugar: {{ confirmacion.lugar }}</small><br>
-                        <small>Creado por: {{ confirmacion.creador.username }}</small><br>
-                        <small>Creado en: {{ confirmacion.creado_en|date:"d M Y H:i" }}</small><br>
-
-                        {% if confirmacion.confirmado %}
-                            <span style="color:green; font-weight:bold;">✔ Entrega Confirmada</span>
-                        {% else %}
-                            <span style="color:orange; font-weight:bold;">⏳ Pendiente de Confirmación</span>
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p>No has realizado intercambios aún.</p>
-    {% endif %}
-
-    <h1 class="prod-dest">Mis Productos</h1>
-    {% if mis_productos %}
-        <div class="list-prod">
-            {% for confirmacion in mis_productos %}
-                <div class="list-prod-item">
-                    <div class="img-prod">
-                        {% if confirmacion.producto.imagen %}
-                        <img src="{{ confirmacion.producto.imagen.url }}" alt="{{ confirmacion.producto.nombre }}"
-                            style="width: 100px; height: 100px; object-fit: cover;">
-                        {% else %}
-                        <img src="{% static 'images/default_product.png' %}" alt="Sin imagen"
-                            style="width: 100px; height: 100px; object-fit: cover;">
-                        {% endif %}
-                    </div>
-
-                    <div class="info">
-                        <strong>Producto: {{ confirmacion.producto.nombre }}</strong><br>
-                        <small>Fecha: {{ confirmacion.fecha }}</small><br>
-                        <small>Hora: {{ confirmacion.hora }}</small><br>
-                        <small>Lugar: {{ confirmacion.lugar }}</small><br>
-                        <small>Creado por: {{ confirmacion.creador.username }}</small><br>
-                        <small>Creado en: {{ confirmacion.creado_en|date:"d M Y H:i" }}</small><br>
-
-                        {% if confirmacion.confirmado %}
-                            <span style="color:green; font-weight:bold;">✔ Entrega Confirmada</span>
-                        {% else %}
-                            <span style="color:orange; font-weight:bold;">⏳ Pendiente de Confirmación</span>
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p>No has vendido ni intercambiado productos aún.</p>
-    {% endif %}
-
-    <h1 class="prod-dest">No Realizados</h1>
-    {% if reportados %}
-        <div class="list-prod">
-            {% for confirmacion in reportados %}
-                <div class="list-prod-item">
-                    <div class="img-prod">
-                        {% if confirmacion.producto.imagen %}
-                        <img src="{{ confirmacion.producto.imagen.url }}" alt="{{ confirmacion.producto.nombre }}"
-                            style="width: 100px; height: 100px; object-fit: cover;">
-                        {% else %}
-                        <img src="{% static 'images/default_product.png' %}" alt="Sin imagen"
-                            style="width: 100px; height: 100px; object-fit: cover;">
-                        {% endif %}
-                    </div>
-
-                    <div class="info">
-                        <strong>Producto: {{ confirmacion.producto.nombre }}</strong><br>
-                        <small>Fecha: {{ confirmacion.fecha }}</small><br>
-                        <small>Hora: {{ confirmacion.hora }}</small><br>
-                        <small>Lugar: {{ confirmacion.lugar }}</small><br>
-                        <small>Creado por: {{ confirmacion.creador.username }}</small><br>
-                        <small>Creado en: {{ confirmacion.creado_en|date:"d M Y H:i" }}</small><br>
-
-                        <span style="color:red; font-weight:bold;">❌ No se concretó</span>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p>No has realizado reportes aún.</p>
-    {% endif %}
+        document.addEventListener("DOMContentLoaded", function () {
+            toggleSeccion("todos");  // Mostrar todo por defecto
+        });
+    </script>
 {% endblock %} 

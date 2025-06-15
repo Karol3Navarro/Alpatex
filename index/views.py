@@ -521,32 +521,32 @@ def mis_compras(request):
         canal__usuarios=usuario,
         concretado=True,
         confirmado=False
-    ).distinct()
+    ).distinct().order_by('-fecha')
 
     # Compras (productos comprados, confirmados y de tipo venta), excluyendo los que eres vendedor
     compras = ConfirmacionEntrega.objects.filter(
         canal__usuarios=usuario,
         confirmado=True,
         producto__tipo='Venta'
-    ).exclude(producto__usuario=usuario).distinct()
+    ).exclude(producto__usuario=usuario).distinct().order_by('-fecha')
 
     # Intercambios (productos intercambiados, confirmados), excluyendo los que eres vendedor
     intercambios = ConfirmacionEntrega.objects.filter(
         canal__usuarios=usuario,
         confirmado=True,
         producto__tipo='Intercambio'
-    ).exclude(producto__usuario=usuario).distinct()
+    ).exclude(producto__usuario=usuario).distinct().order_by('-fecha')
 
     # Mis productos vendidos o intercambiados (como vendedor)
     mis_productos = ConfirmacionEntrega.objects.filter(
         producto__usuario=usuario,
         confirmado=True
-    ).distinct()
+    ).distinct().order_by('-fecha')
 
     reportados = ConfirmacionEntrega.objects.filter(
         canal__usuarios=usuario,
         concretado=False
-    )
+    ).order_by('-fecha')
 
     return render(request, 'index/mis_compras.html', {
         'pendientes': pendientes,
