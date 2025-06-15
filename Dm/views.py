@@ -26,7 +26,7 @@ class Inbox(View):
 	def get(self, request):
 		inbox = Canal.objects.filter(canalusuario__usuario=request.user)
 		
-		if request.user.is_staff:
+		if request.user.is_authenticated and request.user.is_staff:
 			base_template = 'admin_alpatex/base.html'
 		else:
 			base_template = 'index/base.html'
