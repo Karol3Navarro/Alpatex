@@ -23,13 +23,17 @@ from email.mime.image import MIMEImage
 from Dm.utils import contar_mensajes_no_leidos
 
 
-
+#renderiza la plantilla home_admin.html
 def dashboard(request):
     return render(request, 'admin_alpatex/home_admin.html')
+
+#vista que renderiza la plantilla home_admin.html
+#Recopila y calcula datos del sistema para mostrarlos en la página principal del admin
 def home_admin(request):
     # Totales y otros datos
     mensajes_no_leidos = contar_mensajes_no_leidos(request.user)
 
+    #calcula la cantidad de usuarios, productos, reportes y promedios de calificaciones
     total_usuarios = User.objects.count()
     total_productos = Producto.objects.count()
     productos_pendientes = Producto.objects.filter(estado_revision='Pendiente').count()
@@ -76,6 +80,8 @@ def home_admin(request):
     elif mejor_cliente:
         mejor_usuario = {'username': mejor_cliente['cliente__username'], 'promedio': mejor_cliente['promedio']}
 
+    # Lista de productos pendientes (los 5 más recientes)
+    # Se ordenan por fecha de creación descendente 
     productos_pendientes_list = Producto.objects.filter(estado_revision='Pendiente').order_by('-fecha_creacion')[:5]
 
     context = {
@@ -92,8 +98,6 @@ def home_admin(request):
     }
     return render(request, 'admin_alpatex/home_admin.html', context)
 
-
-
 @login_required
 def menu(request):
     request.session["usuario"]="cgarcia"
@@ -101,11 +105,12 @@ def menu(request):
     context={'usuario':usuario}
     return render(request, 'admin_alpatex/home_admin.html', context)
 
-
-
-
+#permite al administrador aceptar o rechazar productos que están pendientes de revisión
 def gestionar_productos(request):
     if request.method == 'POST':
+        # Obtener el ID del producto y la acción desde el formulario
+        # Se espera que el formulario envíe un campo 'producto_id' y 
+        # 'accion'puede ser 'aceptar' o 'rechazar'
         producto_id = request.POST.get('producto_id')
         accion = request.POST.get('accion')
         print(f"Producto ID recibido: {producto_id}, Acción: {accion}")
@@ -115,13 +120,18 @@ def gestionar_productos(request):
             messages.error(request, "Error: No se recibió el ID del producto.")
             return redirect('gestionar_productos')
 
+        # Obtener el producto por ID, o mostrar un error 404 si no existe
         producto = get_object_or_404(Producto, id_producto=producto_id)
 
+        # Validar la acción recibida
         if accion == 'aceptar':
+            # Acepta el producto, cambia su estado de revisión
             producto.estado_revision = 'Aceptado'
             producto.save()
             messages.success(request, "Producto aceptado correctamente.")
         elif accion == 'rechazar':
+            # Rechaza el producto, cambia su estado de revisión y guarda el motivo
+            # Se espera que el formulario envíe un campo 'motivo'
             motivo = request.POST.get('motivo')
             if motivo:
                 producto.estado_revision = 'Rechazado'
@@ -131,18 +141,19 @@ def gestionar_productos(request):
             else:
                 messages.error(request, "Debes indicar el motivo de rechazo.")
         else:
-            messages.error(request, "Acción no válida.")
-
+            messages.error(request, "Acción no válida.")        
         return redirect('gestionar_productos')
 
-    # Obtener productos pendientes y ordenarlos por prioridad
+    # Obtener productos pendientes y ordenarlos por prioridad (por los planes de membresía)
     productos_pendientes = Producto.objects.filter(estado_revision='Pendiente')
     productos_pendientes = sorted(productos_pendientes, key=lambda p: p.prioridad_verificacion)
 
     return render(request, 'admin_alpatex/gestion_productos.html', {'productos_pendientes': productos_pendientes})
 
+
 @login_required
 def reporte_productos(request):
+    # Obtiene todos los productos de la base de datos
     productos = Producto.objects.all()
 
     # Filtrado por nombre de producto
@@ -168,7 +179,7 @@ def reporte_productos(request):
     return render(request, 'admin_alpatex/reporte_productos.html', {'productos': productos})
 
 
-
+# Función para exportar los productos a un archivo Excel
 def export_to_excel(request):
     # Crea un libro de trabajo de Excel
     wb = openpyxl.Workbook()
@@ -198,16 +209,21 @@ def export_to_excel(request):
     wb.save(response)
     return response
 
-
+# Permite buscar y filtrar usuarios normales por nombre y membresía 
+# para gestionarlos desde el panel de admin
 def usuarios(request):
+    # Se obtienen los parámetros de la solicitud GET
     query = request.GET.get('q')
     membresia = request.GET.get('membresia')
 
+    # Filtra los usuarios que no son superusuarios ni staff, y que no tienen fecha de eliminación
     usuarios = User.objects.select_related('perfil').filter(
         perfil__fecha_eliminacion__isnull=True,
         is_superuser=False,
         is_staff=False
     )
+    # Si se proporciona un término de búsqueda, filtra los usuarios por nombre de usuario
+    # Si se proporciona una membresía, filtra los usuarios por la membresía asociada
     if query:
         usuarios = usuarios.filter(username__icontains=query)
     if membresia:
@@ -215,12 +231,18 @@ def usuarios(request):
             usuarios = usuarios.filter(perfil__membresia__isnull=True)
         else:
             usuarios = usuarios.filter(perfil__membresia__nombre=membresia)
-
     return render(request, 'admin_alpatex/usuarios.html', {'usuarios': usuarios})
+
+# Permite al administrador eliminar un usuario normal, marcando su perfil como eliminado
 def reactivar_usuario(request, user_id):
+    # Verifica que el usuario tenga permisos de administrador
     user = get_object_or_404(User, id=user_id)
+    # Verifica que el usuario tenga un perfil asociado
     perfil = user.perfil
 
+    # Verifica que el perfil tenga una fecha de eliminación
+    # si no tiene fecha de eliminación, redirige a la lista de usuarios eliminados
+    # si tiene fecha de eliminación, procede a reactivarlo
     if request.method == 'POST':
         perfil.fecha_eliminacion = None
         perfil.motivo_eliminacion = ''
@@ -244,6 +266,7 @@ def reactivar_usuario(request, user_id):
             "Saludos,\nEquipo Alpatex"
         )
 
+        # Enviar correo electrónico
         msg = EmailMultiAlternatives(subject, text, from_email, to)
         msg.attach_alternative(html_content, "text/html")
 
@@ -254,27 +277,35 @@ def reactivar_usuario(request, user_id):
             mime_image.add_header('Content-ID', '<logo_alpatex>')
             mime_image.add_header('Content-Disposition', 'inline', filename='alpatex-v2-tipografía.png')
             msg.attach(mime_image)
-
         msg.send()
 
         return redirect('usuarios_eliminados')
     return redirect('usuarios_eliminados')
 
+
+# Permite al administrador ver los usuarios eliminados
+# los que tienen una fecha de eliminación en su perfil
 def usuarios_eliminados(request):
+    # Obtiene todos los perfiles de usuario que tienen una fecha de eliminación
     perfiles = Perfil.objects.filter(fecha_eliminacion__isnull=False)
+    # Se ordenan por fecha de eliminación descendente
     return render(request, 'admin_alpatex/usuarios_eliminados.html', {'perfiles': perfiles})
 
-
-
+# Permite al administrador ver el perfil de un usuario normal
+# incluyendo sus calificaciones y reportes recibidos
 @login_required
 def perfil_usuario(request, username):
+    # Obtiene el usuario por su nombre de usuario
+    # Si no existe, devuelve un error 404
     usuario = get_object_or_404(User, username=username)
+    # Verifica que el usuario tenga un perfil asociado
     perfil = get_object_or_404(Perfil, user=usuario)
     
     opiniones = []
 
     # Calificaciones vendedor
     calificaciones_vendedor = CalificacionVendedor.objects.filter(vendedor=usuario).select_related('comprador', 'producto')
+    # Se obtienen las calificaciones del vendedor y se agregan a la lista de opiniones
     for calificacion in calificaciones_vendedor:
         perfil_comprador = getattr(calificacion.comprador, 'perfil', None)
         foto = perfil_comprador.get_foto_perfil_url() if perfil_comprador else None
@@ -288,7 +319,7 @@ def perfil_usuario(request, username):
             'fecha': calificacion.fecha_creacion,
         })
 
-    # Calificaciones cliente (si quieres incluirlas también)
+    # Calificaciones cliente 
     calificaciones_cliente = CalificacionCliente.objects.filter(cliente=usuario).select_related('vendedor', 'producto')
     for calificacion in calificaciones_cliente:
         perfil_vendedor = getattr(calificacion.vendedor, 'perfil', None)
@@ -332,46 +363,75 @@ def perfil_usuario(request, username):
 #Membresias
 # Listado
 def listar_membresias(request):
+    # Obtiene todas las membresías disponibles
+    # y las pasa al contexto para renderizar la plantilla
     membresias = Membresia.objects.all()
     return render(request, 'admin_alpatex/membresia_list.html', {'membresias': membresias})
 
 # Crear
 def crear_membresia(request):
+    # Si la solicitud es POST, se procesa el formulario
+    # Si es GET, se muestra un formulario vacío para crear una nueva membresía
     if request.method == 'POST':
+        # Crea una instancia del formulario con los datos POST
+        # y valida los datos ingresados
         form = MembresiaForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('listar_membresias')
+    
+    # Si la solicitud es GET, se muestra un formulario vacío
+    # para crear una nueva membresía
     else:
         form = MembresiaForm()
+    # Renderiza la plantilla con el formulario
+    # para crear o editar una membresía
     return render(request, 'admin_alpatex/membresia_form.html', {'form': form})
+
+# Editar una membresia existente
+def editar_membresia(request, membresia_id):
+    # Obtiene la membresía por su ID, o devuelve un error 404 si no existe
+    membresia = get_object_or_404(Membresia, pk=membresia_id)
+    # Si la solicitud es POST, se procesa el formulario
+    if request.method == 'POST':
+        # Crea una instancia del formulario con los datos POST
+        # y la instancia de la membresía para editar
+        form = MembresiaForm(request.POST, instance=membresia)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_membresias')
+    # Si la solicitud es GET, se muestra el formulario con los datos de la membresía para editar
+    else:
+        form = MembresiaForm(instance=membresia)
+    # Renderiza la plantilla con el formulario para editar la membresía
+    return render(request, 'admin_alpatex/membresia_form.html', {'form': form})
+
+# Eliminar una membresía existente
+def eliminar_membresia(request, membresia_id):
+    # Obtiene la membresía por su ID, o devuelve un error 404 si no existe
+    # Luego la elimina y redirige a la lista de membresías
+    membresia = get_object_or_404(Membresia, pk=membresia_id)
+    membresia.delete()
+    return redirect('listar_membresias')
+
+# Permite al administrador ver los detalles de un producto específico
+# incluyendo su información, calificaciones y reportes recibidos
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def ver_producto_admin(request, id_producto):
     producto = get_object_or_404(Producto, id_producto=id_producto)
     return render(request, 'admin_alpatex/ver_producto.html', {'producto': producto})
-# Editar
-def editar_membresia(request, membresia_id):
-    membresia = get_object_or_404(Membresia, pk=membresia_id)
-    if request.method == 'POST':
-        form = MembresiaForm(request.POST, instance=membresia)
-        if form.is_valid():
-            form.save()
-            return redirect('listar_membresias')
-    else:
-        form = MembresiaForm(instance=membresia)
-    return render(request, 'admin_alpatex/membresia_form.html', {'form': form})
 
-# Eliminar
-def eliminar_membresia(request, membresia_id):
-    membresia = get_object_or_404(Membresia, pk=membresia_id)
-    membresia.delete()
-    return redirect('listar_membresias')
-
+# Permite al administrador eliminar un usuario normal
+# marcando su perfil como eliminado y enviando un correo de notificación
 def eliminar_usuario(request, user_id):
+    # Verifica que el usuario tenga permisos de administrador
+    # Obtiene el usuario por su ID, o devuelve un error 404 si no existe
     user = get_object_or_404(User, id=user_id)
     perfil = user.perfil
 
+    #con el metodo post, se marca el perfil como eliminado
+    # y se guarda la fecha de eliminación y el motivo
     if request.method == 'POST':
         motivo = request.POST.get('motivo', '')
 
@@ -410,12 +470,16 @@ def eliminar_usuario(request, user_id):
 
         msg.send()
 
-        return redirect('usuarios')  # ✅ CORRECTO
-    # 🚫 NUNCA devuelvas usuarios.html directamente desde aquí
+        return redirect('usuarios') 
+    # NO devolver usuarios.html directamente desde aquí
     return redirect('usuarios')
+
+# Permite al administrador ver los usuarios reportados
 @login_required
 def usuarios_reportados(request):
     # Contar reportes recibidos como vendedor y como usuario
+    #filtra los usuarios que tienen al menos un reporte recibido
+    # ya sea como vendedor o como usuario
     usuarios = User.objects.annotate(
         num_reportes_vendedor=Count('reportes_recibidos', distinct=True),
         num_reportes_usuario=Count('reportes_usuario', distinct=True)
@@ -427,17 +491,19 @@ def usuarios_reportados(request):
         'usuarios': usuarios
     })
 
+# Permite al administrador generar un reporte de usuarios
 def reporte_usuarios(request):
     # Filtrar usuarios que no sean admin (superusuario) o staff
     usuarios = User.objects.filter(
         Q(is_superuser=False) & Q(is_staff=False)
     )
     
-    # Aplicar filtros de búsqueda si vienen en GET (ejemplo)
+    # Aplicar filtros de búsqueda si vienen en GET
     username = request.GET.get('username')
     email = request.GET.get('email')
     estado = request.GET.get('estado')
 
+    # Filtrar por nombre de usuario, email y estado
     if username:
         usuarios = usuarios.filter(username__icontains=username)
     if email:
@@ -453,10 +519,13 @@ def reporte_usuarios(request):
     }
     return render(request, 'admin_alpatex/reporte_usuarios.html', context)
 
-
+# Permite al administrador exportar el reporte de productos a un archivo Excel
 def export_to_pdf(request):
+    # Crea un buffer en memoria para el PDF
     buffer = BytesIO()
+    # Crea un objeto Canvas de ReportLab para generar el PDF
     p = canvas.Canvas(buffer, pagesize=letter)
+    # Obtiene el tamaño de la página
     width, height = letter
 
     # Ruta absoluta del logo
@@ -494,10 +563,13 @@ def export_to_pdf(request):
     y -= 20
     p.setFont("Helvetica", 8)
 
+    # Función para truncar el texto si es demasiado largo
     def truncar(texto, max_len=25):
         texto = str(texto)
         return texto if len(texto) <= max_len else texto[:max_len-3] + "..."
 
+    # Itera sobre los productos y escribe sus datos en el PDF
+    # Se truncan los textos
     for prod in productos:
         datos = [
             truncar(prod.nombre),
@@ -518,23 +590,32 @@ def export_to_pdf(request):
     p.save()
     buffer.seek(0)
     return HttpResponse(buffer, content_type='application/pdf')
+
+# Permite al administrador exportar el reporte de usuarios a un archivo Excel
 def export_usuarios_to_excel(request):
+    # Crea un libro de trabajo de Excel
     wb = openpyxl.Workbook()
+    # Selecciona la hoja activa y le asigna un título
     ws = wb.active
     ws.title = "Reporte de Usuarios"
 
     # Títulos de columnas
     ws.append(['Username', 'Email', 'Fecha de creación', 'Estado', 'Fecha eliminación'])
 
+    # Filtra los usuarios que no son superusuarios ni staff
     usuarios = User.objects.filter(
         Q(is_superuser=False) & Q(is_staff=False)
     )
 
+    # Si hay filtros en la solicitud GET, aplica los filtros
+    #filtra por nombre de usuario, email y estado
     for user in usuarios:
         perfil = getattr(user, 'perfil', None)
         fecha_eliminacion = perfil.fecha_eliminacion if perfil else None
         estado = 'Eliminado' if fecha_eliminacion else 'Activo'
 
+        # Si el usuario tiene un perfil, se obtiene la fecha de eliminación
+        # Si no tiene perfil, se considera que está activo
         ws.append([
             user.username,
             user.email,
@@ -542,15 +623,19 @@ def export_usuarios_to_excel(request):
             estado,
             fecha_eliminacion.strftime('%d %b %Y') if fecha_eliminacion else 'N/A',
         ])
-
+    # Crea una respuesta HTTP para descargar el archivo Excel
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=reporte_usuarios.xlsx'
     wb.save(response)
     return response
 
+# Permite al administrador exportar el reporte de usuarios a un archivo PDF
 def export_usuarios_to_pdf(request):
+    # Crea un buffer en memoria para el PDF
     buffer = BytesIO()
+    # Crea un objeto Canvas de ReportLab para generar el PDF
     p = canvas.Canvas(buffer, pagesize=letter)
+    # Obtiene el tamaño de la página
     width, height = letter
 
     # Logo
@@ -590,6 +675,8 @@ def export_usuarios_to_pdf(request):
         texto = str(texto)
         return texto if len(texto) <= max_len else texto[:max_len-3] + "..."
 
+    # Itera sobre los usuarios y escribe sus datos en el PDF
+    # Se truncan los textos para que no excedan el ancho de la columna
     for user in usuarios:
         perfil = getattr(user, 'perfil', None)
         fecha_eliminacion = perfil.fecha_eliminacion if perfil else None
@@ -611,7 +698,8 @@ def export_usuarios_to_pdf(request):
             p.showPage()
             y = height - 50
             p.setFont("Helvetica", 8)
-
+    
+    # Finaliza el PDF y lo guarda en el buffer
     p.save()
     buffer.seek(0)
     return HttpResponse(buffer, content_type='application/pdf')
