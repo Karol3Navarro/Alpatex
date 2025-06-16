@@ -10,16 +10,24 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 from email.mime.image import MIMEImage
 import os
+
+
 def cambiar_clave(request):
     error_email = False
-
     if request.method == 'POST':
+        # Utiliza PasswordResetForm para manejar la validación del correo electrónico
+        # y la generación del token de restablecimiento de contraseña
         form = PasswordResetForm(request.POST)
         if form.is_valid():
+            # Obtiene el correo electrónico del formulario
+            # y busca usuarios con ese correo en la base de datos
             correo = form.cleaned_data['email']
             usuarios = User.objects.filter(email=correo)
+            # Si existen usuarios con ese correo, genera el enlace de restablecimiento
             if usuarios.exists():
                 for user in usuarios:
+                    # Genera el UID y el token para el usuario
+                    # Utiliza urlsafe_base64_encode para codificar el ID del usuario
                     uid = urlsafe_base64_encode(force_bytes(user.pk))
                     token = default_token_generator.make_token(user)
                     reset_link = request.build_absolute_uri(f"/autenticacion/reset-clave/{uid}/{token}/")
@@ -59,36 +67,41 @@ def cambiar_clave(request):
 
 def reset_clave(request, uidb64, token):
     try:
+        # Decodifica el UID usando urlsafe_base64_decode
         uid = urlsafe_base64_decode(uidb64)
         user = User.objects.get(pk=uid)
+        # Verifica el token usando default_token_generator
         if default_token_generator.check_token(user, token):
             clave_cambiada_exito = False
+            # Si el token es válido, muestra el formulario para cambiar la contraseña
+            # Utiliza SetPasswordForm para manejar el cambio de contraseña
             if request.method == 'POST':
                 form = SetPasswordForm(user, request.POST)
                 if form.is_valid():
                     form.save()
                     clave_cambiada_exito = True
                 else:
-                    # Aquí puedes reemplazar o limpiar errores de validación
-                    # Por ejemplo, sobreescribir errores de new_password1:
+                    # Si el formulario no es válido, filtra los errores personalizados
+                    # para evitar mostrar errores de longitud o comunes
                     errores_personalizados = []
-                    for error in form.errors.get('new_password1', []):
-                        # Por ejemplo, ignorar mensajes de "too short" y "too common"
+                    for error in form.errors.get('new_password1', []):                        
                         if "too short" in error or "too common" in error:
                             continue
                         else:
                             errores_personalizados.append(error)
                     form.errors['new_password1'] = errores_personalizados
+            # Si el método no es POST, muestra el formulario vacío
             else:
                 form = SetPasswordForm(user)
             return render(request, 'autenticacion/reset_clave.html', {'form': form, 'clave_cambiada_exito': clave_cambiada_exito})
+        # Si el token no es válido, redirige a una página de error
         else:
             return redirect('autenticacion:error_token')
+    # Maneja errores de decodificación, tipo, valor y si el usuario no existe
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         return redirect('autenticacion:error_token')
 
-
-
+#vistas que muestran paginas especificas de autenticación o recuperación de contraseña
 def clave_cambiada(request):
     return render(request, 'autenticacion/clave_cambiada.html')
 def clave_enviada(request):
