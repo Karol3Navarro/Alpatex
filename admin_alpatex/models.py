@@ -45,12 +45,10 @@ class SuscripcionMercadoPago(models.Model):
     def __str__(self):
         return f"Suscripción {self.subscription_id} - {self.perfil.user.username}"
 
-    #Actualiza la fecha de fin de la suscripción
+    #cambia el estado de la suscripción a 'cancelled' y registra la fecha de cancelación
     def cancelar(self):
         self.estado = 'cancelled'
-        # Actualiza la fecha de cancelación a la fecha actual
         self.fecha_cancelacion = timezone.now()
-        # La membresía seguirá activa hasta la fecha_fin
         self.save()
 
     #Calcula la fecha del próximo pago (30 días después del último)
@@ -60,14 +58,15 @@ class SuscripcionMercadoPago(models.Model):
             self.proximo_pago = self.ultimo_pago + timedelta(days=30)
             self.save()
 
-    #Verifica si la suscripción ha expirado
+    #Verifica si una suscripción ya expiró automáticamente según la fecha de fin
+    # y actualiza su estado si es necesario
     def verificar_estado(self):
         # Si la suscripción está activa y tiene una fecha de fin, verifica si ha pasado esa fecha
-        #Si la fecha de fin es nula, la suscripción no ha expirado
-        #si la fecha de fin es menor a la fecha actual, cambia el estado a 'expired'
+        # Si ya pasó, cambia el estado de la suscripción a 'expired' y guarda el cambio
         if self.estado == 'active' and self.fecha_fin and timezone.now() > self.fecha_fin:
             self.estado = 'expired'
             self.save()
+        #Devuelve el estado actual de la suscripción.
         return self.estado
 
 
