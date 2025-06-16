@@ -132,6 +132,12 @@
                 <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada" width="150">
             {% endif %}
         </div>
+        
+			{% if request.user.is_authenticated and request.user != perfil.user %}
+				<a href="{% url 'detailms' perfil.user.username %}" class="btn btn-chat" title="Chatear con {{ perfil.user.username }}">
+					💬 Chatear con {{ perfil.user.username }}
+				</a>
+			{% endif %}
 
         <p><strong>Correo:</strong> {{ perfil.user.email }}</p>
         <p><strong>Membresía:</strong> {% if perfil.membresia %}{{ perfil.membresia.nombre }}{% else %}Básico{% endif %}</p>
