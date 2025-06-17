@@ -1,26 +1,7 @@
-import os
-import json
+
 import re
 import requests
 from pathlib import Path
-
-# Token de prueba (Sandbox)
-MP_ACCESS_TOKEN_SANDBOX = "TEST-7429934597752386-052722-2b3af6cbfe000d172d6b847019a36d3d-2464461320"
-
-# Token de Producción (descomentar cuando se pase a producción)
-# MP_ACCESS_TOKEN_PROD = "APP_USR-8742947522442677-060223-396c1153906822a73b663c752f0baf33-2461175817"
-
-# URL base para Webhooks
-MP_API_BASE = "https://api.mercadopago.com/v1/webhooks"
-
-# IDs de planes en Sandbox 
-PLAN_IDS = [
-    "2c938084970fb5df01972e615a200bcb",  # Plan Oro 
-    "2c93808497271d1901972e62675a0211",  # Plan Plata 
-]
-
-# Lista de eventos para recibir en el Webhook
-WEBHOOK_TOPICS = ["payment", "preapproval"]
 
 # Ruta a settings.py 
 SETTINGS_PATH = Path("Alpatex/settings.py")
@@ -28,16 +9,28 @@ SETTINGS_PATH = Path("Alpatex/settings.py")
 # Nombre de la variable en settings.py
 NGROK_VAR_NAME = "NGROK_URL"
 
-#Consulta el API local de ngrok para obtener el túnel HTTPS
+#Consulta el API local de ngrok para obtener la url
 # Devuelve una URL como 'https://abcd1234.ngrok.io' o None si falla
 def get_ngrok_url():
+    # Verifica si ngrok está corriendo
     try:
+        # Realiza una solicitud al API de ngrok
         r = requests.get("http://localhost:4040/api/tunnels")
+        # Verifica el estado de la respuesta
         r.raise_for_status()
+        # Extrae la URL del túnel HTTPS
+        # La respuesta es un JSON
         data = r.json()
+        # Busca el túnel HTTPS 
+        # data.get("tunnels") es una lista de diccionarios
+        # Cada túnel tiene un campo "proto" que indica el protocolo (http o https
+        # y un campo "public_url" que es la URL pública del túnel
         for t in data.get("tunnels", []):
+            # Verifica si el túnel es HTTPS
             if t.get("proto") == "https":
+                # Retorna la URL pública del túnel
                 return t.get("public_url")
+    # Si ocurre un error al hacer la solicitud o procesar la respuesta
     except Exception as e:
         print("Error obteniendo la URL de ngrok:", e)
     return None
@@ -45,16 +38,19 @@ def get_ngrok_url():
 #inserta o reemplaza la línea NGROK_URL = 'ngrok_url' en settings.py
 #Actualiza ALLOWED_HOSTS y CSRF_TRUSTED_ORIGINS para incluir el dominio de ngrok
 def update_settings(ngrok_url: str):
+    # Verifica que el archivo settings.py exista
     if not SETTINGS_PATH.exists():
         print(f"No se encontró el archivo {SETTINGS_PATH}")
         return
-
+    
+    #guarda el contenido del archivo settings.py
     content = SETTINGS_PATH.read_text(encoding="utf-8")
     
-    # Actualizar NGROK_URL
     ngrok_pattern = rf"{NGROK_VAR_NAME}\s*=\s*['\"].*?['\"]"
     nuevo_ngrok = f"{NGROK_VAR_NAME} = '{ngrok_url}'"
-
+    
+    #busca en content la línea donde se define la variable de la URL de ngrok con ngrok_pattern
+    #y lo reemplaza por nuevo_ngrok 
     if re.search(ngrok_pattern, content):
         content = re.sub(ngrok_pattern, nuevo_ngrok, content)
     else:
@@ -63,203 +59,74 @@ def update_settings(ngrok_url: str):
     # Extraer el dominio de ngrok (sin el protocolo)
     ngrok_domain = ngrok_url.replace('https://', '').replace('http://', '')
     
-    # actualizar ALLOWED_HOSTS
+    # buscan la lista de hosts permitidos (ALLOWED_HOSTS) en settings.py (content)
+    #define la expresión regular para encontrar ALLOWED_HOSTS
     hosts_pattern = r"ALLOWED_HOSTS\s*=\s*\[(.*?)\]"
+    # Busca ALLOWED_HOSTS en el contenido
     hosts_match = re.search(hosts_pattern, content, re.DOTALL)
     
+    # Si ALLOWED_HOSTS ya existe, actualiza o agrega el dominio de ngrok y hosts locales
     if hosts_match:
+        # Extrae la lista actual de hosts
+        # hosts_match.group(1) contiene el contenido entre los corchetes de ALLOWED_HOSTS
         current_hosts = hosts_match.group(1)
-        # Convertir la lista actual a un conjunto para evitar duplicados
+        #limpiar la lista actual de hosts, eliminando espacios y comillas
         hosts_set = {h.strip().strip("'\"") for h in current_hosts.split(',') if h.strip()}
         # Agregar el nuevo dominio y los hosts locales si no existen
         hosts_set.update([ngrok_domain, 'localhost', '127.0.0.1'])
-        # Convertir de vuelta a una lista ordenada
+        #ordena el conjunto de hosts alfabéticamente y los convierte en una lista
         hosts_list = sorted(list(hosts_set))
+        #crea un nuevo contenido para ALLOWED_HOSTS, los pone dentro de corchetes y los convierte a string
         new_hosts = f"ALLOWED_HOSTS = [{', '.join(repr(h) for h in hosts_list)}]"
+        #Reemplaza la línea original de ALLOWED_HOSTS en el contenido por la nueva línea generada
         content = re.sub(hosts_pattern, new_hosts, content)
     else:
-        # Si no existe ALLOWED_HOSTS, agregarlo después de DEBUG
+        # agrega la configuración de ALLOWED_HOSTS si no existe en el archivo
         debug_pattern = r"(DEBUG\s*=\s*True)"
         new_hosts = f"\\1\n\nALLOWED_HOSTS = ['{ngrok_domain}', 'localhost', '127.0.0.1']"
         content = re.sub(debug_pattern, new_hosts, content)
 
-    # Actualizar CSRF_TRUSTED_ORIGINS
+    #Permite localizar y extraer la lista de orígenes confiables para CSRF en  settings.py
     csrf_pattern = r"CSRF_TRUSTED_ORIGINS\s*=\s*\[(.*?)\]"
     csrf_match = re.search(csrf_pattern, content, re.DOTALL)
     
     if csrf_match:
+        # Extrae la lista actual de orígenes confiables
+        # csrf_match.group(1) contiene el contenido entre los corchetes de CSRF_TRUSTED_ORIGINS
         current_origins = csrf_match.group(1)
-        # Convertir la lista actual a un conjunto para evitar duplicados
+        # limpiar la lista actual de orígenes, eliminando espacios y comillas
         origins_set = {o.strip().strip("'\"") for o in current_origins.split(',') if o.strip()}
-        # Agregar el nuevo origen
+        # Agregar el nuevo origen de ngrok si no existe
         origins_set.add(ngrok_url)
         # Convertir de vuelta a una lista ordenada
         origins_list = sorted(list(origins_set))
+        # Crear una nueva línea para CSRF_TRUSTED_ORIGINS
+        # Convertir la lista a string, asegurando que cada origen esté entre comillas
         new_csrf = f"CSRF_TRUSTED_ORIGINS = [{', '.join(repr(o) for o in origins_list)}]"
+        # Reemplazar la línea original de CSRF_TRUSTED_ORIGINS en el contenido por la nueva línea generada
         content = re.sub(csrf_pattern, new_csrf, content)
     else:
-        # Si no existe CSRF_TRUSTED_ORIGINS, agregarlo después de ALLOWED_HOSTS
+        # Si no existe CSRF_TRUSTED_ORIGINS, se agrega después de ALLOWED_HOSTS
         hosts_pattern = r"(ALLOWED_HOSTS\s*=\s*\[.*?\])"
         new_csrf = f"\\1\n\nCSRF_TRUSTED_ORIGINS = ['{ngrok_url}']"
         content = re.sub(hosts_pattern, new_csrf, content, flags=re.DOTALL)
-
+    # Escribe el contenido actualizado de settings.py
     SETTINGS_PATH.write_text(content, encoding="utf-8")
     print(f"settings.py actualizado:")
     print(f"- {NGROK_VAR_NAME} = '{ngrok_url}'")
     print(f"- ALLOWED_HOSTS actualizado para incluir '{ngrok_domain}'")
     print(f"- CSRF_TRUSTED_ORIGINS actualizado para incluir '{ngrok_url}'")
 
-
-#Lista todos los webhooks del entorno
-# retorna la lista de objetos. si no hay ninguno (404), devuelve lista vacia
-#si ocurre otro error, retorna None
-def list_webhooks(access_token: str):
-    url = MP_API_BASE
-    headers = {"Authorization": f"Bearer {access_token}"}
-
-    try:
-        print(f"Intentando listar webhooks en {url}")
-        print(f"Usando token: {access_token[:10]}...")
-        r = requests.get(url, headers=headers)
-        print(f"Respuesta del servidor: {r.status_code}")
-
-        # En Sandbox, si no existe ningun webhook, Mercado Pago devuelve 404
-        if r.status_code == 404:
-            print("No hay webhooks existentes. Se interpretará como lista vacía.")
-            return []
-
-        r.raise_for_status()
-        payload = r.json()
-        return payload.get("data", [])
-    except Exception as e:
-        print(f"Error listando webhooks (token={access_token[:10]}...): {e}")
-        return None
-
-#crea un nuevo webhook, devuelve el json completo de respuesta si se crea con exito, o None si falla
-def create_webhook(access_token: str, target_url: str, topics: list):
-    url = MP_API_BASE
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {access_token}"
-    }
-    body = {
-        "url": target_url,
-        "topics": topics
-    }
-
-    try:
-        print(f"Creando webhook en {url} → URL destino: {target_url}")
-        r = requests.post(url, json=body, headers=headers)
-        r.raise_for_status()
-        return r.json()
-    except Exception as e:
-        print(f"Error creando webhook ({target_url}) con token={access_token[:10]}...: {e}")
-        if r is not None:
-            print("   Response:", r.text)
-        return None
-
-# Actualiza un webhook existente, según su id, para que apunte a target_url y quede suscrito a eventos
-#Devuelve el JSON completo de respuesta si se actualiza con éxito, o None si falla
-def update_webhook(access_token: str, webhook_id: str, target_url: str, topics: list):
-    url = f"{MP_API_BASE}/{webhook_id}"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {access_token}"
-    }
-    body = {
-        "url": target_url,
-        "topics": topics
-    }
-
-    try:
-        print(f"Actualizando webhook {webhook_id} → nueva URL: {target_url}")
-        r = requests.put(url, json=body, headers=headers)
-        r.raise_for_status()
-        return r.json()
-    except Exception as e:
-        print(f"Error actualizando webhook {webhook_id}: {e}")
-        if r is not None:
-            print("   Response:", r.text)
-        return None
-
-#revisa que exista un webhook en el entorno, si es sandbox, no se puede hacer automaticamente (se hace manualmente en mercado pago)
-#si es produccion actualiza vía API
-def ensure_webhook(access_token: str, ngrok_url: str, topics: list, env_name: str):
-
-    # Sandbox, manualmente en mercado pago
-    if access_token.startswith("TEST-"):
-        print(f"\nEn {env_name} (Sandbox) la API de Webhooks está deshabilitada.")
-        print("Por favor, crea el webhook manualmente desde: Dashboard → Tu App → Webhooks & Notifications.\n")
-        return
-
-    # produccion
-    base_endpoint = f"{ngrok_url}/webhook/mercadopago/"
-    existing = list_webhooks(access_token)
-
-    if existing is None:
-        print(f"No se pudo listar webhooks en {env_name}.")
-        return
-
-    if len(existing) == 0:
-        print(f"No existen webhooks en {env_name}. Creando uno nuevo...")
-        nuevo = create_webhook(access_token, base_endpoint, topics)
-        if nuevo and nuevo.get("id"):
-            print(f"Creado Webhook en {env_name}: id={nuevo.get('id')}, url={nuevo.get('url')}")
-        else:
-            print(f"Falló la creación del webhook en {env_name}.")
-    else:
-        w = existing[0]
-        wid = w.get("id")
-        wurl = w.get("url")
-        print(f"Encontrado Webhook en {env_name}: id={wid}, url={wurl}")
-        actualizado = update_webhook(access_token, wid, base_endpoint, topics)
-        if actualizado and actualizado.get("id"):
-            print(f"Actualizado Webhook en {env_name}: id={actualizado.get('id')}, url={actualizado.get('url')}")
-        else:
-            print(f"Falló la actualización del webhook {wid} en {env_name}.")
-
-#actualiza el campo back_url de los planes en sandbox
-def update_plan_back_url(access_token: str, plan_id: str, ngrok_url: str):
-
-    url = f"https://api.mercadopago.com/preapproval_plan/{plan_id}"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {access_token}"
-    }
-    body = {
-        "back_url": f"{ngrok_url}/index/pago/exito/"
-    }
-
-    try:
-        print(f"Intentando actualizar plan {plan_id} en {url}")
-        print(f"Usando token: {access_token[:10]}...")
-        print(f"Body de la petición: {json.dumps(body, indent=2)}")
-        r = requests.put(url, json=body, headers=headers)
-        print(f"Respuesta del servidor: {r.status_code}")
-        if r.status_code != 200:
-            print(f"Contenido de la respuesta: {r.text}")
-        else:
-            print(f"Plan {plan_id} actualizado (back_url) en Mercado Pago.")
-    except Exception as e:
-        print(f"Excepción al actualizar plan {plan_id}: {e}")
-
-
+#flujo principal del script
 if __name__ == "__main__":
+    #extrae la URL de ngrok
     ngrok_url = get_ngrok_url()
+    # Si no se pudo obtener la URL de ngrok, muestra un mensaje de error y termina
     if not ngrok_url:
-        print("No se pudo obtener la URL de ngrok. Asegúrate de que ngrok esté corriendo en el puerto 4040.")
+        print("No se pudo obtener la URL de ngrok. Asegúrate de que ngrok esté corriendo en el puerto")
         exit(1)
 
-    # 1actualizar settings.py
+    #si  se obtuvo la URL de ngrok, actualiza settings.py
     update_settings(ngrok_url)
-
-    # 2 en sandbox, omite la actualizacion de Webhook (se hace manualmente en mercado pago)
-    print("\n=== Actualizando Webhook en SANDBOX ===")
-    ensure_webhook(MP_ACCESS_TOKEN_SANDBOX, ngrok_url, WEBHOOK_TOPICS, env_name="SANDBOX")
-
-    # 3 actualizar back_url de los planes en Sandbox
-    print("\n=== Actualizando back_url de Planes (Sandbox) ===")
-    for pid in PLAN_IDS:
-        update_plan_back_url(MP_ACCESS_TOKEN_SANDBOX, pid, ngrok_url)
 
     print("\nProceso finalizado.")
