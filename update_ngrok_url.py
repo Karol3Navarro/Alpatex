@@ -9,10 +9,9 @@ SETTINGS_PATH = Path("Alpatex/settings.py")
 # Nombre de la variable en settings.py
 NGROK_VAR_NAME = "NGROK_URL"
 
-#Consulta el API local de ngrok para obtener la url
-# Devuelve una URL como 'https://abcd1234.ngrok.io' o None si falla
+#retorna la URL pública de ngrok
+#realiza una solicitud a la API de ngrok para obtener la URL pública
 def get_ngrok_url():
-    # Verifica si ngrok está corriendo
     try:
         # Realiza una solicitud al API de ngrok
         r = requests.get("http://localhost:4040/api/tunnels")
@@ -23,7 +22,7 @@ def get_ngrok_url():
         data = r.json()
         # Busca el túnel HTTPS 
         # data.get("tunnels") es una lista de diccionarios
-        # Cada túnel tiene un campo "proto" que indica el protocolo (http o https
+        # Cada túnel tiene un campo "proto" que indica el protocolo (http o https)
         # y un campo "public_url" que es la URL pública del túnel
         for t in data.get("tunnels", []):
             # Verifica si el túnel es HTTPS
@@ -35,8 +34,8 @@ def get_ngrok_url():
         print("Error obteniendo la URL de ngrok:", e)
     return None
 
-#inserta o reemplaza la línea NGROK_URL = 'ngrok_url' en settings.py
-#Actualiza ALLOWED_HOSTS y CSRF_TRUSTED_ORIGINS para incluir el dominio de ngrok
+#actualiza la URL de ngrok en settings.py
+#actualiza ALLOWED_HOSTS y CSRF_TRUSTED_ORIGINS para incluir el dominio de ngrok
 def update_settings(ngrok_url: str):
     # Verifica que el archivo settings.py exista
     if not SETTINGS_PATH.exists():
@@ -49,7 +48,8 @@ def update_settings(ngrok_url: str):
     ngrok_pattern = rf"{NGROK_VAR_NAME}\s*=\s*['\"].*?['\"]"
     nuevo_ngrok = f"{NGROK_VAR_NAME} = '{ngrok_url}'"
     
-    #busca en content la línea donde se define la variable de la URL de ngrok con ngrok_pattern
+    #busca en content la línea donde se define la variable de la URL de ngrok 
+    # con ngrok_pattern
     #y lo reemplaza por nuevo_ngrok 
     if re.search(ngrok_pattern, content):
         content = re.sub(ngrok_pattern, nuevo_ngrok, content)
@@ -60,12 +60,12 @@ def update_settings(ngrok_url: str):
     ngrok_domain = ngrok_url.replace('https://', '').replace('http://', '')
     
     # buscan la lista de hosts permitidos (ALLOWED_HOSTS) en settings.py (content)
-    #define la expresión regular para encontrar ALLOWED_HOSTS
+    #define la expresión para encontrar ALLOWED_HOSTS
     hosts_pattern = r"ALLOWED_HOSTS\s*=\s*\[(.*?)\]"
     # Busca ALLOWED_HOSTS en el contenido
     hosts_match = re.search(hosts_pattern, content, re.DOTALL)
     
-    # Si ALLOWED_HOSTS ya existe, actualiza o agrega el dominio de ngrok y hosts locales
+    # Si ALLOWED_HOSTS ya existe, actualiza el dominio de ngrok y hosts locales
     if hosts_match:
         # Extrae la lista actual de hosts
         # hosts_match.group(1) contiene el contenido entre los corchetes de ALLOWED_HOSTS
