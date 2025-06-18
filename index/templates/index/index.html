@@ -61,7 +61,7 @@
 
             <!-- Formulario de Registro -->
             <div class="container-form">
-                <form method="POST" action="{% url 'registro' %}">
+                <form  id="form-registro" method="POST" action="{% url 'registro' %}">
                     {% csrf_token %}
 
                     <h2 class="prod-dest">Registrarse</h2>
@@ -75,20 +75,26 @@
                     <span>Completa el formulario</span>
 
                     <div class="container-input">
-                        <input type="text" class="inp" id="nombre_usuario" name="nombre_usuario" placeholder="Usuario" required>
+                        <input type="text" class="inp" id="nombre_usuario" name="nombre_usuario" placeholder="Usuario" required minlength="4" maxlength="20" 
+                        pattern="^[a-zA-Z0-9_]+$" title="Solo letras, números y guiones bajos">
                     </div>
                     <div class="container-input">
-                        <input type="text" class="inp" id="nombre_completo" name="nombre_completo" placeholder="Nombre Completo" required>
+                        <input type="text" class="inp" id="nombre_completo" name="nombre_completo" placeholder="Nombre Completo" required minlength="5" maxlength="50"
+                        pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$" 
+                        title="Solo letras y espacios">
                     </div>
                     <div class="container-input">
-                        <input type="text" class="inp" id="rut" name="rut" required placeholder="Run: Ej: 12.345.678-9" maxlength="12">
+                        <input type="text" class="inp" id="rut" name="rut" required placeholder="Run: Ej: 12.345.678-9" maxlength="12" 
+                        pattern="^\d{1,2}\.\d{3}\.\d{3}-[\dkK]{1}$"title="Formato válido: 12.345.678-9 (con puntos y guion)">
                     </div>
                     <div class="container-input" style="position: relative;">
                         <input type="text" class="inp" id="direccion" name="direccion" required autocomplete="off" placeholder="Dirección">
                         <ul id="sugerencias-direccion" role="listbox"></ul>
                     </div>
                     <div class="container-input">
-                        <input type="email" class="inp" id="email" name="email" placeholder="Correo electrónico" required>
+                        <input type="email" class="inp" id="email" name="email" placeholder="Correo electrónico" required
+                               pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                title="Ingresa un correo válido">                      
                     </div>
                     <div class="container-input">
                         <input type="password" class="inp" id="password1" name="password1" placeholder="Contraseña" required>
@@ -222,7 +228,8 @@
             const formRegistro = document.getElementById("form-registro");
             const pass1 = document.getElementById("password1");
             const pass2 = document.getElementById("password2");
-
+            const emailInput = document.getElementById("email");
+            
             formRegistro.addEventListener("submit", function (e) {
                 const rut = rutInput.value;
 
@@ -232,9 +239,24 @@
                         icon: 'error',
                         title: 'RUT inválido.',
                         text: 'Verifica el formato y dígito verificador.',
-                        confirmButtonText: 'Comprendo!'
+                        confirmButtonText: 'Entendido'
                     });
                     rutInput.focus();
+                    return;
+                }
+                
+                // Validación correo 
+                const emailValue = emailInput.value;
+                const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (!emailPattern.test(emailValue)) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Correo inválido.',
+                        text: 'Por favor, ingresa un correo electrónico válido.',
+                        confirmButtonText: 'Entendido'
+                    });
+                    emailInput.focus();
                     return;
                 }
 

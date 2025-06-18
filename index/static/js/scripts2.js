@@ -94,3 +94,4 @@ function toggleEditProducto(modo, productoId) {
         btn.setAttribute("onclick", `toggleEditProducto(true, ${productoId})`);
     }
 }
+
