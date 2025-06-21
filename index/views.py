@@ -313,7 +313,7 @@ def producto_add_perf(request):
             messages.success(request, "Producto creado con éxito!")
             return redirect('productos_perf')
         else:
-            messages.error(request, "Por favor corrige los errores en el formulario.")
+            messages.error(request, "Por favor de rellenar todos los datos")
     else:
         # Pasar la dirección del usuario al formulario como valor predeterminado
         form = ProductoForm(initial={'direccion': direccion_usuario})
@@ -438,7 +438,7 @@ def producto_del(request,pk):
         context = {'productos':productos, 'mensaje':mensaje}
         return render(request, 'index/producto_perfi.html', context)
     except:
-        mensaje="Error, producto no existe"
+        mensaje="Producto no existe"
         productos =Producto.objects.all()
         context = {'productos':productos, 'mensaje':mensaje}
         return render(request, 'index/productos_perf.html', context)
