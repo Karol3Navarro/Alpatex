@@ -3,35 +3,74 @@
 {% block body %}
   <h1 class="prod-dest">Videojuegos Disponibles</h1>
 
-  <div class="coleccion col-lib-vid">
-    {% if videojuegos %}
-      <div class="productos-contenedor">
-        {% for videojuegos in videojuegos %}
-          <a href="{% url 'ver_producto' videojuegos.id_producto %}" class="producto-card-link">
-            <div class="producto-card">
+  <div class="ver-todo">
+    <div class="clear">
+      <div class="sidebar">
+        <h4 class="prod-dest title-left">Catálogo</h4>
+        <div class="filtro-menu">       
 
-              <div class="producto-img">
-                {% if videojuegos.imagen %}
-                  <img src="{{ videojuegos.imagen.url }}" alt="{{ videojuegos.nombre }}">
-                {% else %}
-                  <img src="{% static 'images/default_book.png' %}" alt="Sin imagen">
-                {% endif %}
-              </div>
+          <div class="filtro-bloque">
+            <h5 class="prod-dest title-left">Estado</h5>
+            <label class="radio-label">
+              <input type="radio" name="estado" value="Nuevo">
+              <span class="radio-custom"></span> Nuevo
+            </label>
 
-              <div class="producto-info">
-                <strong>{{ videojuegos.nombre }}</strong><br>
-                <small>Publicado por: {{ videojuegos.usuario.username }}</small><br>
-                <small>Estado: {{ videojuegos.estado }}</small><br>
-                <small>Tipo: {{ videojuegos.tipo }}</small><br>
-                <small>Categoría: {{ videojuegos.categoria }}</small><br>  
-              </div>
+            <label class="radio-label">
+              <input type="radio" name="estado" value="Usado">
+              <span class="radio-custom"></span> Usado
+            </label>
+          </div>
 
-            </div>
-          </a>
-        {% endfor %}
+          <div class="filtro-bloque">
+            <h5 class="prod-dest title-left">Tipo de publicación</h5>
+            <label class="radio-label">
+              <input type="radio" name="tipo" value="Venta">
+              <span class="radio-custom"></span> Venta
+            </label>
+
+            <label class="radio-label">
+              <input type="radio" name="tipo" value="Intercambio">
+              <span class="radio-custom"></span> Intercambio
+            </label>
+          </div>            
+        </div>
+        <button class="btn btn-secondary" id="limp-filt">Limpiar filtros</button>
       </div>
-    {% else %}
-      <p>No hay videojuegos disponibles.</p>
-    {% endif %}
+
+      <div class="coleccion">
+        {% if videojuegos %}
+          <div class="productos-contenedor">
+            {% for videojuegos in videojuegos %}
+              <a href="{% url 'ver_producto' videojuegos.id_producto %}" class="producto-card-link"
+                data-estado="{{ videojuegos.estado }}"
+                data-tipo="{{ videojuegos.tipo }}">
+                <div class="producto-card">
+
+                  <div class="producto-img">
+                    {% if videojuegos.imagen %}
+                      <img src="{{ videojuegos.imagen.url }}" alt="{{ videojuegos.nombre }}">
+                    {% else %}
+                      <img src="{% static 'images/default_book.png' %}" alt="Sin imagen">
+                    {% endif %}
+                  </div>
+
+                  <div class="producto-info">
+                    <strong>{{ videojuegos.nombre }}</strong><br>
+                    <small>Publicado por: {{ videojuegos.usuario.username }}</small><br>
+                    <small>Estado: {{ videojuegos.estado }}</small><br>
+                    <small>Tipo: {{ videojuegos.tipo }}</small><br>
+                    <small>Categoría: {{ videojuegos.categoria }}</small><br>  
+                  </div>
+
+                </div>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p>No hay videojuegos disponibles.</p>
+        {% endif %}
+      </div>
+    </div>
   </div>
 {% endblock %}

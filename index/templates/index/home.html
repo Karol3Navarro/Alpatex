@@ -22,29 +22,31 @@
 </script>
 {% endif %}
 <!-- Carrusel estilizado -->
-<div id="carouselExampleFade" class="carousel slide carousel-fade mb-10 rounded-4 overflow-hidden shadow-lg" data-bs-ride="carousel" data-bs-interval="4000">
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img src="{% static 'img/1.svg' %}" class="d-block w-100" style="height: 600px; object-fit: cover;" alt="Imagen 1">
+<div class="container my-5">
+  <div id="carouselExampleFade" class="carousel slide carousel-fade mb-10 rounded-4 overflow-hidden shadow-lg" data-bs-ride="carousel" data-bs-interval="4000">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="{% static 'img/1.svg' %}" class="d-block w-100" alt="Imagen 1">
+      </div>
+      <div class="carousel-item">
+        <img src="{% static 'img/2.svg' %}" class="d-block w-100" alt="Imagen 2">
+      </div>
+      <div class="carousel-item">
+        <img src="{% static 'img/3.svg' %}" class="d-block w-100" alt="Imagen 3">
+      </div>
+      <div class="carousel-item">
+        <img src="{% static 'img/4.svg' %}" class="d-block w-100" alt="Imagen 4">
+      </div>
     </div>
-    <div class="carousel-item">
-      <img src="{% static 'img/2.svg' %}" class="d-block w-100" style="height: 600px; object-fit: cover;" alt="Imagen 2">
-    </div>
-    <div class="carousel-item">
-      <img src="{% static 'img/3.svg' %}" class="d-block w-100" style="height: 600px; object-fit: cover;" alt="Imagen 3">
-    </div>
-    <div class="carousel-item">
-      <img src="{% static 'img/4.svg' %}" class="d-block w-100" style="height: 600px; object-fit: cover;" alt="Imagen 4">
-    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Anterior</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Siguiente</span>
+    </button>
   </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Anterior</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Siguiente</span>
-  </button>
 </div>
 
 <!-- Productos Destacados -->
@@ -70,27 +72,28 @@
     </div>
 </div>
 -->
-
-<div class="swiper mySwiper">
-  <div class="swiper-wrapper">
-    {% for x in productos %}
-      <div class="swiper-slide">
-        <div class="card-product">
-          <div class="card-body">
-            <img src="{{ x.imagen.url }}" class="card-img-top">
-            <h5 class="card-title">{{ x.nombre }}</h5>
-            <p class="price card-text">Precio: {{ x.precio }}</p>
-            <p class="estado card-text">Estado: {{ x.estado }}</p>
-            <a href="{% url 'ver_producto' id_producto=x.id_producto %}" class="btn btn-primary">Ver Producto</a>
+<div class="container-items">
+  <div class="swiper mySwiper">
+    <div class="swiper-wrapper">
+      {% for x in productos %}
+        <div class="swiper-slide">
+          <div class="card-product">
+            <div class="card-body">
+              <img src="{{ x.imagen.url }}" class="card-img-top">
+              <h5 class="card-title">{{ x.nombre }}</h5>
+              <p class="price card-text">Precio: {{ x.precio }}</p>
+              <p class="estado card-text">Estado: {{ x.estado }}</p>
+              <a href="{% url 'ver_producto' id_producto=x.id_producto %}" class="btn btn-primary">Ver Producto</a>
+            </div>
           </div>
         </div>
-      </div>
-    {% endfor %}
-  </div>
+      {% endfor %}
+    </div>
 
-  <!-- Navegación opcional -->
-  <div class="swiper-button-next"></div>
-  <div class="swiper-button-prev"></div>
+    <!-- Navegación opcional -->
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+  </div>
 </div>
 
 <div class="promos">

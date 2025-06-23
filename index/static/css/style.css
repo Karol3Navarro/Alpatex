@@ -241,6 +241,14 @@ nav ul.menu li a.navegacion:hover {
     border-radius: 6px;
 }
 /*-----------------*/
+.carousel-inner{
+    height: 600px;
+}
+.carousel-item img{
+    height: 100%;
+    object-fit: cover;
+}
+
 body {
     height: 100vh;
     margin: 0;
@@ -859,7 +867,7 @@ PRODUCTOS DESTACADOS
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 260px;
+    max-width: 250px;
     height: 100%;
     background: #fff;
     border: 2px solid #e4e4e4;
@@ -1168,6 +1176,12 @@ VER TODO
 .producto-card-link {
     text-decoration: none;
     color: inherit;
+}
+.swiper-slide{
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 .swiper-button-next:after, .swiper-button-prev:after {

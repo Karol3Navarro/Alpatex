@@ -3,7 +3,7 @@ console.log("scripts.js cargado");
 document.addEventListener("DOMContentLoaded", function(){
   new Swiper(".mySwiper", {
     slidesPerView: 4,
-    spaceBetween: 30,
+    spaceBetween: 20,
     loop: true,
     navigation: {
       nextEl: ".swiper-button-next",
@@ -131,13 +131,24 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-//FUNCION PARA EL FILTRO DE PRODUCTOS.HTLM 
+//FUNCION PARA EL FILTRO DE PRODUCTOS.HTML
 document.addEventListener("DOMContentLoaded", function () {
   const filtros = document.querySelectorAll('input[type="radio"]');
   filtros.forEach(filtro => {
     filtro.addEventListener('change', aplicarFiltros);
   });
+
+  const btnLimpiar  = document.getElementById("limp-filt");
+  btnLimpiar.addEventListener("click", function () {
+    filtros.forEach(r => r.checked = false);
+
+    const productos = document.querySelectorAll('.producto-card-link');
+    productos.forEach(producto => {
+      producto.style.display = "block";
+    });
+  });
 });
+
 
 function aplicarFiltros() {
   const categoria = document.querySelector('input[name="categoria"]:checked')?.value;
@@ -158,6 +169,12 @@ function aplicarFiltros() {
     }
   });
 }
+
+document.getElementById("limp-filt").addEventListener("click", function (){
+  const radios = document.querySelectorAll('input[type="radio"]:checked');
+  radios.forEach(r => r.checked = false);
+
+});
 
 //FUNCION PARA EDITAR PRODUCTOS
 const editables = [

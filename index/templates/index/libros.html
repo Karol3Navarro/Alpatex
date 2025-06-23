@@ -2,36 +2,73 @@
 {% load static %}
 {% block body %}
   <h1 class="prod-dest">Libros Disponibles</h1>
+  <div class="vet-todo">
+    <div class="clear">
+      <div class="sidebar">
+        <h4 class="prod-dest title-left">Catálogo</h4>
+        <div class="filtro-menu">       
 
-  <div class="coleccion col-lib-vid">
-    {% if libros %}
-      <div class="productos-contenedor">
-        {% for libro in libros %}
-          <a href="{% url 'ver_producto' libro.id_producto %}" class="producto-card-link">
-            <div class="producto-card">
-              
-              <div class="producto-img">
-                {% if libro.imagen %}
-                  <img src="{{ libro.imagen.url }}" alt="{{ libro.nombre }}">
-                {% else %}
-                  <img src="{% static 'images/default_book.png' %}" alt="Sin imagen">
-                {% endif %}
-              </div>
+          <div class="filtro-bloque">
+            <h5 class="prod-dest title-left">Estado</h5>
+            <label class="radio-label">
+              <input type="radio" name="estado" value="Nuevo">
+              <span class="radio-custom"></span> Nuevo
+            </label>
 
-              <div class="producto-info">
-                <strong>{{ libro.nombre }}</strong><br>
-                <small>Publicado por: {{ libro.usuario.username }}</small><br>
-                <small>Estado: {{ libro.estado }}</small><br>
-                <small>Tipo: {{ libro.tipo }}</small><br>
-                <small>Categoría: {{ libro.categoria }}</small><br>  
-              </div>
-            </div>
-          </a>
-        {% endfor %}
+            <label class="radio-label">
+              <input type="radio" name="estado" value="Usado">
+              <span class="radio-custom"></span> Usado
+            </label>
+          </div>
+
+          <div class="filtro-bloque">
+            <h5 class="prod-dest title-left">Tipo de publicación</h5>
+            <label class="radio-label">
+              <input type="radio" name="tipo" value="Venta">
+              <span class="radio-custom"></span> Venta
+            </label>
+
+            <label class="radio-label">
+              <input type="radio" name="tipo" value="Intercambio">
+              <span class="radio-custom"></span> Intercambio
+            </label>
+          </div>            
+        </div>
+        <button class="btn btn-secondary" id="limp-filt">Limpiar filtros</button>
       </div>
-    {% else %}
-      <p>No hay libros disponibles.</p>
-    {% endif %}
+
+      <div class="coleccion">
+        {% if libros %}
+          <div class="productos-contenedor">
+            {% for libro in libros %}
+              <a href="{% url 'ver_producto' libro.id_producto %}" class="producto-card-link"
+                  data-estado="{{ libro.estado }}"
+                  data-tipo="{{ libro.tipo }}">
+                <div class="producto-card">
+                  
+                  <div class="producto-img">
+                    {% if libro.imagen %}
+                      <img src="{{ libro.imagen.url }}" alt="{{ libro.nombre }}">
+                    {% else %}
+                      <img src="{% static 'images/default_book.png' %}" alt="Sin imagen">
+                    {% endif %}
+                  </div>
+
+                  <div class="producto-info">
+                    <strong>{{ libro.nombre }}</strong><br>
+                    <small>Publicado por: {{ libro.usuario.username }}</small><br>
+                    <small>Estado: {{ libro.estado }}</small><br>
+                    <small>Tipo: {{ libro.tipo }}</small><br>
+                  </div>
+                </div>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p>No hay libros disponibles.</p>
+        {% endif %}
+      </div>
+    </div>
   </div>
   
 {% endblock %}
