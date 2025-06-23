@@ -514,6 +514,12 @@ input[type="submit"]:hover{
     background-color: #DD1155;
     transform: scale(1.05);
 }
+a.btn:active,
+button.btn:active {
+  background-color: #DD1155 !important;
+  color: white !important;
+}
+
 .error {
     color: red;
     font-size: 14px;

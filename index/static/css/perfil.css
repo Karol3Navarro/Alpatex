@@ -3,8 +3,9 @@
   max-width: 900px;
   margin: 40px auto 15px;
   padding: 30px 40px;
-  background: #f5f0f8;
+  background: #fff;
   border-radius: 25px;
+  border: 2px solid #ccc;
   box-shadow: 0 15px 30px rgba(173, 92, 161, 0.2);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #3a2e4d;
