@@ -72,52 +72,63 @@
   <h2 class="mb-4 text-center">Panel de Administración – <strong>Alpatex</strong></h2>
 
   <div class="row g-3 mb-4">
-    <div class="col-sm-6 col-md-4 col-lg-2">
-      <div class="widget">
-        <div class="icon-box bg-primary"><i class="bi bi-people-fill"></i></div>
-        <div class="text-box">
-          <h6>Usuarios</h6>
-          <h4>{{ total_usuarios }}</h4>
-        </div>
-      </div>
-    </div>
-    <div class="col-sm-6 col-md-4 col-lg-2">
-      <div class="widget">
-        <div class="icon-box bg-success"><i class="bi bi-box-seam"></i></div>
-        <div class="text-box">
-          <h6>Productos</h6>
-          <h4>{{ total_productos }}</h4>
-        </div>
-      </div>
-    </div>
-    <div class="col-sm-6 col-md-4 col-lg-2">
-      <div class="widget">
-        <div class="icon-box bg-warning"><i class="bi bi-hourglass-split"></i></div>
-        <div class="text-box">
-          <h6>Pendientes</h6>
-          <h4>{{ productos_pendientes }}</h4>
-        </div>
-      </div>
-    </div>
-    <div class="col-sm-6 col-md-4 col-lg-2">
-      <div class="widget">
-        <div class="icon-box bg-danger"><i class="bi bi-flag-fill"></i></div>
-        <div class="text-box">
-          <h6>Reportes V.</h6>
-          <h4>{{ total_reportes_vendedor }}</h4>
-        </div>
-      </div>
-    </div>
-    <div class="col-sm-6 col-md-4 col-lg-2">
-      <div class="widget">
-        <div class="icon-box bg-secondary"><i class="bi bi-exclamation-triangle-fill"></i></div>
-        <div class="text-box">
-          <h6>Reportes U.</h6>
-          <h4>{{ total_reportes_usuario }}</h4>
-        </div>
+  <div class="col-sm-6 col-md-4 col-lg-2">
+    <div class="widget">
+      <a href="{% url 'usuarios' %}" class="icon-box bg-primary" style="text-decoration: none;">
+        <i class="bi bi-people-fill"></i>
+      </a>
+      <div class="text-box">
+        <h6>Usuarios</h6>
+        <h4>{{ total_usuarios }}</h4>
       </div>
     </div>
   </div>
+  <div class="col-sm-6 col-md-4 col-lg-2">
+    <div class="widget">
+      <a href="" class="icon-box bg-success" style="text-decoration: none;">
+        <i class="bi bi-box-seam"></i>
+      </a>
+      <div class="text-box">
+        <h6>Productos</h6>
+        <h4>{{ total_productos }}</h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-md-4 col-lg-2">
+    <div class="widget">
+      <a href="{% url 'gestionar_productos' %}" class="icon-box bg-warning" style="text-decoration: none;">
+        <i class="bi bi-hourglass-split"></i>
+      </a>
+      <div class="text-box">
+        <h6>Pendientes</h6>
+        <h4>{{ productos_pendientes }}</h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-md-4 col-lg-2">
+    <div class="widget">
+      <a href="{% url 'usuarios_reportados' %}" class="icon-box bg-danger" style="text-decoration: none;">
+        <i class="bi bi-flag-fill"></i>
+      </a>
+      <div class="text-box">
+        <h6>Reportes V.</h6>
+        <h4>{{ total_reportes_vendedor }}</h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-md-4 col-lg-2">
+    <div class="widget">
+      <a href="{% url 'usuarios_reportados' %}" class="icon-box bg-secondary" style="text-decoration: none;">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+      </a>
+      <div class="text-box">
+        <h6>Reportes U.</h6>
+        <h4>{{ total_reportes_usuario }}</h4>
+      </div>
+    </div>
+  </div>
+</div>
+
 
   <!-- Calificaciones y Productos -->
   <div class="row mt-4">

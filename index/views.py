@@ -128,18 +128,35 @@ def registrar_usuario(request):
         email = request.POST['email']
         password1 = request.POST['password1']
         password2 = request.POST['password2']
+
+        data = {
+            'nombre_usuario': username,
+            'nombre_completo': nombre_completo,
+            'rut': rut,
+            'direccion': direccion,
+            'email': email,
+            'mostrar_registro': True
+        }
+
         if not all([username, nombre_completo, rut, direccion, email, password1, password2]):
-            return render(request, 'index/index.html', {'error': 'Todos los campos son obligatorios.'})
+            data['error'] = 'Todos los campos son obligatorios.'
+            return render(request, 'index/index.html', data)
 
         if User.objects.filter(username=username).exists():
-            return render(request, 'index/index.html', {'error': 'El nombre de usuario ya está en uso.'})
-        if User.objects.filter(email=email).exists():
-            return render(request, 'index/index.html', {'error': 'El correo ya está registrado.'})
-        if Perfil.objects.filter(rut=rut).exists():
-            return render(request, 'index/index.html', {'error': 'El RUT ya está registrado.'})
-        if password1 != password2:
-            return render(request, 'index/index.html', {'error': 'Las claves no coinciden.'})
+            data['error'] = 'El nombre de usuario ya está en uso.'
+            return render(request, 'index/index.html', data)
 
+        if User.objects.filter(email=email).exists():
+            data['error'] = 'El correo ya está registrado.'
+            return render(request, 'index/index.html', data)
+
+        if Perfil.objects.filter(rut=rut).exists():
+            data['error'] = 'El RUT ya está registrado.'
+            return render(request, 'index/index.html', data)
+
+        if password1 != password2:
+            data['error'] = 'Las claves no coinciden.'
+            return render(request, 'index/index.html', data)
 
         # Crear usuario y perfil
         user = User.objects.create_user(username=username, email=email, password=password1)
@@ -179,6 +196,7 @@ def registrar_usuario(request):
         return redirect('index')
 
     return render(request, 'index/index.html')
+
 def index(request):
     storage = get_messages(request)
     for _ in storage:

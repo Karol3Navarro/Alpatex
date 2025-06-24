@@ -73,15 +73,22 @@
                     </div>
 
                     <span>Completa el formulario</span>
+                    {% if error %}
+                <div class="alert alert-danger" style="margin: 10px 0; color: #a94442; background: #f2dede; border: 1px solid #ebccd1; padding: 10px; border-radius: 4px;">
+                    {{ error }}
+                </div>
+            {% endif %}
+
 
                     <div class="container-input">
-                        <input type="text" class="inp" id="nombre_usuario" name="nombre_usuario" placeholder="Usuario" required minlength="4" maxlength="20" 
-                        pattern="^[a-zA-Z0-9_]+$" title="Solo letras, números y guiones bajos">
+                        <input type="text" class="inp" id="nombre_usuario" name="nombre_usuario"
+                            placeholder="Usuario" value="{{ nombre_usuario|default:'' }}" required minlength="4" maxlength="20"
+                            pattern="^[a-zA-Z0-9_]+$" title="Solo letras, números y guiones bajos">
                     </div>
                     <div class="container-input">
-                        <input type="text" class="inp" id="nombre_completo" name="nombre_completo" placeholder="Nombre Completo" required minlength="5" maxlength="50"
-                        pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$" 
-                        title="Solo letras y espacios">
+                     <input type="text" class="inp" id="nombre_completo" name="nombre_completo"
+                    placeholder="Nombre Completo" value="{{ nombre_completo|default:'' }}" required minlength="5" maxlength="50"
+                    pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$" title="Solo letras y espacios">
                     </div>
                     <div class="container-input">
                         <input type="text" class="inp" id="rut" name="rut" required placeholder="Run: Ej: 12.345.678-9" maxlength="12" 
@@ -124,6 +131,13 @@
     </main>
 
     <!-- JS Funcionalidad -->
+     {% if mostrar_registro %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector(".container").classList.add("toggle");
+    });
+</script>
+{% endif %}
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const container = document.querySelector(".container");
