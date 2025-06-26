@@ -452,20 +452,14 @@ def producto_findEdit(request, pk):
 
 #Eliminar Producto
 def producto_del(request,pk):
-    context={}
     try:
-        producto=Producto.objects.get(id_producto=pk)
-
+        producto = Producto.objects.get(id_producto=pk)
         producto.delete()
-        mensaje ="Producto Eliminado Correctamente"
-        productos =Producto.objects.all()
-        context = {'productos':productos, 'mensaje':mensaje}
-        return render(request, 'index/producto_perfi.html', context)
-    except:
-        mensaje="Producto no existe"
-        productos =Producto.objects.all()
-        context = {'productos':productos, 'mensaje':mensaje}
-        return render(request, 'index/productos_perf.html', context)
+        messages.success(request, "Producto Eliminado Correctamente")
+    except Producto.DoesNotExist:
+        messages.error(request, "Producto no existe")
+
+    return redirect('productos_perf')
 
 def redirigir_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
