@@ -90,6 +90,13 @@ class Producto(models.Model):
 
         super().clean()
 
+class ImagenProducto(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='imagenes')
+    imagen = models.ImageField(upload_to='productos/imagenes_adicionales/')
+
+    def __str__(self):
+        return f"Imagen de {self.producto.nombre}"
+
 #Modelo calificacion producto
 class CalificacionProducto(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)

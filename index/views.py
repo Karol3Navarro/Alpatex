@@ -2,13 +2,13 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from .models import Producto, Perfil, CalificacionVendedor, ReporteVendedor, CalificacionCliente
+from .models import Producto, Perfil, CalificacionVendedor, ReporteVendedor, CalificacionCliente, ImagenProducto
 from .Forms import PerfilForm, ProductoForm, ReporteVendedorForm, ReporteusuarioForm
 import json
 from django.db.models import Avg
 from Dm.utils import contar_mensajes_no_leidos
 from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
+from django.template.loader import render_to_string 
 from email.mime.image import MIMEImage
 import os
 from django.core.serializers.json import DjangoJSONEncoder
@@ -323,11 +323,17 @@ def producto_add_perf(request):
 
     if request.method == "POST":
         form = ProductoForm(request.POST, request.FILES)
+        imagenes = request.FILES.getlist('imagenes')
         if form.is_valid():
             producto = form.save(commit=False)
             producto.usuario = request.user
             producto.estado_revision = "Pendiente"
+            producto.imagen = imagenes[0]
             producto.save()
+
+            for img in imagenes[1:]:
+                ImagenProducto.objects.create(producto=producto, imagen=img)
+
             messages.success(request, "Producto creado con éxito!")
             return redirect('productos_perf')
         else:

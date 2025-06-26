@@ -12,8 +12,30 @@
 
     <div class="prod-detalle">
         <div class="izq">
-            <img src="{{ producto.imagen.url }}" class="img">
+            <div class="swiper">
+                <div class="swiper-wrapper">
+                <!-- Imagen principal -->
+                <div class="swiper-slide">
+                    <img src="{{ producto.imagen.url }}" class="img">
+                </div>
+
+                <!-- Imágenes adicionales -->
+                {% for img in producto.imagenes.all %}
+                    <div class="swiper-slide">
+                    <img src="{{ img.imagen.url }}" class="img">
+                    </div>
+                {% endfor %}
+                </div>
+
+                <!-- Botones de navegación -->
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+
+                <!-- Paginación opcional -->
+                <div class="swiper-pagination"></div>
+            </div>
         </div>
+
         <div class="der">
             <h2 class="der-titulo">{{ producto.nombre }}</h2>
 
@@ -44,4 +66,20 @@
         
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const swiper = new Swiper('.swiper', {
+            loop: true,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            });
+        });
+    </script>
 {% endblock %}
