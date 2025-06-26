@@ -3,6 +3,31 @@
 {% block title %}Producto{% endblock title %}
 {% block body %}
 
+    <style>
+        .swiper {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        }
+
+        .swiper-wrapper {
+        display: flex;
+        }
+
+        .swiper-slide {
+        flex-shrink: 0;
+        width: 100%;
+        height: auto;
+        }
+
+        .swiper-slide img {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+        border-radius: 10px;
+        }
+    </style>
+
     <div class="reg-btn">
         <a onclick="window.history.back();" class="regresar">
             <span class="material-symbols-outlined">chevron_left</span> Regresar
@@ -11,8 +36,22 @@
     
 
     <div class="prod-detalle">
-        <div class="izq">
-            <img src="{{ producto.imagen.url }}" class="img">
+        <div class="swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                <img src="{{ producto.imagen.url }}" alt="Imagen principal">
+                </div>
+                {% for img in producto.imagenes.all %}
+                <div class="swiper-slide">
+                    <img src="{{ img.imagen.url }}" alt="Imagen adicional">
+                </div>
+                {% endfor %}
+            </div>
+            <!-- Botones -->
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
+            <!-- Paginación -->
+            <div class="swiper-pagination"></div>
         </div>
         <div class="der">
             <h2 class="der-titulo">{{ producto.nombre }}</h2>
@@ -29,4 +68,20 @@
            
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            new Swiper('.swiper', {
+            loop: true,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            });
+        });
+    </script>
 {% endblock %}
