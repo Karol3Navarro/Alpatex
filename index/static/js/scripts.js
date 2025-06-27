@@ -1,5 +1,36 @@
 console.log("scripts.js cargado");
 
+//FUNCION PARA EDITAR PRODUCTOS
+document.addEventListener("DOMContentLoaded", function () {
+  const editables = [
+    "username_input",
+    "email_input",
+    "genero_input",
+    "foto_perfil_input",
+    "direccion_input"
+  ];
+
+  window.toggleEdit = function (modo) {
+    console.log("Modo edición:", modo);
+    editables.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = !modo;
+    });
+
+    document.getElementById("label_foto_perfil").style.display = modo ? "block" : "none";
+    document.getElementById("foto_perfil_input").style.display = modo ? "inline-block" : "none";
+    document.getElementById("guardar_editar").style.display = modo ? "inline-block" : "none";
+
+    const btn = document.getElementById("btn_editar");
+    if (modo) {
+      btn.textContent = "Cancelar edición";
+      btn.setAttribute("onclick", "toggleEdit(false)");
+    } else {
+      btn.textContent = "Editar perfil";
+      btn.setAttribute("onclick", "toggleEdit(true)");
+    }
+  }
+});
 // Variables globales para almacenar la membresía y el precio seleccionados
 let membresiaSeleccionada = null;
 let precioSeleccionado = null;
@@ -180,35 +211,7 @@ function aplicarFiltros() {
   });
 }
 
-//FUNCION PARA EDITAR PRODUCTOS
-const editables = [
-  "username_input",
-  "email_input",
-  "genero_input",
-  "foto_perfil_input",
-  "direccion_input"
-];
 
-function toggleEdit(modo) {
-  console.log("Modo edición:", modo);
-  editables.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.disabled = !modo;
-  });
-
-  document.getElementById("label_foto_perfil").style.display = modo ? "block" : "none";
-  document.getElementById("foto_perfil_input").style.display = modo ? "inline-block" : "none";
-  document.getElementById("guardar_editar").style.display = modo ? "inline-block" : "none";
-
-  const btn = document.getElementById("btn_editar");
-  if (modo) {
-    btn.textContent = "Cancelar edición";
-    btn.setAttribute("onclick", "toggleEdit(false)");
-  } else {
-    btn.textContent = "Editar perfil";
-    btn.setAttribute("onclick", "toggleEdit(true)");
-  }
-}
 
 // FUNCIÓN PARA EDITAR LA INFORMACIÓN DE UN PRODUCTO
 function toggleEditProducto(modo, productoId) {
