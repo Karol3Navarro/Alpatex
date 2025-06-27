@@ -98,10 +98,19 @@
 
 <div class="promos">
   <ul class="list-promos d-flex justify-content-center">
-    <li class="list-item">
-      <a href="{% url 'ver_membresia_usuario' %}"><img class="promo1" src="{% static 'img/memb-promo.png' %}" alt=""></a>
+    <li class="list-item mx-2">
+      <a href="{% url 'ver_membresia_usuario' %}">
+        <img class="promo1" src="{% static 'img/memb-promo.png' %}" alt="Promo Membresía">
+      </a>
+    </li>
+    <li class="list-item mx-2">
+      <a href="{% url 'producto_add_perf' %}">
+        <img class="promo1" src="{% static 'img/agregar-producto.jpeg' %}" alt="Agregar Producto">
+      </a>
     </li>
   </ul>
 </div>
+
+
 
 {% endblock %}
