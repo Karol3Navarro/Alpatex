@@ -93,7 +93,8 @@
                 <!-- Al hacer click, abrimos el modal para tokenizar -->
                 <button type="button"
                         class="btn contratar"
-                        onclick="mostrarFormularioPago('{{ m.id }}', '{{ m.precio }}')">
+                        data-membresia-id="{{ m.id }}"
+                        data-precio="{{ m.precio }}">
                   CONTRATAR
                 </button>
               {% endif %}
@@ -116,6 +117,8 @@
                id="form-checkout__cardholderEmail"
                name="cardholderEmail"
                placeholder="Email"
+               value="{{ request.user.email }}"
+               readonly
                required />
         <input type="text"
                id="form-checkout__cardNumber"
@@ -187,8 +190,28 @@
     data-client-id="{{ mercadopago_public_key_sandbox }}">
   </script>
 
-
   <script>
     const MERCADOPAGO_PUBLIC_KEY = "{{ mercadopago_public_key_sandbox }}";
+    
+    // Script específico para la página de membresía
+    document.addEventListener('DOMContentLoaded', function() {
+      const botonesContratar = document.querySelectorAll('.btn.contratar');
+
+      
+      botonesContratar.forEach(function(boton, index) {
+        console.log('Configurando botón', index, ':', boton);
+        boton.addEventListener('click', function(e) {
+          e.preventDefault();
+          const membresiaId = this.getAttribute('data-membresia-id');
+          const precio = this.getAttribute('data-precio');
+          
+          if (typeof window.mostrarFormularioPago === 'function') {
+            window.mostrarFormularioPago(membresiaId, precio);
+          } else {
+            alert('Error: El formulario de pago no está disponible. Por favor, recarga la página.');
+          }
+        });
+      });
+    });
   </script>
 {% endblock %}

@@ -871,19 +871,6 @@ def eliminar_confirmacion(request, pk):
     return redirect('mis_compras')
 
 @csrf_exempt
-def mercadopago_webhook(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            mp_service = MercadoPagoService()
-            mp_service.procesar_webhook(data)
-            return HttpResponse(status=200)
-        except Exception as e:
-            return HttpResponse(status=400)
-    return HttpResponse(status=405)
-
-#Webhook que recibe notificaciones de Mercado Pago
-@csrf_exempt
 def webhook_mercadopago(request):
 
     if request.method == "POST":
@@ -920,23 +907,34 @@ def webhook_mercadopago(request):
     return HttpResponse(status=405)
 
 @csrf_exempt
+@login_required
 def crear_suscripcion_api(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
     
     try:
         data = json.loads(request.body)
+        print("Datos recibidos en crear_suscripcion_api:", data)
+        
         token_tarjeta = data.get('token_tarjeta')
-        email = data.get('email')
         membresia_id = data.get('membresia_id')
+        
+        print("Token de tarjeta:", token_tarjeta)
+        print("ID de membresía:", membresia_id)
 
         if not token_tarjeta:
+            print("Error: Token de tarjeta faltante")
             return JsonResponse({'error': 'El token de tarjeta es requerido'}, status=400)
-        if not (email and membresia_id):
+        if not membresia_id:
+            print("Error: ID de membresía faltante")
             return JsonResponse({'error': 'Faltan datos requeridos'}, status=400)
 
-        perfil = Perfil.objects.get(user__email=email)
+        # Usar el perfil del usuario autenticado
+        perfil = request.user.perfil
+        print("Perfil del usuario:", perfil.user.email)
+        
         membresia = Membresia.objects.get(id=membresia_id)
+        print("Membresía encontrada:", membresia.nombre)
 
         mp_service = MercadoPagoService()
         respuesta = mp_service.crear_suscripcion(perfil, membresia, token_tarjeta)
@@ -948,11 +946,11 @@ def crear_suscripcion_api(request):
             'init_point': init_point,
             'suscripcion_id': subscription_id
         })
-    except Perfil.DoesNotExist:
-        return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
     except Membresia.DoesNotExist:
+        print("Error: Membresía no encontrada")
         return JsonResponse({'error': 'Membresía no encontrada'}, status=404)
     except Exception as e:
+        print("Error en crear_suscripcion_api:", str(e))
         return JsonResponse({'error': str(e)}, status=400)
    
 @csrf_exempt

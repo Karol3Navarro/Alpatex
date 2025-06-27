@@ -1,5 +1,13 @@
 console.log("scripts.js cargado");
 
+// Variables globales para almacenar la membresía y el precio seleccionados
+let membresiaSeleccionada = null;
+let precioSeleccionado = null;
+let cardForm = null;
+
+// Hacer cardForm disponible globalmente
+window.cardForm = cardForm;
+
 document.addEventListener("DOMContentLoaded", function(){
   new Swiper(".mySwiper", {
     slidesPerView: 4,
@@ -139,14 +147,16 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   const btnLimpiar  = document.getElementById("limp-filt");
-  btnLimpiar.addEventListener("click", function () {
-    filtros.forEach(r => r.checked = false);
+  if (btnLimpiar) {
+    btnLimpiar.addEventListener("click", function () {
+      filtros.forEach(r => r.checked = false);
 
-    const productos = document.querySelectorAll('.producto-card-link');
-    productos.forEach(producto => {
-      producto.style.display = "block";
+      const productos = document.querySelectorAll('.producto-card-link');
+      productos.forEach(producto => {
+        producto.style.display = "block";
+      });
     });
-  });
+  }
 });
 
 
@@ -169,12 +179,6 @@ function aplicarFiltros() {
     }
   });
 }
-
-document.getElementById("limp-filt").addEventListener("click", function (){
-  const radios = document.querySelectorAll('input[type="radio"]:checked');
-  radios.forEach(r => r.checked = false);
-
-});
 
 //FUNCION PARA EDITAR PRODUCTOS
 const editables = [
@@ -254,177 +258,146 @@ function cerrarModal() {
   document.getElementById("modRecContra").style.display = "none";
 }
 
-// Variables globales para almacenar la membresía y el precio seleccionados
-let membresiaSeleccionada = null;
-let precioSeleccionado = null;
-let cardForm = null;
-
-// Función global para mostrar el formulario de pago
-window.mostrarFormularioPago = function (membresiaId, precio) {
-  if (!cardForm) {
-    console.error("El formulario de pago no está inicializado");
-    return;
-  }
-
-  membresiaSeleccionada = membresiaId;
-  precioSeleccionado = precio;
-
-  const modal = document.getElementById("modal-pago");
-  if (!modal) {
-    console.error("No se encontró el modal de pago");
-    return;
-  }
-
-  const cerrarBtn = modal.querySelector(".cerrar");
-  if (!cerrarBtn) {
-    console.error("No se encontró el botón de cerrar");
-    return;
-  }
-
-  // Limpia cualquier <input name="membresia_id"> previo
-  const formPago = document.getElementById("form-pago");
-  if (!formPago) {
-    console.error("No se encontró el formulario de pago");
-    return;
-  }
-
-  const prevHidden = formPago.querySelector('input[name="membresia_id"]');
-  if (prevHidden) {
-    prevHidden.remove();
-  }
-
-  // Inserta el campo hidden con el ID de la membresía
-  const membresiaInput = document.createElement("input");
-  membresiaInput.type = "hidden";
-  membresiaInput.name = "membresia_id";
-  membresiaInput.value = membresiaId;
-  formPago.appendChild(membresiaInput);
-
-  // Mostramos el modal
-  modal.style.display = "flex";
-
-  // Al hacer clic en la X, cerramos y limpiamos
-  cerrarBtn.onclick = function () {
-    modal.style.display = "none";
-    limpiarModal();
-    window.onclick = null;
-  };
-
-  // Al hacer clic fuera del contenido, también cerramos
-  window.onclick = function (event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-      limpiarModal();
-      window.onclick = null;
-    }
-  };
-};
 
 // Función para inicializar MercadoPago
 function inicializarMercadoPago() {
+  console.log("=== INICIANDO INICIALIZACIÓN DE MERCADOPAGO ===");
+  
   // 1) Valida que la llave esté definida
   if (typeof MERCADOPAGO_PUBLIC_KEY === 'undefined' || !MERCADOPAGO_PUBLIC_KEY) {
     console.error("MERCADOPAGO_PUBLIC_KEY no está definida");
     return;
   }
+  console.log("MERCADOPAGO_PUBLIC_KEY:", MERCADOPAGO_PUBLIC_KEY);
 
   // 2) Valida que MercadoPago esté disponible
   if (typeof MercadoPago === 'undefined') {
-    console.error("El SDK de MercadoPago no está cargado");
+    console.error(" El SDK de MercadoPago no está cargado");
     return;
   }
+  console.log("SDK de MercadoPago disponible");
 
-  console.log("Inicializando MercadoPago con llave:", MERCADOPAGO_PUBLIC_KEY);
+  console.log("Creando instancia de MercadoPago...");
   const mp = new MercadoPago(MERCADOPAGO_PUBLIC_KEY, { locale: 'es-CL' });
+  console.log("Instancia de MercadoPago creada:", mp);
 
-  // 3) Crea el cardForm de Mercado Pago
-  cardForm = mp.cardForm({
-    amount: "0",
-    autoMount: true,
-    form: {
-      id: "form-pago",
-      cardholderName: {
-        id: "form-checkout__cardholderName",
-        placeholder: "Nombre del titular de la tarjeta"
-      },
-      cardholderEmail: {
-        id: "form-checkout__cardholderEmail",
-        placeholder: "E-mail"
-      },
-      cardNumber: {
-        id: "form-checkout__cardNumber",
-        placeholder: "Número de tarjeta (ej: 5031 7557 3453 0604)"
-      },
-      expirationDate: {
-        id: "form-checkout__expirationDate",
-        placeholder: "MM/YY (ej: 12/27)"
-      },
-      securityCode: {
-        id: "form-checkout__securityCode",
-        placeholder: "CVV (ej: 123)"
-      },
-      installments: {
-        id: "form-checkout__installments",
-        placeholder: "Cuotas"
-      },
-      identificationType: {
-        id: "form-checkout__identificationType",
-        placeholder: "Tipo de documento"
-      },
-      identificationNumber: {
-        id: "form-checkout__identificationNumber",
-        placeholder: "DNI (ej: 12345678-9)"
-      },
-      issuer: {
-        id: "form-checkout__issuer",
-        placeholder: "Banco emisor"
-      }
-    },
-    callbacks: {
-      onFormMounted: (error) => {
-        if (error) {
-          console.warn("Error montando el cardForm:", error);
-        } else {
-          console.log("Formulario de pago montado correctamente");
+  // 3) Verifica que el formulario existe
+  const formPago = document.getElementById("form-pago");
+  if (!formPago) {
+    console.error("No se encontró el formulario con id 'form-pago'");
+    return;
+  }
+  console.log("Formulario encontrado:", formPago);
+
+  // 4) Crea el cardForm de Mercado Pago
+  try {
+    console.log("Creando cardForm...");
+    cardForm = mp.cardForm({
+      amount: "0",
+      autoMount: true,
+      form: {
+        id: "form-pago",
+        cardholderName: {
+          id: "form-checkout__cardholderName",
+          placeholder: "Nombre del titular de la tarjeta"
+        },
+        cardholderEmail: {
+          id: "form-checkout__cardholderEmail",
+          placeholder: "E-mail"
+        },
+        cardNumber: {
+          id: "form-checkout__cardNumber",
+          placeholder: "Número de tarjeta (ej: 5031 7557 3453 0604)"
+        },
+        expirationDate: {
+          id: "form-checkout__expirationDate",
+          placeholder: "MM/YY (ej: 12/27)"
+        },
+        securityCode: {
+          id: "form-checkout__securityCode",
+          placeholder: "CVV (ej: 123)"
+        },
+        installments: {
+          id: "form-checkout__installments",
+          placeholder: "Cuotas"
+        },
+        identificationType: {
+          id: "form-checkout__identificationType",
+          placeholder: "Tipo de documento"
+        },
+        identificationNumber: {
+          id: "form-checkout__identificationNumber",
+          placeholder: "DNI (ej: 12345678-9)"
+        },
+        issuer: {
+          id: "form-checkout__issuer",
+          placeholder: "Banco emisor"
         }
       },
-      onSubmit: (event) => {
-        event.preventDefault();
-        procesarPago();
-      },
-      onFetching: (resource) => {
-        console.log("Fetching recurso:", resource);
-      },
-      onError: (error) => {
-        // Si el error es sobre cuotas/payer_costs, no se muestra nada al usuario
-        let mensaje = error && error.message ? error.message : JSON.stringify(error);
-        if (
-          mensaje.includes("payer_costs") ||
-          mensaje.includes("installments") ||
-          mensaje.includes("Failed to get installments") ||
-          mensaje.includes("Cannot destructure property 'payer_costs'")
-        ) {
-          // No mostramos nada, es un error esperado en Sandbox o sin cuotas
-          return;
+      callbacks: {
+        onFormMounted: (error) => {
+          if (error) {
+            console.warn("Error montando el cardForm:", error);
+          } else {
+            console.log("Formulario de pago montado correctamente");
+          }
+        },
+        onSubmit: (event) => {
+          event.preventDefault();
+          procesarPago();
+        },
+        onFetching: (resource) => {
+          console.log("Fetching recurso:", resource);
+        },
+        onError: (error) => {
+          // Si el error es sobre cuotas/payer_costs, no se muestra nada al usuario
+          let mensaje = error && error.message ? error.message : JSON.stringify(error);
+          if (
+            mensaje.includes("payer_costs") ||
+            mensaje.includes("installments") ||
+            mensaje.includes("Failed to get installments") ||
+            mensaje.includes("Cannot destructure property 'payer_costs'")
+          ) {
+            // No mostramos nada, es un error esperado en Sandbox o sin cuotas
+            return;
+          }
+          // Para cualquier otro error, si se muestra
+          console.error("Error en cardForm:", error);
+          document.getElementById('form-result').innerHTML =
+            `<div class="alert alert-error">Error en el formulario de pago: ${mensaje}</div>`;
         }
-        // Para cualquier otro error, si se muestra
-        console.error("Error en cardForm:", error);
-        document.getElementById('form-result').innerHTML =
-          `<div class="alert alert-error">Error en el formulario de pago: ${mensaje}</div>`;
       }
-    }
-  });
+    });
+    
+    // Actualizar tanto la variable local como la global
+    window.cardForm = cardForm;
+    
+    console.log("cardForm creado exitosamente:", cardForm);
+    console.log("=== INICIALIZACIÓN DE MERCADOPAGO COMPLETADA ===");
+  } catch (error) {
+    console.error("Error al crear cardForm:", error);
+  }
 }
+
+// Hacer la función disponible globalmente
+window.inicializarMercadoPago = inicializarMercadoPago;
 
 // esperar a que el dom este elisto
 document.addEventListener("DOMContentLoaded", function () {
+  console.log("DOM cargado, verificando MercadoPago...");
+  console.log("MERCADOPAGO_PUBLIC_KEY disponible:", typeof MERCADOPAGO_PUBLIC_KEY !== 'undefined');
+  console.log("MercadoPago SDK disponible:", typeof MercadoPago !== 'undefined');
+  
   // Verifica que MercadoPago  está cargado
   if (typeof MercadoPago !== 'undefined') {
+    console.log("MercadoPago ya está cargado, inicializando...");
     inicializarMercadoPago();
   } else {
+    console.log("MercadoPago no está cargado, esperando...");
     // si no esta cargado, se espera a que  cargue
     const checkMercadoPago = setInterval(() => {
       if (typeof MercadoPago !== 'undefined') {
+        console.log("MercadoPago cargado, inicializando...");
         clearInterval(checkMercadoPago);
         inicializarMercadoPago();
       }
@@ -440,15 +413,40 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+// También intentar inicializar cuando se carga la ventana
+window.addEventListener('load', function() {
+  console.log("Ventana cargada, verificando MercadoPago...");
+  console.log("MercadoPago SDK disponible en window.load:", typeof MercadoPago !== 'undefined');
+  if (typeof MercadoPago !== 'undefined' && !cardForm) {
+    console.log("MercadoPago disponible en window.load, inicializando...");
+    inicializarMercadoPago();
+  }
+});
+
 // 4) Limpia el contenido del modal (resetea campos y elimina mensajes)
 function limpiarModal() {
-  document.getElementById("form-result").innerHTML = "";
-  document.getElementById("form-pago").reset();
+  const formResult = document.getElementById("form-result");
+  const formPago = document.getElementById("form-pago");
+  
+  if (formResult) {
+    formResult.innerHTML = "";
+  }
+  
+  if (formPago) {
+    formPago.reset();
+  }
 }
+
+// Hacer la función disponible globalmente
+window.limpiarModal = limpiarModal;
 
 // 5) Lógica para procesar el pago tras generar el token
 async function procesarPago() {
-  const formData = cardForm.getCardFormData();
+  console.log("=== INICIANDO PROCESAR PAGO ===");
+  console.log("window.membresiaSeleccionada al inicio:", window.membresiaSeleccionada);
+  console.log("window.precioSeleccionado al inicio:", window.precioSeleccionado);
+  
+  const formData = window.cardForm.getCardFormData();
   console.log("Datos del formulario:", formData);
 
   if (!formData.token) {
@@ -462,9 +460,11 @@ async function procesarPago() {
 
   const payload = {
     token_tarjeta: formData.token,
-    email: formData.cardholderEmail,
-    membresia_id: membresiaSeleccionada
+    membresia_id: window.membresiaSeleccionada
   };
+
+  console.log("Payload que se enviará al backend:", payload);
+  console.log("window.membresiaSeleccionada:", window.membresiaSeleccionada);
 
   try {
     const response = await fetch('/index/membresia/api/', {
@@ -476,7 +476,11 @@ async function procesarPago() {
       body: JSON.stringify(payload)
     });
 
+    console.log("Respuesta del servidor:", response.status, response.statusText);
+    
     const data = await response.json();
+    console.log("Datos de respuesta:", data);
+    
     if (response.status === 200 && data.init_point) {
       console.log("Redirigiendo a:", data.init_point);
       window.location.href = data.init_point;
@@ -556,3 +560,80 @@ document.getElementById('confirmar-cancelacion').addEventListener('click', funct
   var modal = bootstrap.Modal.getInstance(document.getElementById('modalCancelar'));
   modal.hide();
 });
+
+console.log("ANTES de definir mostrarFormularioPago");
+
+window.mostrarFormularioPago = function (membresiaId, precio) {
+  console.log("Función mostrarFormularioPago llamada con:", membresiaId, precio);
+
+  // Usar las variables globales window
+  window.membresiaSeleccionada = membresiaId;
+  window.precioSeleccionado = precio;
+
+  console.log("window.membresiaSeleccionada configurada como:", window.membresiaSeleccionada);
+  console.log("window.precioSeleccionado configurado como:", window.precioSeleccionado);
+
+  const modal = document.getElementById("modal-pago");
+  if (!modal) {
+    console.error("No se encontró el modal de pago");
+    alert("Error: No se encontró el modal de pago");
+    return;
+  }
+
+  // Limpia cualquier <input name=\"membresia_id\"> previo
+  const formPago = document.getElementById("form-pago");
+  if (!formPago) {
+    console.error("No se encontró el formulario de pago");
+    alert("Error: No se encontró el formulario de pago");
+    return;
+  }
+
+  const prevHidden = formPago.querySelector('input[name=\"membresia_id\"]');
+  if (prevHidden) {
+    prevHidden.remove();
+  }
+
+  // Inserta el campo hidden con el ID de la membresía
+  const membresiaInput = document.createElement("input");
+  membresiaInput.type = "hidden";
+  membresiaInput.name = "membresia_id";
+  membresiaInput.value = membresiaId;
+  formPago.appendChild(membresiaInput);
+
+  // Mostramos el modal
+  modal.style.display = "flex";
+  console.log("Modal mostrado exitosamente");
+
+  // Al hacer clic en la X, cerramos y limpiamos
+  const cerrarBtn = modal.querySelector(".cerrar");
+  if (cerrarBtn) {
+    cerrarBtn.onclick = function () {
+      modal.style.display = "none";
+      if (typeof window.limpiarModal === 'function') {
+        window.limpiarModal();
+      }
+    };
+  }
+
+  // Al hacer clic fuera del contenido, también cerramos
+  window.onclick = function (event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+      if (typeof window.limpiarModal === 'function') {
+        window.limpiarModal();
+      }
+    }
+  };
+
+  // Verificar si cardForm está disponible
+  if (!window.cardForm) {
+    console.warn("cardForm no está inicializado. El formulario de pago puede no funcionar correctamente.");
+    const formResult = document.getElementById('form-result');
+    if (formResult) {
+      formResult.innerHTML = '<div class="alert alert-warning">Inicializando formulario de pago...</div>';
+    }
+  }
+};
+
+
+console.log("DESPUÉS de definir mostrarFormularioPago");

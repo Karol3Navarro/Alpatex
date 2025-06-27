@@ -1545,6 +1545,12 @@ footer{
     font-size: 1rem;
 }
 
+#form-pago input[readonly] {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
 #form-pago button {
     background-color: #5a2d50;
     color: white;

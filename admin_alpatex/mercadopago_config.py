@@ -17,9 +17,9 @@ def get_base_url():
 
 # URLs para Sandbox
 MERCADOPAGO_WEBHOOK_URL = f"{get_base_url()}/index/webhook/mercadopago/"
-MERCADOPAGO_SUCCESS_URL = f"{get_base_url()}/index/pago/exito/"
-MERCADOPAGO_FAILURE_URL = f"{get_base_url()}/index/pago/fallo/"
-MERCADOPAGO_PENDING_URL = f"{get_base_url()}/index/pago/fallo/"
+MERCADOPAGO_SUCCESS_URL = f"{get_base_url()}/index/pago_exito/"
+MERCADOPAGO_FAILURE_URL = f"{get_base_url()}/index/pago_rechazado/"
+MERCADOPAGO_PENDING_URL = f"{get_base_url()}/index/pago_rechazado/"
 
 # Configuración de suscripciones
 SUBSCRIPTION_FREQUENCY = 30  # días
