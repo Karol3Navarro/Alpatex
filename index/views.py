@@ -32,15 +32,17 @@ from admin_alpatex.mercadopago_config import (
 )
 
 
-
+# Vista que prepara datos de productos para mostrarlos en un mapa
 def map(request):
+# Filtra productos disponibles, aceptados y con dirección definida
     productos = Producto.objects.select_related('usuario').filter(
         disponible=True,
         estado_revision='Aceptado',
         direccion__isnull=False
     )
     productos_data = []
-    
+    # Prepara la información de cada producto
+
     for producto in productos:
         if producto.direccion:  # Solo productos que tengan dirección
             productos_data.append({
@@ -49,18 +51,20 @@ def map(request):
                 'direccion': producto.direccion,
                 'vendedor': producto.usuario.username  # Opcional, si quieres mostrar quién lo vende
             })
-
+    # Convierte los datos a JSON para el frontend
     productos_json = json.dumps(productos_data, cls=DjangoJSONEncoder)
-
+    # Pasa los datos al template
     context = {
-        'perfiles_json': productos_json  # Puedes cambiarle el nombre si quieres, pero no es necesario
+        'perfiles_json': productos_json  
     }
     return render(request, 'index/map.html', context)
 
+# Vista de cierre de sesión (renderiza index sin hacer logout real)
 def logout(request):
     context={}
     return render(request, 'index/index.html', context)
 
+# Vista del menú principal (requiere login)
 @login_required
 def menu(request):
     request.session["usuario"]="cgarcia"
@@ -68,15 +72,15 @@ def menu(request):
     context={'usuario':usuario}
     return render(request, 'index/home.html', context)
 
-
+# Vista de inicio/home
 def home(request):
-    usuarios = User.objects.all()
-
+    usuarios = User.objects.all() # Obtiene todos los usuarios
+    # Obtiene productos aceptados y disponibles
     productos = Producto.objects.filter(
         estado_revision='Aceptado',
         disponible=True,
     ).select_related('usuario__perfil')
-
+    # Ordena productos por prioridad y fecha
     productos = sorted(
         productos,
         key=lambda p: (p.prioridad_visibilidad, -p.fecha_creacion.timestamp())
@@ -86,7 +90,7 @@ def home(request):
     pendientes = ConfirmacionEntrega.objects.none()  # por defecto vacío
     usuario = request.user
     mensajes_no_leidos = contar_mensajes_no_leidos(request.user)
-    # Mostrar pendientes solo si no se ha mostrado aún en esta sesión
+    # Control para mostrar confirmaciones pendientes solo una vez por sesión
     if not request.session.get('pendientes_mostrados', False):
         pendientes = ConfirmacionEntrega.objects.filter(
             canal__usuarios=usuario,
@@ -107,20 +111,24 @@ def home(request):
     }
     return render(request, 'index/home.html', context)
 
+# Vista de detalle de un producto
 def ver_producto(request, id_producto):
+ # Obtiene el producto o lanza un 404 si no existe
     producto = get_object_or_404(Producto, id_producto=id_producto)
     
     # Incrementar el contador de visitas
     producto.contador_visitas += 1
     producto.save()
-
+    # Pasa el producto al template
     context = {
         'producto': producto,
     }
     return render(request, 'index/ver_producto.html', context)
 
+# Registro de usuario
 def registrar_usuario(request):
     if request.method == 'POST':
+    # Recoge datos del formulario
         username = request.POST['nombre_usuario']
         nombre_completo = request.POST['nombre_completo']
         rut = request.POST['rut']
@@ -128,7 +136,7 @@ def registrar_usuario(request):
         email = request.POST['email']
         password1 = request.POST['password1']
         password2 = request.POST['password2']
-
+        # Datos para volver a rellenar el formulario si hay error
         data = {
             'nombre_usuario': username,
             'nombre_completo': nombre_completo,
@@ -137,7 +145,7 @@ def registrar_usuario(request):
             'email': email,
             'mostrar_registro': True
         }
-
+        # Validaciones
         if not all([username, nombre_completo, rut, direccion, email, password1, password2]):
             data['error'] = 'Todos los campos son obligatorios.'
             return render(request, 'index/index.html', data)
@@ -162,11 +170,11 @@ def registrar_usuario(request):
         user = User.objects.create_user(username=username, email=email, password=password1)
         user.first_name = nombre_completo
         user.save()
-
+        # Crea el perfil asociado al usuario
         perfil = Perfil.objects.create(user=user, rut=rut, direccion=direccion)
         perfil.save()
 
-        # Contexto del correo
+        # Envía correo de bienvenida
         context = {
             'username': username,
             'site_url': request.build_absolute_uri('/')[:-1],  # URL base sin slash final
@@ -182,7 +190,7 @@ def registrar_usuario(request):
         msg = EmailMultiAlternatives(subject, 'Gracias por registrarte en Alpatex.', from_email, to)
         msg.attach_alternative(html_content, "text/html")
 
-        # Adjuntar imagen embebida
+        # Adjuntar logo 
         logo_path = os.path.join(settings.BASE_DIR, 'index', 'static', 'img', 'alpatex-v2-tipografía.png')
         with open(logo_path, 'rb') as img:
             mime_image = MIMEImage(img.read())
@@ -196,18 +204,21 @@ def registrar_usuario(request):
         return redirect('index')
 
     return render(request, 'index/index.html')
-
+# Login
 def index(request):
+    # Limpia mensajes previos
     storage = get_messages(request)
     for _ in storage:
         pass
     if request.method == "POST":
+        # Intenta autenticar al usuario
         username = request.POST.get('username')
         password = request.POST.get('password')
 
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
+        # Verifica si el perfil está activo
             try:
                 perfil = user.perfil
             except Perfil.DoesNotExist:
@@ -218,8 +229,7 @@ def index(request):
                 error_message = "Tu cuenta ha sido eliminada y no puedes ingresar."
                 messages.error(request, error_message)
                 return render(request, 'index/index.html', {'error_message': error_message})
-
-            # Usuario activo, permite login
+            # Inicia sesión y redirige según el tipo de usuario
             login(request, user)
             if user.is_staff:
                 return redirect('home_admin')
@@ -233,9 +243,7 @@ def index(request):
 
     return render(request, 'index/index.html')
 
-
- 
-
+# Editar el perfil del usuario
 @login_required
 def editar_perfil(request):
     if request.method == 'POST':
@@ -248,16 +256,17 @@ def editar_perfil(request):
 
     return render(request, 'perfil/editar_perfil.html', {'form': form})
 
+# Ver y editar el perfil del usuario desde el perfil
 @login_required
 def perfil_usuario(request):
     perfil, _ = Perfil.objects.get_or_create(user=request.user)
-    
     ahora = timezone.now()
+
+    # Consulta si tiene una suscripción activa
     suscripcion_activa = SuscripcionMercadoPago.objects.filter(
         perfil=perfil,
-        fecha_fin__gte=ahora  # La suscripción sigue vigente
+        fecha_fin__gte=ahora
     ).order_by('-fecha_inicio').first()
-
 
     if request.method == 'POST':
         form = PerfilForm(request.POST, request.FILES, instance=perfil, user=request.user)
@@ -270,22 +279,7 @@ def perfil_usuario(request):
     else:
         form = PerfilForm(instance=perfil, user=request.user)
 
-    return render(request, 'index/perfil.html', {'perfil': perfil, 'form': form,
-        'suscripcion_activa': suscripcion_activa})
-
- 
-
-@login_required
-def editar_perfil(request):
-    if request.method == 'POST':
-        form = PerfilForm(request.POST, request.FILES, instance=request.user.perfil)
-        if form.is_valid():
-            form.save()
-            return redirect('perfil')
-    else:
-        form = PerfilForm(instance=request.user.perfil)
-
-    return render(request, 'perfil/editar_perfil.html', {'form': form})
+    return render(request, 'index/perfil.html', {'perfil': perfil, 'form': form, 'suscripcion_activa': suscripcion_activa})
 
 @login_required
 def productos_perfil(request):
@@ -309,12 +303,13 @@ def productos_perfil(request):
     })
 
 
+# Agregar un nuevo producto desde el perfil del usuario
 @login_required
 def producto_add_perf(request):
     productos = Producto.objects.all()
     direccion_usuario = ""
 
-    # Obtener la dirección del usuario autenticado
+    # Obtiene la dirección del usuario (si tiene perfil)
     if request.user.is_authenticated:
         try:
             direccion_usuario = request.user.perfil.direccion or ""
@@ -327,10 +322,11 @@ def producto_add_perf(request):
         if form.is_valid():
             producto = form.save(commit=False)
             producto.usuario = request.user
-            producto.estado_revision = "Pendiente"
+            producto.estado_revision = "Pendiente"  # Nuevo producto pendiente de revisión
             producto.imagen = imagenes[0]
             producto.save()
 
+            # Guarda imágenes adicionales
             for img in imagenes[1:]:
                 ImagenProducto.objects.create(producto=producto, imagen=img)
 
@@ -339,7 +335,6 @@ def producto_add_perf(request):
         else:
             messages.error(request, "Por favor de rellenar todos los datos")
     else:
-        # Pasar la dirección del usuario al formulario como valor predeterminado
         form = ProductoForm(initial={'direccion': direccion_usuario})
 
     context = {
