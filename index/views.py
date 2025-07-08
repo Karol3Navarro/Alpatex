@@ -241,7 +241,7 @@ def index(request):
             msg.send()
 
             messages.success(request, 'Usuario registrado correctamente.')
-            return redirect('index/index.html', {'mostrar_login': True})
+            return render(request, 'index/index.html', {'mostrar_login': True})
 
     return render(request, 'index/index.html')
 
