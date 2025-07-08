@@ -126,120 +126,122 @@ def ver_producto(request, id_producto):
     return render(request, 'index/ver_producto.html', context)
 
 # Registro de usuario
-def registrar_usuario(request):
-    if request.method == 'POST':
-    # Recoge datos del formulario
-        username = request.POST['nombre_usuario']
-        nombre_completo = request.POST['nombre_completo']
-        rut = request.POST['rut']
-        direccion = request.POST['direccion']
-        email = request.POST['email']
-        password1 = request.POST['password1']
-        password2 = request.POST['password2']
-        # Datos para volver a rellenar el formulario si hay error
-        data = {
-            'nombre_usuario': username,
-            'nombre_completo': nombre_completo,
-            'rut': rut,
-            'direccion': direccion,
-            'email': email,
-            'mostrar_registro': True
-        }
-        # Validaciones
-        if not all([username, nombre_completo, rut, direccion, email, password1, password2]):
-            data['error'] = 'Todos los campos son obligatorios.'
-            return render(request, 'index/index.html', data)
-
-        if User.objects.filter(username=username).exists():
-            data['error'] = 'El nombre de usuario ya está en uso.'
-            return render(request, 'index/index.html', data)
-
-        if User.objects.filter(email=email).exists():
-            data['error'] = 'El correo ya está registrado.'
-            return render(request, 'index/index.html', data)
-
-        if Perfil.objects.filter(rut=rut).exists():
-            data['error'] = 'El RUT ya está registrado.'
-            return render(request, 'index/index.html', data)
-
-        if password1 != password2:
-            data['error'] = 'Las claves no coinciden.'
-            return render(request, 'index/index.html', data)
-
-        # Crear usuario y perfil
-        user = User.objects.create_user(username=username, email=email, password=password1)
-        user.first_name = nombre_completo
-        user.save()
-        # Crea el perfil asociado al usuario
-        perfil = Perfil.objects.create(user=user, rut=rut, direccion=direccion)
-        perfil.save()
-
-        # Envía correo de bienvenida
-        context = {
-            'username': username,
-            'site_url': request.build_absolute_uri('/')[:-1],  # URL base sin slash final
-        }
-
-        # Renderizar HTML
-        html_content = render_to_string('index/bienvenida.html', context)
-
-        subject = '¡Bienvenido a Alpatex!'
-        from_email = settings.DEFAULT_FROM_EMAIL
-        to = [email]
-
-        msg = EmailMultiAlternatives(subject, 'Gracias por registrarte en Alpatex.', from_email, to)
-        msg.attach_alternative(html_content, "text/html")
-
-        # Adjuntar logo 
-        logo_path = os.path.join(settings.BASE_DIR, 'index', 'static', 'img', 'alpatex-v2-tipografía.png')
-        with open(logo_path, 'rb') as img:
-            mime_image = MIMEImage(img.read())
-            mime_image.add_header('Content-ID', '<logo_alpatex>')
-            mime_image.add_header('Content-Disposition', 'inline', filename='alpatex-v2-tipografía.png')
-            msg.attach(mime_image)
-
-        msg.send()
-
-        messages.success(request, 'Usuario registrado correctamente.')
-        return redirect('index')
-
-    return render(request, 'index/index.html')
 # Login
 def index(request):
     # Limpia mensajes previos
     storage = get_messages(request)
     for _ in storage:
         pass
+
     if request.method == "POST":
+        form_type = request.POST.get('form_type')
         # Intenta autenticar al usuario
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        if form_type == 'login':
+            username = request.POST.get('username')
+            password = request.POST.get('password')
 
-        user = authenticate(request, username=username, password=password)
+            user = authenticate(request, username=username, password=password)
 
-        if user is not None:
-        # Verifica si el perfil está activo
-            try:
-                perfil = user.perfil
-            except Perfil.DoesNotExist:
-                perfil = None
+            if user is not None:
+            # Verifica si el perfil está activo
+                try:
+                    perfil = user.perfil
+                except Perfil.DoesNotExist:
+                    perfil = None
 
-            if perfil and perfil.fecha_eliminacion is not None:
-                # Usuario eliminado, no puede ingresar
-                error_message = "Tu cuenta ha sido eliminada y no puedes ingresar."
+                if perfil and perfil.fecha_eliminacion is not None:
+                    # Usuario eliminado, no puede ingresar
+                    error_message = "Tu cuenta ha sido eliminada y no puedes ingresar."
+                    messages.error(request, error_message)
+                    return render(request, 'index/index.html', {'error_message': error_message})
+                
+                #Inicia sesión y redirige según el tipo de usuario
+                login(request, user)
+                if user.is_staff:
+                    return redirect('home_admin')
+                else:
+                    return redirect('home')
+
+            else:
+                error_message = "Credenciales incorrectas, por favor intenta nuevamente."
                 messages.error(request, error_message)
                 return render(request, 'index/index.html', {'error_message': error_message})
-            # Inicia sesión y redirige según el tipo de usuario
-            login(request, user)
-            if user.is_staff:
-                return redirect('home_admin')
-            else:
-                return redirect('home')
 
-        else:
-            error_message = "Credenciales incorrectas, por favor intenta nuevamente."
-            messages.error(request, error_message)
-            return render(request, 'index/index.html', {'error_message': error_message})
+        elif form_type == 'register':
+            # Recoge datos del formulario
+            username = request.POST['nombre_usuario']
+            nombre_completo = request.POST['nombre_completo']
+            rut = request.POST['rut']
+            direccion = request.POST['direccion']
+            email = request.POST['email']
+            password1 = request.POST['password1']
+            password2 = request.POST['password2']
+
+            data = {
+                'nombre_usuario': username,
+                'nombre_completo': nombre_completo,
+                'rut': rut,
+                'direccion': direccion,
+                'email': email,
+                'mostrar_registro': True
+            }
+            #Validaciones
+            if not all([username, nombre_completo, rut, direccion, email, password1, password2]):
+                data['error'] = 'Todos los campos son obligatorios.'
+                return render(request, 'index/index.html', data)
+
+            if User.objects.filter(username=username).exists():
+                data['error'] = 'El nombre de usuario ya está en uso.'
+                return render(request, 'index/index.html', data)
+
+            if User.objects.filter(email=email).exists():
+                data['error'] = 'El correo ya está registrado.'
+                return render(request, 'index/index.html', data)
+
+            if Perfil.objects.filter(rut=rut).exists():
+                data['error'] = 'El RUT ya está registrado.'
+                return render(request, 'index/index.html', data)
+
+            if password1 != password2:
+                data['error'] = 'Las claves no coinciden.'
+                return render(request, 'index/index.html', data)
+            
+            #Crear usuario y perfil
+            user = User.objects.create_user(username=username, email=email, password=password1)
+            user.first_name = nombre_completo
+            user.save()
+            # Crea el perfil asociado al usuario
+            perfil = Perfil.objects.create(user=user, rut=rut, direccion=direccion)
+            perfil.save()
+
+            #Enviar correo de bienvenida
+            context = {
+                'username': username,
+                'site_url': request.build_absolute_uri('/')[:-1],  # URL base sin slash final
+            }
+
+            # Renderizar HTML
+            html_content = render_to_string('index/bienvenida.html', context)
+
+            subject = '¡Bienvenido a Alpatex!'
+            from_email = settings.DEFAULT_FROM_EMAIL
+            to = [email]
+
+            msg = EmailMultiAlternatives(subject, 'Gracias por registrarte en Alpatex.', from_email, to)
+            msg.attach_alternative(html_content, "text/html")
+
+            # Adjuntar logo 
+            logo_path = os.path.join(settings.BASE_DIR, 'index', 'static', 'img', 'alpatex-v2-tipografía.png')
+            with open(logo_path, 'rb') as img:
+                mime_image = MIMEImage(img.read())
+                mime_image.add_header('Content-ID', '<logo_alpatex>')
+                mime_image.add_header('Content-Disposition', 'inline', filename='alpatex-v2-tipografía.png')
+                msg.attach(mime_image)
+
+            msg.send()
+
+            messages.success(request, 'Usuario registrado correctamente.')
+            return redirect('index/index.html', {'mostrar_login': True})
 
     return render(request, 'index/index.html')
 

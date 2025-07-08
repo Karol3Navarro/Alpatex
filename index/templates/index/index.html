@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,13 +22,13 @@
 
 <body>
     {% if messages %}
-        <div class="mensajes">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
+    <div class="mensajes">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
         </div>
+        {% endfor %}
+    </div>
     {% endif %}
     <main>
         <div class="container">
@@ -35,6 +36,8 @@
             <div class="container-form">
                 <form method="POST" class="login">
                     {% csrf_token %}
+                    <input type="hidden" name="form_type" value="login">
+
                     <h2 class="prod-dest">Iniciar Sesión</h2>
 
                     <div class="social-networks">
@@ -61,8 +64,9 @@
 
             <!-- Formulario de Registro -->
             <div class="container-form">
-                <form  id="form-registro" method="POST" action="{% url 'registro' %}">
+                <form id="form-registro" method="POST">
                     {% csrf_token %}
+                    <input type="hidden" name="form_type" value="register">
 
                     <h2 class="prod-dest">Registrarse</h2>
 
@@ -74,40 +78,46 @@
 
                     <span>Completa el formulario</span>
                     {% if error %}
-                <div class="alert alert-danger" style="margin: 10px 0; color: #a94442; background: #f2dede; border: 1px solid #ebccd1; padding: 10px; border-radius: 4px;">
-                    {{ error }}
-                </div>
-            {% endif %}
+                    <div class="alert alert-danger"
+                        style="margin: 10px 0; color: #a94442; background: #f2dede; border: 1px solid #ebccd1; padding: 10px; border-radius: 4px;">
+                        {{ error }}
+                    </div>
+                    {% endif %}
 
 
                     <div class="container-input">
-                        <input type="text" class="inp" id="nombre_usuario" name="nombre_usuario"
-                            placeholder="Usuario" value="{{ nombre_usuario|default:'' }}" required minlength="4" maxlength="20"
+                        <input type="text" class="inp" id="nombre_usuario" name="nombre_usuario" placeholder="Usuario"
+                            value="{{ nombre_usuario|default:'' }}" required minlength="4" maxlength="20"
                             pattern="^[a-zA-Z0-9_]+$" title="Solo letras, números y guiones bajos">
                     </div>
                     <div class="container-input">
-                     <input type="text" class="inp" id="nombre_completo" name="nombre_completo"
-                    placeholder="Nombre Completo" value="{{ nombre_completo|default:'' }}" required minlength="5" maxlength="50"
-                    pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$" title="Solo letras y espacios">
+                        <input type="text" class="inp" id="nombre_completo" name="nombre_completo"
+                            placeholder="Nombre Completo" value="{{ nombre_completo|default:'' }}" required
+                            minlength="5" maxlength="50" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
+                            title="Solo letras y espacios">
                     </div>
                     <div class="container-input">
-                        <input type="text" class="inp" id="rut" name="rut" required placeholder="Run: Ej: 12.345.678-9" maxlength="12" 
-                        pattern="^\d{1,2}\.\d{3}\.\d{3}-[\dkK]{1}$"title="Formato válido: 12.345.678-9 (con puntos y guion)">
+                        <input type="text" class="inp" id="rut" name="rut" required placeholder="Run: Ej: 12.345.678-9"
+                            maxlength="12" pattern="^\d{1,2}\.\d{3}\.\d{3}-[\dkK]{1}$"
+                            title="Formato válido: 12.345.678-9 (con puntos y guion)">
                     </div>
                     <div class="container-input" style="position: relative;">
-                        <input type="text" class="inp" id="direccion" name="direccion" required autocomplete="off" placeholder="Dirección">
+                        <input type="text" class="inp" id="direccion" name="direccion" required autocomplete="off"
+                            placeholder="Dirección">
                         <ul id="sugerencias-direccion" role="listbox"></ul>
                     </div>
                     <div class="container-input">
-                        <input type="email" class="inp" id="email" name="email" placeholder="Correo electrónico" required
-                               pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                                title="Ingresa un correo válido">                      
+                        <input type="email" class="inp" id="email" name="email" placeholder="Correo electrónico"
+                            required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                            title="Ingresa un correo válido">
                     </div>
                     <div class="container-input">
-                        <input type="password" class="inp" id="password1" name="password1" placeholder="Contraseña" required>
+                        <input type="password" class="inp" id="password1" name="password1" placeholder="Contraseña"
+                            required>
                     </div>
                     <div class="container-input">
-                        <input type="password" class="inp" id="password2" name="password2" placeholder="Confirmar contraseña" required>
+                        <input type="password" class="inp" id="password2" name="password2"
+                            placeholder="Confirmar contraseña" required>
                     </div>
 
                     <button type="submit" class="btn">Registrar</button>
@@ -131,13 +141,13 @@
     </main>
 
     <!-- JS Funcionalidad -->
-     {% if mostrar_registro %}
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelector(".container").classList.add("toggle");
-    });
-</script>
-{% endif %}
+    {% if mostrar_registro %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelector(".container").classList.add("toggle");
+        });
+    </script>
+    {% endif %}
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const container = document.querySelector(".container");
@@ -243,7 +253,7 @@
             const pass1 = document.getElementById("password1");
             const pass2 = document.getElementById("password2");
             const emailInput = document.getElementById("email");
-            
+
             formRegistro.addEventListener("submit", function (e) {
                 const rut = rutInput.value;
 
@@ -258,7 +268,7 @@
                     rutInput.focus();
                     return;
                 }
-                
+
                 // Validación correo 
                 const emailValue = emailInput.value;
                 const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -288,4 +298,5 @@
         });
     </script>
 </body>
+
 </html>
