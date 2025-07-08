@@ -785,13 +785,14 @@ def perfil_publico(request, username):
     opiniones.sort(key=lambda x: x['fecha'], reverse=True)
 
     return render(request, 'index/perfil_publico.html', {
-        'perfil': perfil,
-        'opiniones': opiniones,
-        'promedio_vendedor': promedio_v,
-        'promedio_cliente': promedio_c,
-        'promedio_general': promedio_general,
+    'perfil': perfil,
+    'productos': productos,  # <- ESTA LÍNEA ES CLAVE
+    'opiniones': opiniones,
+    'promedio_vendedor': promedio_v,
+    'promedio_cliente': promedio_c,
+    'promedio_general': promedio_general,
+})
 
-    })
 
 @login_required
 def agregar_favorito(request, producto_id):
