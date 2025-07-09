@@ -45,7 +45,6 @@
                 <p class="precio">Producto para <strong>intercambio</strong></p>
             {% endif %}     
 
-            <p><strong>Detalles del Producto:</strong> (Aquí puedes agregar más detalles)</p>
             <p><strong>Publicado por: <a href="{% url 'perfil_publico' producto.usuario.username %}">
                 {{ producto.usuario.username }}</a></p>
             <p><strong>Estado:</strong> {{producto.estado}} </p>
