@@ -570,6 +570,7 @@ def mis_compras(request):
         'mis_productos': mis_productos,
         'reportados': reportados
     })
+
 @login_required
 def calificar_cliente(request):
     if request.method == 'POST':

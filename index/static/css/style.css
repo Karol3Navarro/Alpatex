@@ -520,6 +520,17 @@ button.btn:active {
   color: white !important;
 }
 
+/*Boton de filtro*/
+.btn-group .btn-outline-primary:focus,
+.btn-group .btn-outline-primary:active,
+.btn-group .btn-outline-primary.show,
+.btn-group .btn-outline-primary.dropdown-toggle:focus,
+.btn-group .btn-outline-primary.dropdown-toggle:active {
+    background-color: #DD1155 !important;
+    color: white !important;
+    box-shadow: none !important;
+}
+
 .error {
     color: red;
     font-size: 14px;
@@ -898,6 +909,24 @@ PRODUCTOS DESTACADOS
 }
 .card-body .btn{
     margin-top: auto;
+}
+ .card-body .card-title{
+    margin-bottom: 10px;
+}
+.recorte{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: block;
+}
+.card-body .price{
+    margin: 0;
+}
+.actions{
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
 }
 /*
 VER PRODUCTO
@@ -1398,21 +1427,24 @@ footer{
 }
 
 /* VISTA USUARIOS */
-.admin-users{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    padding: 0 2rem;
+.admin-users {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  padding: 15px 0;
 }
 
 .user-card{
-    width: 300px;
+    background: white;
     border: 1px solid #ccc;
+    width: 300px;
     border-radius: 15px;
     padding: 0.5rem;
     text-align: center;
     position: relative;
     transition: transform 0.3s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 .user-card:hover{
     transform: translateY(-5px);
@@ -1423,6 +1455,16 @@ footer{
     gap: 1rem;
     align-items: center;
     justify-content: center;
+}
+.perfil-foto img {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}
+.card-body .btn-perfil{
+    margin: 0;
 }
 .btn-ver, .btn-eliminar{
     font-size: 13px;

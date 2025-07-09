@@ -22,7 +22,7 @@
 <div class="admin-users">
   {% for usuario in usuarios %}
     <div class="user-card">
-      <!-- Botón 3 puntos en esquina superior derecha SIN la flechita -->
+      <!-- Botón 3 puntos en esquina superior-->
       <div class="acciones-usuario dropdown">
         <button class="btn-menu" type="button" id="dropdownMenuButton{{ usuario.id }}" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Menú opciones usuario">
           &#x22EE;
@@ -41,9 +41,11 @@
           </li>
         </ul>
       </div>
-        <div class="perfil-foto">
-          <img src="{{ usuario.perfil.get_foto_perfil_url }}" alt="Foto de perfil">
-        </div>
+
+      <div class="perfil-foto">
+        <img src="{{ usuario.perfil.get_foto_perfil_url }}" alt="Foto de perfil">
+      </div>
+
       <div class="card-body">
         <h5>{{ usuario.username }}</h5>
         <p><strong>Membresía:</strong> {% if usuario.perfil.membresia %}{{ usuario.perfil.membresia.nombre }}{% else %}Básico{% endif %}</p>
