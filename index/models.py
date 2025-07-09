@@ -175,7 +175,11 @@ class ReporteUsuario(models.Model):
     fecha_reporte = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Reporte contra {self.usuario.username} - {self.fecha_reporte.strftime('%d/%m/%Y %H:%M')}"
+        if self.usuario:
+            usuario_str = self.usuario.username
+        else:
+            usuario_str = "Usuario desconocido"
+        return f"Reporte contra {usuario_str} - {self.fecha_reporte.strftime('%d/%m/%Y %H:%M')}"
 
 
 class CalificacionCliente(models.Model):

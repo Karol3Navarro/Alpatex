@@ -214,81 +214,87 @@ class CanalDetailView(LoginRequiredMixin, CanalFormMixin, DetailView):
 	 
 
 class DetailMs(LoginRequiredMixin, CanalFormMixin, DetailView):
-	template_name = 'index/inbox.html'
+    template_name = 'index/inbox.html'
 
-	def get_object(self, *args, **kwargs):
-		username = self.kwargs.get("username")
-		mi_username = self.request.user.username
-		self.enviar_mensaje = False  # bandera
+    def get_template_names(self):
+        if self.request.user.is_authenticated and self.request.user.is_staff:
+            return ['admin_alpatex/inbox.html']
+        return ['index/inbox.html']
 
-		canal, _ = Canal.objects.obtener_o_crear_canal_ms(mi_username, username)
+    def get_object(self, *args, **kwargs):
+        username = self.kwargs.get("username")
+        mi_username = self.request.user.username
+        self.enviar_mensaje = False  # bandera
 
-		producto_id = self.request.GET.get("producto_id")
-		if producto_id:
-			self.producto = get_object_or_404(Producto, id_producto=producto_id)
-			self.enviar_mensaje = True
+        canal, _ = Canal.objects.obtener_o_crear_canal_ms(mi_username, username)
 
-		return canal
+        producto_id = self.request.GET.get("producto_id")
+        if producto_id:
+            self.producto = get_object_or_404(Producto, id_producto=producto_id)
+            self.enviar_mensaje = True
 
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
+        return canal
 
-		canal = self.get_object()
-		usuario = self.request.user
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-		# MENSAJE AUTOMÁTICO ADMINISTRADOR
-		if usuario.is_staff or usuario.is_superuser:
-			texto_mensaje = (
-				"Hola, soy el Administrador de Alpatex. <br>"
-				"Veo que tienes reportes en tu perfil. Según las políticas de la plataforma, debes:<br>"
-				"1️⃣ Coordinar otra fecha y lugar para la nueva entrega del producto.<br>"
-				"2️⃣ Si tienes más de 3 reportes, nos veremos en la obligación de eliminar tu perfil.<br>"
-				"3️⃣ Contactar soporte si crees que el reporte fue un error.<br>"
-				"Gracias por tu comprensión."
-			)
+        canal = self.get_object()
+        usuario = self.request.user
 
-			ya_enviado = CanalMensaje.objects.filter(
-				canal=canal,
-				usuario=usuario,
-				texto=texto_mensaje
-			).exists()
+        # MENSAJE AUTOMÁTICO ADMINISTRADOR
+        if usuario.is_staff or usuario.is_superuser:
+            texto_mensaje = (
+                "Hola, soy el Administrador de Alpatex. <br>"
+                "Veo que tienes reportes en tu perfil. Según las políticas de la plataforma, debes:<br>"
+                "1️⃣ Coordinar otra fecha y lugar para la nueva entrega del producto.<br>"
+                "2️⃣ Si tienes más de 3 reportes, nos veremos en la obligación de eliminar tu perfil.<br>"
+                "3️⃣ Contactar soporte si crees que el reporte fue un error.<br>"
+                "Gracias por tu comprensión."
+            )
 
-			if not ya_enviado:
-				CanalMensaje.objects.create(
-					canal=canal,
-					usuario=usuario,
-					texto=texto_mensaje
-				)
+            ya_enviado = CanalMensaje.objects.filter(
+                canal=canal,
+                usuario=usuario,
+                texto=texto_mensaje
+            ).exists()
 
-		# MENSAJE DE INTERÉS POR PRODUCTO
-		elif getattr(self, 'enviar_mensaje', False):
-			url_producto = self.request.build_absolute_uri(
-				reverse('ver_producto', kwargs={'id_producto': self.producto.id_producto})
-			)
+            if not ya_enviado:
+                CanalMensaje.objects.create(
+                    canal=canal,
+                    usuario=usuario,
+                    texto=texto_mensaje
+                )
 
-			texto_mensaje = f""" 
-				¡Hola! Estoy interesado en tu producto: {self.producto.nombre}.<br>
-				<img src="{self.request.build_absolute_uri(self.producto.imagen.url)}" alt="{self.producto.nombre}" style="max-width: 150px; height: auto; margin-top: 10px;" /> <br>
-				<a href="{url_producto}" class="btn btn-primary" style="margin-top: 10px; display: inline-block;">Ver Producto</a>
-			"""
+        # MENSAJE DE INTERÉS POR PRODUCTO
+        elif getattr(self, 'enviar_mensaje', False):
+            url_producto = self.request.build_absolute_uri(
+                reverse('ver_producto', kwargs={'id_producto': self.producto.id_producto})
+            )
 
-			ya_enviado = CanalMensaje.objects.filter(
-				canal=canal,
-				usuario=usuario,
-				texto=texto_mensaje
-			).exists()
+            texto_mensaje = f""" 
+                ¡Hola! Estoy interesado en tu producto: {self.producto.nombre}.<br>
+                <img src="{self.request.build_absolute_uri(self.producto.imagen.url)}" alt="{self.producto.nombre}" style="max-width: 150px; height: auto; margin-top: 10px;" /> <br>
+                <a href="{url_producto}" class="btn btn-primary" style="margin-top: 10px; display: inline-block;">Ver Producto</a>
+            """
 
-			if not ya_enviado:
-				CanalMensaje.objects.create(
-					canal=canal,
-					usuario=usuario,
-					texto=texto_mensaje,
-					producto=self.producto
-				)
+            ya_enviado = CanalMensaje.objects.filter(
+                canal=canal,
+                usuario=usuario,
+                texto=texto_mensaje
+            ).exists()
 
-		context['inbox'] = Canal.objects.filter(canalusuario__usuario=usuario)
-		context['form'] = FormMensajes()
-		return context
+            if not ya_enviado:
+                CanalMensaje.objects.create(
+                    canal=canal,
+                    usuario=usuario,
+                    texto=texto_mensaje,
+                    producto=self.producto
+                )
+
+        context['inbox'] = Canal.objects.filter(canalusuario__usuario=usuario)
+        context['form'] = FormMensajes()
+        return context
+
 
 def mensajes_privados(request, username, *args, **kwargs):
 	if not request.user.is_authenticated:

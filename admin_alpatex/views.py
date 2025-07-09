@@ -34,7 +34,7 @@ def home_admin(request):
     mensajes_no_leidos = contar_mensajes_no_leidos(request.user)
 
     #calcula la cantidad de usuarios, productos, reportes y promedios de calificaciones
-    total_usuarios = User.objects.count()
+    total_usuarios = User.objects.filter(is_superuser=False).count()
     total_productos = Producto.objects.count()
     productos_pendientes = Producto.objects.filter(estado_revision='Pendiente').count()
     
@@ -296,7 +296,6 @@ def usuarios_eliminados(request):
 @login_required
 def perfil_usuario(request, username):
     # Obtiene el usuario por su nombre de usuario
-    # Si no existe, devuelve un error 404
     usuario = get_object_or_404(User, username=username)
     # Verifica que el usuario tenga un perfil asociado
     perfil = get_object_or_404(Perfil, user=usuario)
@@ -305,7 +304,6 @@ def perfil_usuario(request, username):
 
     # Calificaciones vendedor
     calificaciones_vendedor = CalificacionVendedor.objects.filter(vendedor=usuario).select_related('comprador', 'producto')
-    # Se obtienen las calificaciones del vendedor y se agregan a la lista de opiniones
     for calificacion in calificaciones_vendedor:
         perfil_comprador = getattr(calificacion.comprador, 'perfil', None)
         foto = perfil_comprador.get_foto_perfil_url() if perfil_comprador else None
@@ -334,7 +332,7 @@ def perfil_usuario(request, username):
             'fecha': calificacion.fecha,
         })
 
-    # Reportes recibidos
+    # Reportes recibidos (vendedor)
     reportes_recibidos = ReporteVendedor.objects.filter(vendedor=usuario).select_related('comprador')
     for reporte in reportes_recibidos:
         perfil_comprador = getattr(reporte.comprador, 'perfil', None)
@@ -343,7 +341,20 @@ def perfil_usuario(request, username):
             'tipo': 'reporte',
             'usuario': reporte.comprador.username,
             'foto': foto,
-            'puntaje': reporte.puntaje,
+            'puntaje': getattr(reporte, 'puntaje', None),  # En caso de que puntaje no exista
+            'motivo': reporte.motivo,
+            'fecha': reporte.fecha_reporte,
+        })
+
+    # Reportes recibidos (ReporteUsuario)
+    reportes_usuario = ReporteUsuario.objects.filter(usuario=usuario)
+    for reporte in reportes_usuario:
+        perfil_reportado = getattr(reporte.usuario, 'perfil', None)
+        foto = perfil_reportado.get_foto_perfil_url() if perfil_reportado else None
+        opiniones.append({
+            'tipo': 'reporte',
+            'usuario': reporte.usuario.username,
+            'foto': foto,
             'motivo': reporte.motivo,
             'fecha': reporte.fecha_reporte,
         })
@@ -358,7 +369,6 @@ def perfil_usuario(request, username):
     }
     
     return render(request, 'admin_alpatex/perfil.html', context)
-
 
 #Membresias
 # Listado

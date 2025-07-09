@@ -153,9 +153,10 @@
         </div>
         
 			{% if request.user.is_authenticated and request.user != perfil.user %}
-				<a href="{% url 'detailms' perfil.user.username %}" class="btn btn-chat" title="Chatear con {{ perfil.user.username }}">
-					💬 Chatear con {{ perfil.user.username }}
-				</a>
+<a href="{% url 'detailms' perfil.user.username %}" target="_blank" class="btn btn-chat" title="Chatear con {{ perfil.user.username }}">
+    💬 Chatear con {{ perfil.user.username }}
+</a>
+
 			{% endif %}
 
         <p><strong>Correo:</strong> {{ perfil.user.email }}</p>
@@ -227,6 +228,7 @@
         {% else %}
           <img src="{% static 'images/default_profile.jpg' %}" alt="Foto predeterminada" class="cal-avatar">
         {% endif %}
+
         <div class="cal-user-info">
           <h4 class="cal-card-titulo">{{ op.usuario }}</h4>
           <div class="cal-rating">
