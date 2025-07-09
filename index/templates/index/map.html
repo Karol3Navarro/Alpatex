@@ -50,7 +50,6 @@
         let bounds = [userCoords];
 
         for (const prod of productos) {
-            await delay(400);
 
             const coords = await geocode(prod.direccion);
             if (coords) {
