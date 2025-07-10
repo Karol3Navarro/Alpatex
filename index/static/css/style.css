@@ -619,6 +619,7 @@ PROFILE
     flex: 1;
     min-width: 220px;
     text-align: center;
+    position: relative;
 }
 
 .img-perfil{
@@ -627,12 +628,20 @@ PROFILE
     border-radius: 50%;
     object-fit: cover;
     border: 4px solid #ccc;
+    position: relative;
+    z-index: 1;
 }
 
 .marco-membresia {
     position: absolute;
-    margin-left: -190px;
-    margin-top: -10px;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 2;
 }
 
 .perfil-right {
